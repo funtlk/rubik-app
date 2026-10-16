@@ -129,6 +129,7 @@
         <h1 id="t-main-title">🧩 Кубик Рубика</h1>
         <p class="subtitle" id="t-main-sub">Интерактивный справочник методов</p>
         <button class="btn btn-primary" onclick="switchView('view-cfop')" id="t-btn-cfop">🧩 Метод CFOP (Фридрих)</button>
+        <button class="btn" onclick="openStage('4lll')" id="t-btn-4lll">🔰 Метод 4LLL (Упрощенный CFOP)</button>
         <button class="btn" onclick="showStub('Roux')" id="t-btn-roux">🔄 Метод Roux (скоро)</button>
         <button class="btn" onclick="showStub('Beginner')" id="t-btn-beginner">📖 Новичковый метод (скоро)</button>
         
@@ -145,7 +146,6 @@
         <button class="back-btn" onclick="switchView('view-main')" id="t-back-main">← Главное меню</button>
         <h1 id="t-cfop-title">Метод CFOP</h1>
         <p class="subtitle" id="t-cfop-sub">Выберите этап для изучения</p>
-        <button class="btn" onclick="openStage('4lll')"><span id="t-4lll-name">🔰 4LLL (Упрощенный CFOP)</span> <span>›</span></button>
         <button class="btn" onclick="openStage('f2l')"><span id="t-f2l-name">1. F2L (42 случая)</span> <span>›</span></button>
         <button class="btn" onclick="openStage('oll')"><span id="t-oll-name">2. OLL (57 случаев)</span> <span>›</span></button>
         <button class="btn btn-primary" onclick="openStage('pll')"><span id="t-pll-name">3. PLL (21 случай)</span> <span>›</span></button>
@@ -153,7 +153,7 @@
 
     <!-- Список алгоритмов -->
     <div id="view-list" class="view">
-        <button class="back-btn" onclick="switchView('view-cfop')" id="t-back-cfop">← К этапам CFOP</button>
+        <button class="back-btn" onclick="goBackFromList()" id="t-back-list-btn">← Назад</button>
         <h1 id="stage-title">Список алгоритмов</h1>
         <input type="text" id="search" class="search-box" placeholder="Поиск..." oninput="filterList()">
         <div id="list-container"></div>
@@ -161,7 +161,7 @@
 
     <!-- Детали алгоритма -->
     <div id="view-detail" class="view">
-        <button class="back-btn" onclick="switchView('view-list')" id="t-back-list">← К списку</button>
+        <button class="back-btn" onclick="switchView('view-list')" id="t-back-detail">← К списку</button>
         <div class="card">
             <h2 id="det-title" style="margin-top:0; font-size:20px;">Название</h2>
             <p id="det-desc" style="color: var(--hint-color); font-size: 14px; margin-bottom: 12px;"></p>
@@ -187,17 +187,17 @@
                 mainTitle: "🧩 Кубик Рубика",
                 mainSub: "Интерактивный справочник методов",
                 btnCfop: "🧩 Метод CFOP (Фридрих)",
+                btn4lll: "🔰 Метод 4LLL (Упрощенный CFOP)",
                 btnRoux: "🔄 Метод Roux (скоро)",
                 btnBeginner: "📖 Новичковый метод (скоро)",
                 backMain: "← Главное меню",
+                backCfop: "← К этапам CFOP",
                 cfopTitle: "Метод CFOP",
                 cfopSub: "Выберите этап для изучения",
-                fourLllName: "🔰 4LLL (Упрощенный CFOP)",
                 f2lName: "1. F2L (42 случая)",
                 ollName: "2. OLL (57 случаев)",
                 pllName: "3. PLL (21 случай)",
-                backCfop: "← К этапам CFOP",
-                backList: "← К списку",
+                backDetail: "← К списку",
                 searchPH: "Поиск по названию или описанию...",
                 formulaLabel: "Формула:",
                 copyBtn: "Копировать",
@@ -208,17 +208,17 @@
                 mainTitle: "🧩 Rubik's Cube",
                 mainSub: "Interactive Methods Guide",
                 btnCfop: "🧩 CFOP Method (Fridrich)",
+                btn4lll: "🔰 4LLL Method (Simplified CFOP)",
                 btnRoux: "🔄 Roux Method (soon)",
                 btnBeginner: "📖 Beginner Method (soon)",
                 backMain: "← Main Menu",
+                backCfop: "← Back to CFOP Stages",
                 cfopTitle: "CFOP Method",
                 cfopSub: "Select a stage to study",
-                fourLllName: "🔰 4LLL (Simplified CFOP)",
                 f2lName: "1. F2L (42 cases)",
                 ollName: "2. OLL (57 cases)",
                 pllName: "3. PLL (21 cases)",
-                backCfop: "← Back to CFOP Stages",
-                backList: "← Back to list",
+                backDetail: "← Back to list",
                 searchPH: "Search by name or description...",
                 formulaLabel: "Formula:",
                 copyBtn: "Copy",
@@ -229,17 +229,17 @@
                 mainTitle: "🧩 Кубик Рубика",
                 mainSub: "Інтерактивний довідник методів",
                 btnCfop: "🧩 Метод CFOP (Фрідріх)",
+                btn4lll: "🔰 Метод 4LLL (Спрощений CFOP)",
                 btnRoux: "🔄 Метод Roux (скоро)",
                 btnBeginner: "📖 Новачковий метод (скоро)",
                 backMain: "← Головне меню",
+                backCfop: "← До етапів CFOP",
                 cfopTitle: "Метод CFOP",
                 cfopSub: "Оберіть етап для вивчення",
-                fourLllName: "🔰 4LLL (Спрощений CFOP)",
                 f2lName: "1. F2L (42 випадки)",
                 ollName: "2. OLL (57 випадків)",
                 pllName: "3. PLL (21 випадок)",
-                backCfop: "← До етапів CFOP",
-                backList: "← До списку",
+                backDetail: "← До списку",
                 searchPH: "Пошук за назвою чи описом...",
                 formulaLabel: "Формула:",
                 copyBtn: "Копіювати",
@@ -250,17 +250,17 @@
                 mainTitle: "🧩 Cubo de Rubik",
                 mainSub: "Guía Interactiva de Métodos",
                 btnCfop: "🧩 Método CFOP (Fridrich)",
+                btn4lll: "🔰 Método 4LLL (CFOP Simplificado)",
                 btnRoux: "🔄 Método Roux (pronto)",
                 btnBeginner: "📖 Método Principiante (pronto)",
                 backMain: "← Menú Principal",
+                backCfop: "← Volver a CFOP",
                 cfopTitle: "Método CFOP",
                 cfopSub: "Selecciona una etapa",
-                fourLllName: "🔰 4LLL (CFOP Simplificado)",
                 f2lName: "1. F2L (42 casos)",
                 ollName: "2. OLL (57 casos)",
                 pllName: "3. PLL (21 casos)",
-                backCfop: "← Volver a CFOP",
-                backList: "← Volver a la lista",
+                backDetail: "← Volver a la lista",
                 searchPH: "Buscar por nombre o descripción...",
                 formulaLabel: "Fórmula:",
                 copyBtn: "Copiar",
@@ -272,10 +272,10 @@
         const db = {
             '4lll': {
                 title: { 
-                    ru: "Этап 4LLL (Упрощенный CFOP)", 
-                    en: "4LLL Stage (Simplified CFOP)", 
-                    uk: "Етап 4LLL (Спрощений CFOP)", 
-                    es: "Etapa 4LLL (CFOP Simplificado)" 
+                    ru: "Метод 4LLL (Упрощенный CFOP)", 
+                    en: "4LLL Method (Simplified CFOP)", 
+                    uk: "Метод 4LLL (Спрощений CFOP)", 
+                    es: "Método 4LLL (CFOP Simplificado)" 
                 },
                 items: {
                     'EO - Line': { f: "F R U R' U' F'", d: { ru: "Ориентация ребер (Палка / Линия)", en: "Edge Orientation (Line)", uk: "Орієнтація ребер (Палиця)", es: "Orientación de bordes (Línea)" } },
@@ -325,20 +325,21 @@
             document.getElementById('t-main-title').innerText = t.mainTitle;
             document.getElementById('t-main-sub').innerText = t.mainSub;
             document.getElementById('t-btn-cfop').innerText = t.btnCfop;
+            document.getElementById('t-btn-4lll').innerText = t.btn4lll;
             document.getElementById('t-btn-roux').innerText = t.btnRoux;
             document.getElementById('t-btn-beginner').innerText = t.btnBeginner;
             document.getElementById('t-back-main').innerText = t.backMain;
             document.getElementById('t-cfop-title').innerText = t.cfopTitle;
             document.getElementById('t-cfop-sub').innerText = t.cfopSub;
-            document.getElementById('t-4lll-name').innerText = t.fourLllName;
             document.getElementById('t-f2l-name').innerText = t.f2lName;
             document.getElementById('t-oll-name').innerText = t.ollName;
             document.getElementById('t-pll-name').innerText = t.pllName;
-            document.getElementById('t-back-cfop').innerText = t.backCfop;
-            document.getElementById('t-back-list').innerText = t.backList;
+            document.getElementById('t-back-detail').innerText = t.backDetail;
             document.getElementById('search').placeholder = t.searchPH;
             document.getElementById('t-formula-label').innerText = t.formulaLabel;
             document.getElementById('t-copy-btn').innerText = t.copyBtn;
+
+            updateListBackButtonText();
 
             if (document.getElementById('view-list').classList.contains('active')) {
                 document.getElementById('stage-title').innerText = db[currentStageKey].title[currentLang];
@@ -360,8 +361,26 @@
             currentStageKey = stage;
             document.getElementById('stage-title').innerText = db[stage].title[currentLang];
             document.getElementById('search').value = '';
+            updateListBackButtonText();
             renderItems(db[stage].items);
             switchView('view-list');
+        }
+
+        function updateListBackButtonText() {
+            let backBtn = document.getElementById('t-back-list-btn');
+            if (currentStageKey === '4lll') {
+                backBtn.innerText = translations[currentLang].backMain;
+            } else {
+                backBtn.innerText = translations[currentLang].backCfop;
+            }
+        }
+
+        function goBackFromList() {
+            if (currentStageKey === '4lll') {
+                switchView('view-main');
+            } else {
+                switchView('view-cfop');
+            }
         }
 
         function renderItems(items) {
