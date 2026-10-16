@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Кубик Рубика — CFOP</title>
+    <title>Кубик Рубика — CFOP Справочник</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -73,6 +73,7 @@
             border-radius: 8px;
             font-size: 15px;
             margin-top: 8px;
+            word-break: break-all;
         }
         .copy-btn {
             background: var(--button-color);
@@ -82,6 +83,8 @@
             padding: 6px 10px;
             font-size: 13px;
             cursor: pointer;
+            flex-shrink: 0;
+            margin-left: 10px;
         }
         .search-box {
             width: 100%;
@@ -102,15 +105,17 @@
     <!-- Главное меню -->
     <div id="view-main" class="view active">
         <h1>🧩 Кубик Рубика</h1>
-        <p class="subtitle">Справочник методов</p>
-        <button class="btn btn-primary" onclick="switchView('view-cfop')">Метод CFOP</button>
+        <p class="subtitle">Интерактивный справочник методов</p>
+        <button class="btn btn-primary" onclick="switchView('view-cfop')">🧩 Метод CFOP (Фридрих)</button>
+        <button class="btn" onclick="showStub('Метод Roux')">🔄 Метод Roux (скоро)</button>
+        <button class="btn" onclick="showStub('Новичковый метод')">📖 Новичковый метод (скоро)</button>
     </div>
 
     <!-- Меню CFOP -->
     <div id="view-cfop" class="view">
-        <button class="back-btn" onclick="switchView('view-main')">← Назад</button>
+        <button class="back-btn" onclick="switchView('view-main')">← Главное меню</button>
         <h1>Метод CFOP</h1>
-        <p class="subtitle">Выберите этап</p>
+        <p class="subtitle">Выберите этап для изучения</p>
         <button class="btn" onclick="openStage('f2l')"><span>1. F2L (42 случая)</span> <span>›</span></button>
         <button class="btn" onclick="openStage('oll')"><span>2. OLL (57 случаев)</span> <span>›</span></button>
         <button class="btn btn-primary" onclick="openStage('pll')"><span>3. PLL (21 случай)</span> <span>›</span></button>
@@ -118,9 +123,9 @@
 
     <!-- Список алгоритмов -->
     <div id="view-list" class="view">
-        <button class="back-btn" onclick="switchView('view-cfop')">← Назад к этапам</button>
-        <h1 id="stage-title">Список</h1>
-        <input type="text" id="search" class="search-box" placeholder="Поиск..." oninput="filterList()">
+        <button class="back-btn" onclick="switchView('view-cfop')">← К этапам CFOP</button>
+        <h1 id="stage-title">Список алгоритмов</h1>
+        <input type="text" id="search" class="search-box" placeholder="Поиск по номеру или описанию..." oninput="filterList()">
         <div id="list-container"></div>
     </div>
 
@@ -128,8 +133,9 @@
     <div id="view-detail" class="view">
         <button class="back-btn" onclick="switchView('view-list')">← К списку</button>
         <div class="card">
-            <h2 id="det-title" style="margin-top:0;">Название</h2>
-            <p id="det-desc" style="color: var(--hint-color); font-size: 14px;"></p>
+            <h2 id="det-title" style="margin-top:0; font-size:20px;">Название</h2>
+            <p id="det-desc" style="color: var(--hint-color); font-size: 14px; margin-bottom: 12px;"></p>
+            <p style="margin-bottom: 6px; font-size: 14px; font-weight: 600;">Формула:</p>
             <div class="formula-box">
                 <span id="det-formula"></span>
                 <button class="copy-btn" onclick="copyText()">Копировать</button>
@@ -147,30 +153,138 @@
 
         const db = {
             f2l: {
-                title: "F2L (42 случая)",
+                title: "Этап F2L (42 случая)",
                 items: {
-                    'F2L 1': { f: "U R U' R'", d: "Базовый случай" },
-                    'F2L 2': { f: "y' U' L' U L", d: "Зеркальный базовый" },
-                    'F2L 3': { f: "y' F' U' F", d: "Через фасад" },
-                    'F2L 4': { f: "R U R'", d: "Прямой загон" }
+                    'F2L 1': { f: "U R U' R'", d: "Базовый случай (Легкий загон)" },
+                    'F2L 2': { f: "y' U' L' U L", d: "Базовый случай (Зеркальный)" },
+                    'F2L 3': { f: "y' F' U' F", d: "Быстрый загон через фасад" },
+                    'F2L 4': { f: "R U R'", d: "Прямой загон в слот" },
+                    'F2L 5': { f: "U' R U' R' U R U R'", d: "Разделение пары" },
+                    'F2L 6': { f: "y' U L' U L U' L' U' L", d: "Разделение пары (Зеркальный)" },
+                    'F2L 7': { f: "U' R U2' R' U2 R U' R'", d: "Разведение элементов" },
+                    'F2L 8': { f: "y' U L' U2 L U2' L' U L", d: "Разведение элементов (Зеркальный)" },
+                    'F2L 9': { f: "y' U' L' U L U L' U' L", d: "Свободная пара" },
+                    'F2L 10': { f: "U R U' R' U' R U R'", d: "Свободная пара (Зеркальный)" },
+                    'F2L 11': { f: "U' R U R' U R U R'", d: "Совмещение стикеров" },
+                    'F2L 12': { f: "y' U L' U' L U' L' U' L", d: "Совмещение стикеров (Зеркальный)" },
+                    'F2L 13': { f: "y' U' L' U2 L U' L' U L", d: "Создание трехходовки" },
+                    'F2L 14': { f: "U R U2' R' U R U' R'", d: "Создание трехходовки (Зеркальный)" },
+                    'F2L 15': { f: "y' F' U F U2' L' U' L", d: "Разворот угла" },
+                    'F2L 16': { f: "R U' R' U2 F' U' F", d: "Разворот угла (Зеркальный)" },
+                    'F2L 17': { f: "R U2' R' U' R U R'", d: "Угол вверх белым" },
+                    'F2L 18': { f: "y' L' U2 L U L' U' L", d: "Угол вверх белым (Зеркальный)" },
+                    'F2L 19': { f: "U R U2' R' U6 R U' R'", d: "Подготовка трехходовки" },
+                    'F2L 20': { f: "y' U' L' U2 L U' L' U' L", d: "Подготовка трехходовки (Зеркальный)" },
+                    'F2L 21': { f: "y' U2 L' U' L U' L' U L", d: "Двойной поворот крыши" },
+                    'F2L 22': { f: "U2 R U R' U R U' R'", d: "Двойной поворот крыши (Зеркальный)" },
+                    'F2L 23': { f: "U2 R2 U2' R' U' R U' R2", d: "Сложный загон" },
+                    'F2L 24': { f: "y' U2 L2 U2 L U L' U L2", d: "Сложный загон (Зеркальный)" },
+                    'F2L 25': { f: "y' U' L' U L U2' L' U L", d: "Ребро в слоте, угол на крыше" },
+                    'F2L 26': { f: "U R U' R' U2 R U' R'", d: "Ребро в слоте, угол на крыше (Зеркальный)" },
+                    'F2L 27': { f: "R U' R' U R U' R'", d: "Выбивание из слота" },
+                    'F2L 28': { f: "y' L' U L U' L' U L", d: "Выбивание из слота (Зеркальный)" },
+                    'F2L 29': { f: "y' L' U' L U L' U' L", d: "Выравнивание пары" },
+                    'F2L 30': { f: "R U R' U' R U R'", d: "Выравнивание пары (Зеркальный)" },
+                    'F2L 31': { f: "y' U' L' U L U' L' U L", d: "Извлечение ребра" },
+                    'F2L 32': { f: "U R U' R' U R U' R'", d: "Извлечение ребра (Зеркальный)" },
+                    'F2L 33': { f: "U' R U' R' U2 R U' R'", d: "Пара в слоте неправильно" },
+                    'F2L 34': { f: "y' U L' U L U2' L' U L", d: "Пара в слоте неправильно (Зеркальный)" },
+                    'F2L 35': { f: "y' U' L' U' L U2' L' U L", d: "Разворот ребра в слоте" },
+                    'F2L 36': { f: "U R U R' U2 R U' R'", d: "Разворот ребра в слоте (Зеркальный)" },
+                    'F2L 37': { f: "R U' R' U' R U R' U2 R U' R'", d: "Угол в слоте, ребро на крыше" },
+                    'F2L 38': { f: "R U' R' U2 R U' R' U R U' R'", desc: "Переворот элемента", d: "Переворот элемента" },
+                    'F2L 39': { f: "R U' R' U R U2' R' U R U' R'", d: "Переворот угла в слоте" },
+                    'F2L 40': { f: "R U R' U' R U' R' U2 F' U' F", d: "Разворот пары в слоте" },
+                    'F2L 41': { f: "R U' R' r U' r' U2 r U r'", d: "Сложный переворот в слоте" },
+                    'F2L 42': { f: "R U R' U' R U2 R' U' R U2 R' U' R U R'", d: "Полная разборка слота" }
                 }
             },
             oll: {
-                title: "OLL (57 случаев)",
+                title: "Этап OLL (57 случаев)",
                 items: {
+                    'OLL 1': { f: "R U2 R2 F R F' U2 R' F R F'", d: "Точка (Пятно)" },
+                    'OLL 2': { f: "F R U R' U' F' f R U R' U' f'", d: "Точка (Две галочки)" },
+                    'OLL 3': { f: "f R U R' U' f' U' F R U R' U' F'", d: "Точка (Галочка + Палка)" },
+                    'OLL 4': { f: "f R U R' U' f' U F R U R' U' F'", d: "Точка (Зеркальный 3)" },
+                    'OLL 5': { f: "r' U2 R U R' U r", d: "Уголок (Препятствие)" },
+                    'OLL 6': { f: "r U2 R' U' R U' r'", d: "Уголок (Зеркальный 5)" },
+                    'OLL 7': { f: "r U R' U R U2 r'", d: "Молния прямая" },
+                    'OLL 8': { f: "r' U' R U' R' U2 r", d: "Молния обратная" },
+                    'OLL 9': { f: "R U R' U' R' F R F'", d: "Рыбка с уголком" },
+                    'OLL 10': { f: "R U R' U R' F R F' R U2 R'", d: "Рыбка обратная" },
+                    'OLL 11': { f: "r U R' U R U' R' U' r'", d: "Молния правая" },
+                    'OLL 12': { f: "M' U' M U2 M' U' M", d: "Молния левая" },
+                    'OLL 13': { f: "F U R U' R2 F' R U R U' R'", d: "Пушка правая" },
+                    'OLL 14': { f: "R' F R U R' F' R F U' F'", d: "Пушка левая" },
+                    'OLL 15': { f: "l' U' l L' U' L U l' U l", d: "Закорючка правая" },
+                    'OLL 16': { f: "r U r' R U R' U' r U' r'", d: "Закорючка левая" },
+                    'OLL 17': { f: "F R U R' U' R U R' U' F'", d: "Двойной пиф-паф" },
+                    'OLL 18': { f: "r U R' U R U2 r2 U' R U' R' U2 r", d: "Корона" },
+                    'OLL 19': { f: "M' U2 M U2 M' U M U2 M' U2 M", d: "Перекрестие" },
+                    'OLL 20': { f: "r' U' r U' R' U R U' R' U R r' U r", d: "Буква X" },
                     'OLL 21': { f: "R U2 R' U' R U R' U' R U' R'", d: "Крест — Распорка" },
+                    'OLL 22': { f: "R2 D' R U2 R' D R U2 R", d: "Крест — Ушки" },
+                    'OLL 23': { f: "R2 D R' U2 R D' R' U2 R'", d: "Крест — Глаза" },
                     'OLL 24': { f: "r U R' U' r' F R F'", d: "Крест — Вертолет" },
                     'OLL 25': { f: "F' r U R' U' r' F R", d: "Крест — Восьмерка" },
-                    'OLL 27': { f: "R U R' U R U2 R'", d: "Правая рыбка" }
+                    'OLL 26': { f: "R U2 R' U' R U' R'", d: "Крест — Анти-рыбка" },
+                    'OLL 27': { f: "R U R' U R U2 R'", d: "Крест — Правая рыбка" },
+                    'OLL 28': { f: "r U R' U' M U R U' R'", d: "Стелс" },
+                    'OLL 29': { f: "M U R U R' U' R' F R F' M'", d: "Знак вопроса" },
+                    'OLL 30': { f: "F R U R' U' F' U2 F R U R' U' F'", d: "Топор" },
+                    'OLL 31': { f: "R' U' F U R U' R' F' R", d: "Квадрат" },
+                    'OLL 32': { f: "L U F' U' L' U L F L'", d: "Квадрат зеркальный" },
+                    'OLL 33': { f: "R U R' U' R' F R F'", d: "Т-образный 1" },
+                    'OLL 34': { f: "R U R2 U' R' F R U R U' F'", d: "Т-образный 2" },
+                    'OLL 35': { f: "R U2 R2 F R F' R U2 R'", d: "Рыба малая" },
+                    'OLL 36': { f: "R' U' R U' R' U R U R d' R' U R", d: "Рыба большая" },
+                    'OLL 37': { f: "F R U' R' U' R U R' F'", d: "Мягкий пиф-паф" },
+                    'OLL 38': { f: "R U R' U R U' R' U' R' F R F'", d: "Песочные часы" },
+                    'OLL 39': { f: "L F' L' U' L U F U' L'", d: "Молния малая правая" },
+                    'OLL 40': { f: "R' F R U R' U' F' U R", d: "Молния малая левая" },
+                    'OLL 41': { f: "R U R' U R U2 R' F R U R' U' F'", d: "Запятая правая" },
+                    'OLL 42': { f: "R' U' R U' R' U2 R F R U R' U' F'", d: "Запятая левая" },
+                    'OLL 43': { f: "F' U' L' U L F", d: "Палочка мягкая" },
+                    'OLL 44': { f: "F R U R' U' F'", d: "Палочка жесткая" },
+                    'OLL 45': { f: "F R U R' U' F'", d: "Классическая палка" },
+                    'OLL 46': { f: "R' U' R' F R F' U R", d: "Ласточка" },
+                    'OLL 47': { f: "F' L' U' L U L' U' L U F", d: "Буква B правая" },
+                    'OLL 48': { f: "F R U R' U' R U R' U' F'", d: "Буква B левая" },
+                    'OLL 49': { f: "r U r' R U R' U' r U' r'", d: "Рюкзак правый" },
+                    'OLL 50': { f: "r' U' r R' U' R U r' U r", d: "Рюкзак левый" },
+                    'OLL 51': { f: "f R U R' U' f'", d: "Галочка" },
+                    'OLL 52': { f: "R U R' U R U' B U' B' R'", d: "Тайфун" },
+                    'OLL 53': { f: "l' U2 R U R' U' R U R' U l", d: "Трезубец" },
+                    'OLL 54': { f: "r U2 R' U' R U R' U' R U' r'", d: "Трезубец зеркальный" },
+                    'OLL 55': { f: "R' U2 R2 U R' U R U2 R' F R F'", d: "Большая палка" },
+                    'OLL 56': { f: "r U r' U R U' R' U R U' R' r U' r'", d: "Удав" },
+                    'OLL 57': { f: "R U R' U' M' U R U' r'", d: "Буква H" }
                 }
             },
             pll: {
-                title: "PLL (21 случай)",
+                title: "Этап PLL (21 случай)",
                 items: {
-                    'H-Perm': { f: "M2' U M2' U2 M2' U M2'", d: "Противоположные ребра" },
-                    'Z-Perm': { f: "M2' U M2' U' M' U2' M2' U2' M'", d: "Соседние ребра" },
-                    'Ua-Perm': { f: "R2 U' R' U' R U R U R U' R", d: "Цикл ребер против часовой" },
-                    'T-Perm': { f: "R U R' U' R' F R2 U' R' U' R U R' F'", d: "Диагональный обмен" }
+                    'H-Perm': { f: "M2' U M2' U2 M2' U M2'", d: "Противоположные ребра меняются парами" },
+                    'Z-Perm': { f: "M2' U M2' U' M' U2' M2' U2' M'", d: "Соседние ребра меняются крест-накрест" },
+                    'Ua-Perm': { f: "R2 U' R' U' R U R U R U' R", d: "Цикл трех ребер против часовой" },
+                    'Ub-Perm': { f: "R' U R' U' R' U' R' U R U R2", d: "Цикл трех ребер по часовой" },
+                    'Aa-Perm': { f: "x R' D R' U2 R D' R' U2 R2 x'", d: "Пермутация углов (Aa)" },
+                    'Ab-Perm': { f: "x R2 D2 R U R' D2 R U' R x'", d: "Пермутация углов (Ab)" },
+                    'T-Perm': { f: "R U R' U' R' F R2 U' R' U' R U R' F'", d: "Диагональный и смежный обмен" },
+                    'Jb-Perm': { f: "R U R' F' R U R' U' R' F R2 U' R'", d: "Блок спереди-справа" },
+                    'Ja-Perm': { f: "x R2 F R F' R U2 r' U r U2 x'", d: "Блок сзади-слева" },
+                    'Y-Perm': { f: "F R U' R' U' R U R' F' R U R' U' R' F R F'", d: "Диагональный обмен" },
+                    'F-Perm': { f: "R' U' F' R U R' U' R' F R2 U' R' U' R U R' UR", d: "F-пермутация" },
+                    'V-Perm': { f: "R' U R' U' y R' F' R2 U' R' U R' F R F", d: "V-пермутация" },
+                    'Ra-Perm': { f: "R U' R' U' R U R D R' U' R D' R' U2 R'", d: "Ra-пермутация" },
+                    'Rb-Perm': { f: "R2 F R U R U' R' F' R U2 R' U2 R", d: "Rb-пермутация" },
+                    'Ga-Perm': { f: "R2 u R' U R' U' R u' R2 y' R' U R", d: "G-пермутация (Ga)" },
+                    'Gb-Perm': { f: "R' U' R y R2 u' R U' R' U R' u R2", d: "G-пермутация (Gb)" },
+                    'Gc-Perm': { f: "R2 u' R U' R U R' u R2 y R U' R'", d: "G-пермутация (Gc)" },
+                    'Gd-Perm': { f: "R U R' y' R2 u R' U R U R u' R2", d: "G-пермутация (Gd)" },
+                    'E-Perm': { f: "x' L' U L D' L' U' L D L' U' L D' L' U L D x", d: "Обмен углов без ребер" },
+                    'Na-Perm': { f: "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'", d: "Na-пермутация" },
+                    'Nb-Perm': { f: "R' U R U' R' F' U' F R U R' F R' F' R U2 R'", d: "Nb-пермутация" }
                 }
             }
         };
@@ -179,6 +293,10 @@
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
             window.scrollTo(0,0);
+        }
+
+        function showStub(name) {
+            alert(name + " появится в обновлении!");
         }
 
         function openStage(stage) {
@@ -201,7 +319,7 @@
             }
         }
 
-        function filterItems() {
+        function filterList() {
             let q = document.getElementById('search').value.toLowerCase();
             let all = db[currentStageKey].items;
             let filtered = {};
