@@ -95,13 +95,19 @@
             border: 1px solid var(--border-color);
         }
         #cube-container {
-            width: 220px;
-            height: 220px;
+            width: 100%;
+            height: 280px;
+            min-height: 280px;
             margin-bottom: 12px;
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
-            pointer-events: none; /* Completely static, no touch rotation */
+            position: relative;
+            cursor: grab;
+            display: block;
+        }
+        #cube-container:active {
+            cursor: grabbing;
         }
         .controls-panel {
             width: 100%;
@@ -242,6 +248,7 @@
         <div class="cube-section">
             <div style="width: 100%; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px;">
                 <label id="t-custom-formula-label" style="font-size: 11px; color: var(--text-secondary); text-align: center;">Введите или вставьте формулу, чтобы собрать/воспроизвести ситуацию:</label>
+                <div id="t-spam-warning" style="font-size: 10px; color: #ff9f0a; text-align: center; margin-bottom: 2px;">⚠️ Не спамьте на кнопки во время вращения кубика — алгоритм может сбиться!</div>
                 <div style="display: flex; gap: 6px;">
                     <input type="text" id="custom-formula-input" placeholder="Например: R U R' U'" style="flex: 1; padding: 8px 10px; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: monospace; font-size: 13px; outline: none;">
                     <button onclick="executeCustomFormula()" id="t-apply-formula-btn" style="background-color: var(--button-color); color: var(--button-text-color); border: none; border-radius: 8px; padding: 0 12px; font-weight: 600; font-size: 12px; cursor: pointer;">Применить</button>
@@ -306,10 +313,10 @@
     </div>
 
     <div id="view-4lll" class="view">
-        <button class="back-btn" onclick="showView('view-main')">← На главную</button>
+        <button class="back-btn" onclick="showView('view-main')" id="t-back-4lll">← На главную</button>
         <div class="header">
-            <h1>Упрощенный CFOP (4LLL)</h1>
-            <p>Базовые алгоритмы для быстрой сборки</p>
+            <h1 id="t-4lll-title">Упрощенный CFOP (4LLL)</h1>
+            <p id="t-4lll-sub">Базовые алгоритмы для быстрой сборки</p>
         </div>
         <div id="list-4lll-container" class="list-grid"></div>
     </div>
@@ -346,132 +353,132 @@
     let currentCategory = '';
     let currentItemData = null;
     
-    // Complete CFOP Algorithms Data (F2L: 41, OLL: 57, PLL: 21)
+    // Complete CFOP Algorithms Data with multilingual descriptions
     let algorithmsData = {
         f2l: [
-            { id: 1, name: "F2L 1", desc: "Базовый вправо (Угол и ребро на верхнем слое)", formula: "R U R'" },
-            { id: 2, name: "F2L 2", desc: "Базовый влево", formula: "L' U' L" },
-            { id: 3, name: "F2L 3", desc: "Слот в правый задний", formula: "U' R U' R' U R U R'" },
-            { id: 4, name: "F2L 4", desc: "Разделение пары вправо", formula: "R U2 R' U' R U R'" },
-            { id: 5, name: "F2L 5", desc: "Разделение пары влево", formula: "L' U2 L U L' U' L" },
-            { id: 6, name: "F2L 6", desc: "Соединение через увод", formula: "U R U' R'" },
-            { id: 7, name: "F2L 7", desc: "Соединение влево", formula: "U' L' U L" },
-            { id: 8, name: "F2L 8", desc: "Вставка с разворотом угла", formula: "R U' R' U2 R U' R'" },
-            { id: 9, name: "F2L 9", desc: "Вставка слева с разворотом", formula: "L' U L U2 L' U L" },
-            { id: 10, name: "F2L 10", desc: "Угол вверх, ребро сбоку", formula: "U R U R' U' R U R'" },
-            { id: 11, name: "F2L 11", desc: "Угол и ребро в слоте", formula: "R U R' U'" },
-            { id: 12, name: "F2L 12", desc: "Слот зеркальный", formula: "L' U' L U" },
-            { id: 13, name: "F2L 13", desc: "Пара смотрит наружу", formula: "R U' R' U y' R' U R" },
-            { id: 14, name: "F2L 14", desc: "Пара смотрит наружу влево", formula: "L' U L U' y L U L'" },
-            { id: 15, name: "F2L 15", desc: "Угол смотрит вверх", formula: "R U2 R' U' R U R'" },
-            { id: 16, name: "F2L 16", desc: "Угол вверх зеркальный", formula: "L' U2 L U L' U' L" },
-            { id: 17, name: "F2L 17", desc: "Сложная позиция 1", formula: "R U' R' U R U R'" },
-            { id: 18, name: "F2L 18", desc: "Сложная позиция 2", formula: "L' U L U' L' U' L" },
-            { id: 19, name: "F2L 19", desc: "Угол и ребро сонаправлены", formula: "R U R' U' R U2 R' U' R U R'" },
-            { id: 20, name: "F2L 20", desc: "Угол и ребро сонаправлены левые", formula: "L' U' L U L' U2 L U L' U' L" },
-            { id: 21, name: "F2L 21", desc: "Угол смотрит направо", formula: "y' R' U R U' R' U' R" },
-            { id: 22, name: "F2L 22", desc: "Угол смотрит налево", formula: "y L U' L' U L U L'" },
-            { id: 23, name: "F2L 23", desc: "Ребро в слоте развернуто", formula: "R U R' U' R U R' U' R U R'" },
-            { id: 24, name: "F2L 24", desc: "Ребро в слоте левое", formula: "L' U' L U L' U' L U L' U' L" },
-            { id: 25, name: "F2L 25", desc: "Угол на дне", formula: "R U' R' U2 y R' U' R" },
-            { id: 26, name: "F2L 26", desc: "Угол на дне левый", formula: "L' U L U2 y' L U L'" },
-            { id: 27, name: "F2L 27", desc: "Связка через фронт", formula: "R' F R F' R U R'" },
-            { id: 28, name: "F2L 28", desc: "Связка через фронт левая", formula: "L F' L' F L' U' L" },
-            { id: 29, name: "F2L 29", desc: "Разделение через верх", formula: "R U R' U2 R U' R'" },
-            { id: 30, name: "F2L 30", desc: "Разделение через верх левое", formula: "L' U' L U2 L' U L" },
-            { id: 31, name: "F2L 31", desc: "Угол и ребро на соседних гранях", formula: "R U' R' U y' R' U2 R" },
-            { id: 32, name: "F2L 32", desc: "Угол и ребро соседние левые", formula: "L' U L U' y L U2 L'" },
-            { id: 33, name: "F2L 33", desc: "Слот занят чужим элементом", formula: "R U R' U'" },
-            { id: 34, name: "F2L 34", desc: "Слот занят зеркально", formula: "L' U' L U" },
-            { id: 35, name: "F2L 35", desc: "Пара на верхнем слое разделена", formula: "R U' R' U y' R2 U2 R2" },
-            { id: 36, name: "F2L 36", desc: "Пара на верхнем разделена левая", formula: "L' U L U' y L2 U2 L2" },
-            { id: 37, name: "F2L 37", desc: "Ребро перевернуто в слоте", formula: "R U R' U' R U' R' U2 R U' R'" },
-            { id: 38, name: "F2L 38", desc: "Ребро перевернуто левое", formula: "L' U' L U L' U L U2 L' U L" },
-            { id: 39, name: "F2L 39", desc: "Угол на крыше, ребро в среднем", formula: "R U R' U2 R U R' U' R U R'" },
-            { id: 40, name: "F2L 40", desc: "Угол на крыше слева", formula: "L' U' L U2 L' U' L U L' U' L" },
-            { id: 41, name: "F2L 41", desc: "Финальный случай F2L", formula: "R U' R' U R U2 R'" }
+            { id: 1, name: "F2L 1", desc: { ru: "Базовый вправо (Угол и ребро на верхнем слое)", en: "Basic right (Corner and edge on top layer)", uk: "Базовий вправо (Кут і ребро на верхньому шарі)", es: "Básico derecha (Esquina y arista en capa superior)" }, formula: "R U R'" },
+            { id: 2, name: "F2L 2", desc: { ru: "Базовый влево", en: "Basic left", uk: "Базовий вліво", es: "Básico izquierda" }, formula: "L' U' L" },
+            { id: 3, name: "F2L 3", desc: { ru: "Слот в правый задний", en: "Back-right slot insertion", uk: "Слот у правий задній", es: "Inserción en slot trasero derecho" }, formula: "U' R U' R' U R U R'" },
+            { id: 4, name: "F2L 4", desc: { ru: "Разделение пары вправо", en: "Pair separation right", uk: "Розділення пари вправо", es: "Separación de pareja derecha" }, formula: "R U2 R' U' R U R'" },
+            { id: 5, name: "F2L 5", desc: { ru: "Разделение пары влево", en: "Pair separation left", uk: "Розділення пари вліво", es: "Separación de pareja izquierda" }, formula: "L' U2 L U L' U' L" },
+            { id: 6, name: "F2L 6", desc: { ru: "Соединение через увод", en: "Connection via hide", uk: "З'єднання через відведення", es: "Conexión ocultando" }, formula: "U R U' R'" },
+            { id: 7, name: "F2L 7", desc: { ru: "Соединение влево", en: "Connection left", uk: "З'єднання вліво", es: "Conexión izquierda" }, formula: "U' L' U L" },
+            { id: 8, name: "F2L 8", desc: { ru: "Вставка с разворотом угла", en: "Insertion with corner flip", uk: "Вставка з розворотом кута", es: "Inserción con giro de esquina" }, formula: "R U' R' U2 R U' R'" },
+            { id: 9, name: "F2L 9", desc: { ru: "Вставка слева с разворотом", en: "Left insertion with flip", uk: "Вставка зліва з розворотом", es: "Inserción izquierda con giro" }, formula: "L' U L U2 L' U L" },
+            { id: 10, name: "F2L 10", desc: { ru: "Угол вверх, ребро сбоку", en: "Corner up, edge on side", uk: "Кут вгору, ребро збоку", es: "Esquina arriba, arista al lado" }, formula: "U R U R' U' R U R'" },
+            { id: 11, name: "F2L 11", desc: { ru: "Угол и ребро в слоте", en: "Corner and edge in slot", uk: "Кут і ребро в слоті", es: "Esquina y arista en el slot" }, formula: "R U R' U'" },
+            { id: 12, name: "F2L 12", desc: { ru: "Слот зеркальный", en: "Mirror slot", uk: "Слот дзеркальний", es: "Slot espejo" }, formula: "L' U' L U" },
+            { id: 13, name: "F2L 13", desc: { ru: "Пара смотрит наружу", en: "Pair facing outward", uk: "Пара дивиться назовні", es: "Pareja mirando hacia afuera" }, formula: "R U' R' U y' R' U R" },
+            { id: 14, name: "F2L 14", desc: { ru: "Пара смотрит наружу влево", en: "Pair facing outward left", uk: "Пара дивиться назовні вліво", es: "Pareja mirando hacia afuera izquierda" }, formula: "L' U L U' y L U L'" },
+            { id: 15, name: "F2L 15", desc: { ru: "Угол смотрит вверх", en: "Corner facing up", uk: "Кут дивиться вгору", es: "Esquina mirando hacia arriba" }, formula: "R U2 R' U' R U R'" },
+            { id: 16, name: "F2L 16", desc: { ru: "Угол вверх зеркальный", en: "Corner up mirror", uk: "Кут вгору дзеркальний", es: "Esquina arriba espejo" }, formula: "L' U2 L U L' U' L" },
+            { id: 17, name: "F2L 17", desc: { ru: "Сложная позиция 1", en: "Difficult case 1", uk: "Складна позиція 1", es: "Caso difícil 1" }, formula: "R U' R' U R U R'" },
+            { id: 18, name: "F2L 18", desc: { ru: "Сложная позиция 2", en: "Difficult case 2", uk: "Складна позиція 2", es: "Caso difícil 2" }, formula: "L' U L U' L' U' L" },
+            { id: 19, name: "F2L 19", desc: { ru: "Угол и ребро сонаправлены", en: "Corner and edge aligned", uk: "Кут і ребро сонаправлені", es: "Esquina y arista alineadas" }, formula: "R U R' U' R U2 R' U' R U R'" },
+            { id: 20, name: "F2L 20", desc: { ru: "Угол и ребро сонаправлены левые", en: "Corner and edge aligned left", uk: "Кут і ребро сонаправлені ліві", es: "Esquina y arista alineadas izquierda" }, formula: "L' U' L U L' U2 L U L' U' L" },
+            { id: 21, name: "F2L 21", desc: { ru: "Угол смотрит направо", en: "Corner facing right", uk: "Кут дивиться праворуч", es: "Esquina mirando a la derecha" }, formula: "y' R' U R U' R' U' R" },
+            { id: 22, name: "F2L 22", desc: { ru: "Угол смотрит налево", en: "Corner facing left", uk: "Кут дивиться ліворуч", es: "Esquina mirando a la izquierda" }, formula: "y L U' L' U L U L'" },
+            { id: 23, name: "F2L 23", desc: { ru: "Ребро в слоте развернуто", en: "Edge flipped in slot", uk: "Ребро в слоті розгорнуте", es: "Arista volteada en el slot" }, formula: "R U R' U' R U R' U' R U R'" },
+            { id: 24, name: "F2L 24", desc: { ru: "Ребро в слоте левое", en: "Edge flipped left in slot", uk: "Ребро в слоті ліве", es: "Arista volteada izquierda en slot" }, formula: "L' U' L U L' U' L U L' U' L" },
+            { id: 25, name: "F2L 25", desc: { ru: "Угол на дне", en: "Corner on bottom", uk: "Кут на дні", es: "Esquina abajo" }, formula: "R U' R' U2 y R' U' R" },
+            { id: 26, name: "F2L 26", desc: { ru: "Угол на дне левый", en: "Corner on bottom left", uk: "Кут на дні лівий", es: "Esquina abajo izquierda" }, formula: "L' U L U2 y' L U L'" },
+            { id: 27, name: "F2L 27", desc: { ru: "Связка через фронт", en: "Front connection", uk: "Зв'язка через фронт", es: "Conexión frontal" }, formula: "R' F R F' R U R'" },
+            { id: 28, name: "F2L 28", desc: { ru: "Связка через фронт левая", en: "Front connection left", uk: "Зв'язка через фронт ліва", es: "Conexión frontal izquierda" }, formula: "L F' L' F L' U' L" },
+            { id: 29, name: "F2L 29", desc: { ru: "Разделение через верх", en: "Separation via top", uk: "Розділення через верх", es: "Separación por arriba" }, formula: "R U R' U2 R U' R'" },
+            { id: 30, name: "F2L 30", desc: { ru: "Разделение через верх левое", en: "Separation via top left", uk: "Розділення через верх ліве", es: "Separación por arriba izquierda" }, formula: "L' U' L U2 L' U L" },
+            { id: 31, name: "F2L 31", desc: { ru: "Угол и ребро на соседних гранях", en: "Corner and edge adjacent faces", uk: "Кут і ребро на сусідніх гранях", es: "Esquina y arista en caras adyacentes" }, formula: "R U' R' U y' R' U2 R" },
+            { id: 32, name: "F2L 32", desc: { ru: "Угол и ребро соседние левые", en: "Corner and edge adjacent left", uk: "Кут і ребро сусідні ліві", es: "Esquina y arista adyacentes izquierda" }, formula: "L' U L U' y L U2 L'" },
+            { id: 33, name: "F2L 33", desc: { ru: "Слот занят чужим элементом", en: "Slot occupied by wrong piece", uk: "Слот зайнятий чужим елементом", es: "Slot ocupado por otra pieza" }, formula: "R U R' U'" },
+            { id: 34, name: "F2L 34", desc: { ru: "Слот занят зеркально", en: "Slot occupied mirror", uk: "Слот зайнятий дзеркально", es: "Slot ocupado espejo" }, formula: "L' U' L U" },
+            { id: 35, name: "F2L 35", desc: { ru: "Пара на верхнем слое разделена", en: "Top pair separated", uk: "Пара на верхньому шарі розділена", es: "Pareja superior separada" }, formula: "R U' R' U y' R2 U2 R2" },
+            { id: 36, name: "F2L 36", desc: { ru: "Пара на верхнем разделена левая", en: "Top pair separated left", uk: "Пара на верхньому розділена ліва", es: "Pareja superior separada izquierda" }, formula: "L' U L U' y L2 U2 L2" },
+            { id: 37, name: "F2L 37", desc: { ru: "Ребро перевернуто в слоте", en: "Edge flipped in slot", uk: "Ребро перевернуте в слоті", es: "Arista invertida en slot" }, formula: "R U R' U' R U' R' U2 R U' R'" },
+            { id: 38, name: "F2L 38", desc: { ru: "Ребро перевернуто левое", en: "Edge flipped left", uk: "Ребро перевернуте ліве", es: "Arista invertida izquierda" }, formula: "L' U' L U L' U L U2 L' U L" },
+            { id: 39, name: "F2L 39", desc: { ru: "Угол на крыше, ребро в среднем", en: "Corner on top, edge in middle", uk: "Кут на даху, ребро в середньому", es: "Esquina arriba, arista en medio" }, formula: "R U R' U2 R U R' U' R U R'" },
+            { id: 40, name: "F2L 40", desc: { ru: "Угол на крыше слева", en: "Corner on top left", uk: "Кут на даху зліва", es: "Esquina arriba izquierda" }, formula: "L' U' L U2 L' U' L U L' U' L" },
+            { id: 41, name: "F2L 41", desc: { ru: "Финальный случай F2L", en: "Final F2L case", uk: "Фінальний випадок F2L", es: "Caso final de F2L" }, formula: "R U' R' U R U2 R'" }
         ],
         oll: [
-            { id: 1, name: "OLL 1", desc: "Точка (Точка)", formula: "R U2 R2 F R F' U2 R' F R F'" },
-            { id: 2, name: "OLL 2", desc: "Точка с линиями", formula: "F R U R' U' F' f R U R' U' f'" },
-            { id: 3, name: "OLL 3", desc: "Точка с карманом", formula: "f R U R' U' f' U' F R U R' U' F'" },
-            { id: 4, name: "OLL 4", desc: "Точка с карманом зеркальная", formula: "F R U R' U' F' U f R U R' U' f'" },
-            { id: 5, name: "OLL 5", desc: "Двухсторонняя «Восьмерка»", formula: "r' U2 R U R' U r" },
-            { id: 6, name: "OLL 6", desc: "Двухсторонняя зеркальная", formula: "r U2 R' U' R U' r'" },
-            { id: 7, name: "OLL 7", desc: "«Уши» смотрят наружу", formula: "r U R' U R U2 r'" },
-            { id: 8, name: "OLL 8", desc: "«Уши» смотрят внутрь", formula: "r' U' R U' R' U2 r" },
-            { id: 9, name: "OLL 9", desc: "«Глаза» вправо", formula: "R U R' U' R' F R F'" },
-            { id: 10, name: "OLL 10", desc: "«Глаза» влево", formula: "R U R' U R' F R F' R U2 R'" },
-            { id: 11, name: "OLL 11", desc: "Линия и «глаза»", formula: "r U R' U R' F R F' r'" },
-            { id: 12, name: "OLL 12", desc: "Линия и «глаза» зеркальная", formula: "M' R' U R U R' U' r" },
-            { id: 13, name: "OLL 13", desc: "«Пистолет» правый", formula: "F U R U' R' F'" },
-            { id: 14, name: "OLL 14", desc: "«Пистолет» левый", formula: "R' F R U R' F' R F U' F'" },
-            { id: 15, name: "OLL 15", desc: "«Корова» правая", formula: "r' U' r R' U' R U r' U r" },
-            { id: 16, name: "OLL 16", desc: "«Корова» левая", formula: "r U r' R U R' U' r U' r'" },
-            { id: 17, name: "OLL 17", desc: "«Пандус»", formula: "R U R' U R' F R F' U2 R' F R F'" },
-            { id: 18, name: "OLL 18", desc: "«Пандус» зеркальный", formula: "r U R' U R U2 r2 U' R U' R' U2 r" },
-            { id: 19, name: "OLL 19", desc: "«Вертолет»", formula: "r' R U R U R' U' r R2 F R F'" },
-            { id: 20, name: "OLL 20", desc: "«Восклицательный знак»", formula: "r U R' U' r' F R F'" },
-            { id: 21, name: "OLL 21", desc: "Крест (Все углы на месте)", formula: "F (R U R' U')3 F'" },
-            { id: 22, name: "OLL 22", desc: "Крест (Углами наружу)", formula: "R U2 R2 U' R2 U' R2 U2 R" },
-            { id: 23, name: "OLL 23", desc: "Крест (Две «рыбки»)", formula: "R2 D' R U2 R' D R U2 R" },
-            { id: 24, name: "OLL 24", desc: "Крест с «галстуком»", formula: "r U R' U' r' F R F'" },
-            { id: 25, name: "OLL 25", desc: "Крест (Двойная «рыбка»)", formula: "F' r U R' U' r' F R" },
-            { id: 26, name: "OLL 26", desc: "«Рыбка» базовая", formula: "R U2 R' U' R U' R'" },
-            { id: 27, name: "OLL 27", desc: "«Рыбка» обратная", formula: "R U R' U R U2 R'" },
-            { id: 28, name: "OLL 28", desc: "«Семерка»", formula: "r U R' U' r' R U R U' R'" },
-            { id: 29, name: "OLL 29", desc: "«Кувшин»", formula: "R U R' U' R U' R' F' U' F R U R'" },
-            { id: 30, name: "OLL 30", desc: "«Кувшин» зеркальный", formula: "F R' F' r U R U' r'" },
-            { id: 31, name: "OLL 31", desc: "«П-форма»", formula: "R' U' F U R U' R' F' R" },
-            { id: 32, name: "OLL 32", desc: "«Зебра» правая", formula: "L U F' U' L' U L F L'" },
-            { id: 33, name: "OLL 33", desc: "«Т-форма»", formula: "R U R' U' R' F R F'" },
-            { id: 34, name: "OLL 34", desc: "«Капан» правый", formula: "R U R2 U' R' F R U R U' F'" },
-            { id: 35, name: "OLL 35", desc: "«Рыбка» с хвостом", formula: "R U2 R' F R' F' R U2 R'" },
-            { id: 36, name: "OLL 36", desc: "«Капан» левый", formula: "L' U' L U R U' R' L' U L" },
-            { id: 37, name: "OLL 37", desc: "«Фишер» правый", formula: "F R U' R' U' R U R' F'" },
-            { id: 38, name: "OLL 38", desc: "«Фишер» левый", formula: "R U R' U R U' R' U' R' F R F'" },
-            { id: 39, name: "OLL 39", desc: "«Молния» правая", formula: "L F' L' U' L U F U' L'" },
-            { id: 40, name: "OLL 40", desc: "«Молния» левая", formula: "R' F R U R' U' F' U R" },
-            { id: 41, name: "OLL 41", desc: "«Гроза» правая", formula: "R U R' U R U2 R' F R U R' U' F'" },
-            { id: 42, name: "OLL 42", desc: "«Гроза» левая", formula: "R' U' R U' R' U2 R F R U R' U' F'" },
-            { id: 43, name: "OLL 43", desc: "«Двойная молния» правая", formula: "R' U' F R U R' U' F' R" },
-            { id: 44, name: "OLL 44", desc: "«Двойная молния» левая", formula: "f R U R' U' f'" },
-            { id: 45, name: "OLL 45", desc: "«Звезда»", formula: "F R U R' U' F'" },
-            { id: 46, name: "OLL 46", desc: "«Бумеранг» правый", formula: "R' U' R' F R F' U R" },
-            { id: 47, name: "OLL 47", desc: "«Бумеранг» левый", formula: "R' U' R' F R F' R' F R F' U R" },
-            { id: 48, name: "OLL 48", desc: "«Мост»", formula: "F R U R' U' R U R' U' F'" },
-            { id: 49, name: "OLL 49", desc: "«Мост» левый", formula: "r U' r2 U r2 U r2 U' r" },
-            { id: 50, name: "OLL 50", desc: "«Мост» правый зеркальный", formula: "r' U r2 U' r2 U' r2 U r'" },
-            { id: 51, name: "OLL 51", desc: "«Линия» с ушками", formula: "F U R U' R' U R U' R' F'" },
-            { id: 52, name: "OLL 52", desc: "«Линия» с ушками обратная", formula: "R U R' U R U' B U' B' R'" },
-            { id: 53, name: "OLL 53", desc: "«Башня» правая", formula: "r' U2 R U R' U' R U R' U r" },
-            { id: 54, name: "OLL 54", desc: "«Башня» левая", formula: "r U2 R' U' R U R' U' R U' r'" },
-            { id: 55, name: "OLL 55", desc: "«Крест с точками»", formula: "R' F R U R U' R2 F' R2 U R' U' R" },
-            { id: 56, name: "OLL 56", desc: "«Крест с точками» зеркальный", formula: "r' U r U2 r' U r U2 r' U r" },
-            { id: 57, name: "OLL 57", desc: "«Чистый крест»", formula: "R U R' U' M' U R U' r'" }
+            { id: 1, name: "OLL 1", desc: { ru: "Точка (Точка)", en: "Dot (All oriented)", uk: "Точка (Точка)", es: "Punto" }, formula: "R U2 R2 F R F' U2 R' F R F'" },
+            { id: 2, name: "OLL 2", desc: { ru: "Точка с линиями", en: "Dot with lines", uk: "Точка з лініями", es: "Punto con líneas" }, formula: "F R U R' U' F' f R U R' U' f'" },
+            { id: 3, name: "OLL 3", desc: { ru: "Точка с карманом", en: "Dot with pocket", uk: "Точка з кишенею", es: "Punto con bolsillo" }, formula: "f R U R' U' f' U' F R U R' U' F'" },
+            { id: 4, name: "OLL 4", desc: { ru: "Точка с карманом зеркальная", en: "Dot with pocket mirror", uk: "Точка з кишенею дзеркальна", es: "Punto con bolsillo espejo" }, formula: "F R U R' U' F' U f R U R' U' f'" },
+            { id: 5, name: "OLL 5", desc: { ru: "Двухсторонняя «Восьмерка»", en: "Two-sided 'Figure 8'", uk: "Двостороння «Вісімка»", es: "Doble 'Ocho'" }, formula: "r' U2 R U R' U r" },
+            { id: 6, name: "OLL 6", desc: { ru: "Двухсторонняя зеркальная", en: "Two-sided mirror", uk: "Двостороння дзеркальна", es: "Doble espejo" }, formula: "r U2 R' U' R U' r'" },
+            { id: 7, name: "OLL 7", desc: { ru: "«Уши» смотрят наружу", en: "Ears facing outward", uk: "«Вуха» дивляться назовні", es: "'Orejas' hacia afuera" }, formula: "r U R' U R U2 r'" },
+            { id: 8, name: "OLL 8", desc: { ru: "«Уши» смотрят внутрь", en: "Ears facing inward", uk: "«Вуха» дивляться всередину", es: "'Orejas' hacia adentro" }, formula: "r' U' R U' R' U2 r" },
+            { id: 9, name: "OLL 9", desc: { ru: "«Глаза» вправо", en: "Eyes pointing right", uk: "«Очі» праворуч", es: "'Ojos' a la derecha" }, formula: "R U R' U' R' F R F'" },
+            { id: 10, name: "OLL 10", desc: { ru: "«Глаза» влево", en: "Eyes pointing left", uk: "«Очі» ліворуч", es: "'Ojos' a la izquierda" }, formula: "R U R' U R' F R F' R U2 R'" },
+            { id: 11, name: "OLL 11", desc: { ru: "Линия и «глаза»", en: "Line and eyes", uk: "Лінія та «очі»", es: "Línea y 'ojos'" }, formula: "r U R' U R' F R F' r'" },
+            { id: 12, name: "OLL 12", desc: { ru: "Линия и «глаза» зеркальная", en: "Line and eyes mirror", uk: "Лінія та «очі» дзеркальна", es: "Línea y 'ojos' espejo" }, formula: "M' R' U R U R' U' r" },
+            { id: 13, name: "OLL 13", desc: { ru: "«Пистолет» правый", en: "Right 'Gun'", uk: "«Пістолет» правий", es: "'Pistola' derecha" }, formula: "F U R U' R' F'" },
+            { id: 14, name: "OLL 14", desc: { ru: "«Пистолет» левый", en: "Left 'Gun'", uk: "«Пістолет» лівий", es: "'Pistola' izquierda" }, formula: "R' F R U R' F' R F U' F'" },
+            { id: 15, name: "OLL 15", desc: { ru: "«Корова» правая", en: "Right 'Cow'", uk: "«Корова» права", es: "'Vaca' derecha" }, formula: "r' U' r R' U' R U r' U r" },
+            { id: 16, name: "OLL 16", desc: { ru: "«Корова» левая", en: "Left 'Cow'", uk: "«Корова» ліва", es: "'Vaca' izquierda" }, formula: "r U r' R U R' U' r U' r'" },
+            { id: 17, name: "OLL 17", desc: { ru: "«Пандус»", en: "'Ramp'", uk: "«Пандус»", es: "'Rampa'" }, formula: "R U R' U R' F R F' U2 R' F R F'" },
+            { id: 18, name: "OLL 18", desc: { ru: "«Пандус» зеркальный", en: "'Ramp' mirror", uk: "«Пандус» дзеркальний", es: "'Rampa' espejo" }, formula: "r U R' U R U2 r2 U' R U' R' U2 r" },
+            { id: 19, name: "OLL 19", desc: { ru: "«Вертолет»", en: "'Helicopter'", uk: "«Гелікоптер»", es: "'Helicóptero'" }, formula: "r' R U R U R' U' r R2 F R F'" },
+            { id: 20, name: "OLL 20", desc: { ru: "«Восклицательный знак»", en: "'Exclamation mark'", uk: "«Вкликовий знак»", es: "'Signo de exclamación'" }, formula: "r U R' U' r' F R F'" },
+            { id: 21, name: "OLL 21", desc: { ru: "Крест (Все углы на месте)", en: "Cross (All corners on place)", uk: "Хрест (Усі кути на місці)", es: "Cruz (Todas las esquinas en su lugar)" }, formula: "F (R U R' U')3 F'" },
+            { id: 22, name: "OLL 22", desc: { ru: "Крест (Углами наружу)", en: "Cross (Corners outward)", uk: "Хрест (Кутами назовні)", es: "Cruz (Esquinas hacia afuera)" }, formula: "R U2 R2 U' R2 U' R2 U2 R" },
+            { id: 23, name: "OLL 23", desc: { ru: "Крест (Две «рыбки»)", en: "Cross (Two 'fish')", uk: "Хрест (Дві «рибки»)", es: "Cruz (Dos 'pescados')" }, formula: "R2 D' R U2 R' D R U2 R" },
+            { id: 24, name: "OLL 24", desc: { ru: "Крест с «галстуком»", en: "Cross with 'tie'", uk: "Хрест з «краваткою»", es: "Cruz con 'corbata'" }, formula: "r U R' U' r' F R F'" },
+            { id: 25, name: "OLL 25", desc: { ru: "Крест (Двойная «рыбка»)", en: "Cross (Double 'fish')", uk: "Хрест (Подвійна «рибка»)", es: "Cruz (Doble 'pescado')" }, formula: "F' r U R' U' r' F R" },
+            { id: 26, name: "OLL 26", desc: { ru: "«Рыбка» базовая", en: "Basic 'Fish'", uk: "«Рибка» базова", es: "'Pescado' básico" }, formula: "R U2 R' U' R U' R'" },
+            { id: 27, name: "OLL 27", desc: { ru: "«Рыбка» обратная", en: "Reverse 'Fish'", uk: "«Рибка» зворотна", es: "'Pescado' inverso" }, formula: "R U R' U R U2 R'" },
+            { id: 28, name: "OLL 28", desc: { ru: "«Семерка»", en: "'Seven'", uk: "«Сімка»", es: "'Siete'" }, formula: "r U R' U' r' R U R U' R'" },
+            { id: 29, name: "OLL 29", desc: { ru: "«Кувшин»", en: "'Jug'", uk: "«Глечик»", es: "'Jarra'" }, formula: "R U R' U' R U' R' F' U' F R U R'" },
+            { id: 30, name: "OLL 30", desc: { ru: "«Кувшин» зеркальный", en: "'Jug' mirror", uk: "«Глечик» дзеркальний", es: "'Jarra' espejo" }, formula: "F R' F' r U R U' r'" },
+            { id: 31, name: "OLL 31", desc: { ru: "«П-форма»", en: "'P-Shape'", uk: "«П-форма»", es: "Forma de 'P'" }, formula: "R' U' F U R U' R' F' R" },
+            { id: 32, name: "OLL 32", desc: { ru: "«Зебра» правая", en: "Right 'Zebra'", uk: "«Зебра» права", es: "'Cebra' derecha" }, formula: "L U F' U' L' U L F L'" },
+            { id: 33, name: "OLL 33", desc: { ru: "«Т-форма»", en: "'T-Shape'", uk: "«Т-форма»", es: "Forma de 'T'" }, formula: "R U R' U' R' F R F'" },
+            { id: 34, name: "OLL 34", desc: { ru: "«Капюшон» правый", en: "Right 'Caped'", uk: "«Капюшон» правий", es: "'Capucha' derecha" }, formula: "R U R2 U' R' F R U R U' F'" },
+            { id: 35, name: "OLL 35", desc: { ru: "«Рыбка» с хвостом", en: "'Fish' with tail", uk: "«Рибка» з хвостом", es: "'Pescado' con cola" }, formula: "R U2 R' F R' F' R U2 R'" },
+            { id: 36, name: "OLL 36", desc: { ru: "«Капюшон» левый", en: "Left 'Caped'", uk: "«Капюшон» лівий", es: "'Capucha' izquierda" }, formula: "L' U' L U R U' R' L' U L" },
+            { id: 37, name: "OLL 37", desc: { ru: "«Фишер» правый", en: "Right 'Fisher'", uk: "«Фішер» правий", es: "'Fisher' derecho" }, formula: "F R U' R' U' R U R' F'" },
+            { id: 38, name: "OLL 38", desc: { ru: "«Фишер» левый", en: "Left 'Fisher'", uk: "«Фішер» лівий", es: "'Fisher' izquierdo" }, formula: "R U R' U R U' R' U' R' F R F'" },
+            { id: 39, name: "OLL 39", desc: { ru: "«Молния» правая", en: "Right 'Lightning'", uk: "«Блискавка» права", es: "'Rayo' derecho" }, formula: "L F' L' U' L U F U' L'" },
+            { id: 40, name: "OLL 40", desc: { ru: "«Молния» левая", en: "Left 'Lightning'", uk: "«Блискавка» ліва", es: "'Rayo' izquierdo" }, formula: "R' F R U R' U' F' U R" },
+            { id: 41, name: "OLL 41", desc: { ru: "«Гроза» правая", en: "Right 'Storm'", uk: "«Гроза» права", es: "'Tormenta' derecha" }, formula: "R U R' U R U2 R' F R U R' U' F'" },
+            { id: 42, name: "OLL 42", desc: { ru: "«Гроза» левая", en: "Left 'Storm'", uk: "«Гроза» ліва", es: "'Tormenta' izquierda" }, formula: "R' U' R U' R' U2 R F R U R' U' F'" },
+            { id: 43, name: "OLL 43", desc: { ru: "«Двойная молния» правая", en: "Right 'Double lightning'", uk: "«Подвійна блискавка» права", es: "'Doble rayo' derecho" }, formula: "R' U' F R U R' U' F' R" },
+            { id: 44, name: "OLL 44", desc: { ru: "«Двойная молния» левая", en: "Left 'Double lightning'", uk: "«Подвійна блискавка» ліва", es: "'Doble rayo' izquierdo" }, formula: "f R U R' U' f'" },
+            { id: 45, name: "OLL 45", desc: { ru: "«Звезда»", en: "'Star'", uk: "«Зірка»", es: "'Estrella'" }, formula: "F R U R' U' F'" },
+            { id: 46, name: "OLL 46", desc: { ru: "«Бумеранг» правый", en: "Right 'Boomerang'", uk: "«Бумеранг» правий", es: "'Bumerang' derecho" }, formula: "R' U' R' F R F' U R" },
+            { id: 47, name: "OLL 47", desc: { ru: "«Бумеранг» левый", en: "Left 'Boomerang'", uk: "«Бумеранг» лівий", es: "'Bumerang' izquierdo" }, formula: "R' U' R' F R F' R' F R F' U R" },
+            { id: 48, name: "OLL 48", desc: { ru: "«Мост»", en: "'Bridge'", uk: "«Міст»", es: "'Puente'" }, formula: "F R U R' U' R U R' U' F'" },
+            { id: 49, name: "OLL 49", desc: { ru: "«Мост» левый", en: "Left 'Bridge'", uk: "«Міст» лівий", es: "'Puente' izquierdo" }, formula: "r U' r2 U r2 U r2 U' r" },
+            { id: 50, name: "OLL 50", desc: { ru: "«Мост» правый зеркальный", en: "Right 'Bridge' mirror", uk: "«Міст» правий дзеркальний", es: "'Puente' derecho espejo" }, formula: "r' U r2 U' r2 U' r2 U r'" },
+            { id: 51, name: "OLL 51", desc: { ru: "«Линия» с ушками", en: "'Line' with ears", uk: "«Лінія» з вушками", es: "'Línea' con orejas" }, formula: "F U R U' R' U R U' R' F'" },
+            { id: 52, name: "OLL 52", desc: { ru: "«Линия» с ушками обратная", en: "Reverse 'Line' with ears", uk: "«Лінія» з вушками зворотна", es: "'Línea' con orejas inversa" }, formula: "R U R' U R U' B U' B' R'" },
+            { id: 53, name: "OLL 53", desc: { ru: "«Башня» правая", en: "Right 'Tower'", uk: "«Вежа» права", es: "'Torre' derecha" }, formula: "r' U2 R U R' U' R U R' U r" },
+            { id: 54, name: "OLL 54", desc: { ru: "«Башня» левая", en: "Left 'Tower'", uk: "«Вежа» ліва", es: "'Torre' izquierda" }, formula: "r U2 R' U' R U R' U' R U' r'" },
+            { id: 55, name: "OLL 55", desc: { ru: "«Крест с точками»", en: "Cross with dots", uk: "«Хрест з точками»", es: "Cruz con puntos" }, formula: "R' F R U R U' R2 F' R2 U R' U' R" },
+            { id: 56, name: "OLL 56", desc: { ru: "«Крест с точками» зеркальный", en: "Cross with dots mirror", uk: "«Хрест з точками» дзеркальний", es: "Cruz con puntos espejo" }, formula: "r' U r U2 r' U r U2 r' U r" },
+            { id: 57, name: "OLL 57", desc: { ru: "«Чистый крест»", en: "Pure cross", uk: "«Чистий хрест»", es: "Cruz pura" }, formula: "R U R' U' M' U R U' r'" }
         ],
         pll: [
-            { id: 1, name: "Aa Perm", desc: "Перестановка угла A (диагональ)", formula: "x R' U R' D2 R U' R' D2 R2 x'" },
-            { id: 2, name: "Ab Perm", desc: "Перестановка угла A (фронт)", formula: "x R2 D2 R U R' D2 R U' R x'" },
-            { id: 3, name: "E Perm", desc: "Перестановка E (диагональные углы)", formula: "x' R U' R' D R U R' D' R U R' D R U' R' D' x" },
-            { id: 4, name: "F Perm", desc: "Перестановка F", formula: "R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R2" },
-            { id: 5, name: "Ga Perm", desc: "Перестановка G (a)", formula: "R2 U R U R' U' R' U' R' U R'" },
-            { id: 6, name: "Gb Perm", desc: "Перестановка G (b)", formula: "R' U' R y R2 U R' U R U R U2 R'" },
-            { id: 7, name: "Gc Perm", desc: "Перестановка G (c)", formula: "R2 U' R' U' R U R U R U' R" },
-            { id: 8, name: "Gd Perm", desc: "Перестановка G (d)", formula: "R U R' y' R2 U' R U' R' U' R' U R2" },
-            { id: 9, name: "H Perm", desc: "Перестановка H (ребра)", formula: "M2 U M2 U2 M2 U M2" },
-            { id: 10, name: "Ja Perm", desc: "Перестановка J (a)", formula: "R' U L' U2 R U' R' U2 R L" },
-            { id: 11, name: "Jb Perm", desc: "Перестановка J (b)", formula: "R U R' F' R U R' U' R' F R2 U' R'" },
-            { id: 12, name: "Na Perm", desc: "Перестановка N (a)", formula: "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'" },
-            { id: 13, name: "Nb Perm", desc: "Перестановка N (b)", formula: "R' U R U' R' F' U' F R U R' F R' F' R U' R" },
-            { id: 14, name: "Ra Perm", desc: "Перестановка R (a)", formula: "R U' R' U' R U R D R' U' R D' R' U2 R'" },
-            { id: 15, name: "Rb Perm", desc: "Перестановка R (b)", formula: "R' U2 R U2 R' F R U R' U' R' F' R2" },
-            { id: 16, name: "T Perm", desc: "Перестановка T (базовая)", formula: "R U R' U' R' F R2 U' R' U' R U R' F'" },
-            { id: 17, name: "Ua Perm", desc: "Перестановка U (a - против часовой)", formula: "R U' R U R U R U' R' U' R2" },
-            { id: 18, name: "Ub Perm", desc: "Перестановка U (b - по часовой)", formula: "R2 U R U R' U' R' U' R' U R'" },
-            { id: 19, name: "V Perm", desc: "Перестановка V", formula: "R' U R' U' y R' F' R2 U' R' U R' F R V" },
-            { id: 20, name: "Y Perm", desc: "Перестановка Y", formula: "F R U' R' U' R U R' F' R U R' U' R' F R F'" },
-            { id: 21, name: "Z Perm", desc: "Перестановка Z (ребра)", formula: "M2 U M2 U M' U2 M2 U2 M' U2" }
+            { id: 1, name: "Aa Perm", desc: { ru: "Перестановка угла A (диагональ)", en: "Corner Permutation A (diagonal)", uk: "Перестановка кута A (діагональ)", es: "Permutación de esquina A (diagonal)" }, formula: "x R' U R' D2 R U' R' D2 R2 x'" },
+            { id: 2, name: "Ab Perm", desc: { ru: "Перестановка угла A (фронт)", en: "Corner Permutation A (front)", uk: "Перестановка кута A (фронт)", es: "Permutación de esquina A (frente)" }, formula: "x R2 D2 R U R' D2 R U' R x'" },
+            { id: 3, name: "E Perm", desc: { ru: "Перестановка E (диагональные углы)", en: "E Permutation (diagonal corners)", uk: "Перестановка E (діагональні кути)", es: "Permutación E (esquinas diagonales)" }, formula: "x' R U' R' D R U R' D' R U R' D R U' R' D' x" },
+            { id: 4, name: "F Perm", desc: { ru: "Перестановка F", en: "F Permutation", uk: "Перестановка F", es: "Permutación F" }, formula: "R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R2" },
+            { id: 5, name: "Ga Perm", desc: { ru: "Перестановка G (a)", en: "G Permutation (a)", uk: "Перестановка G (a)", es: "Permutación G (a)" }, formula: "R2 U R U R' U' R' U' R' U R'" },
+            { id: 6, name: "Gb Perm", desc: { ru: "Перестановка G (b)", en: "G Permutation (b)", uk: "Перестановка G (b)", es: "Permutación G (b)" }, formula: "R' U' R y R2 U R' U R U R U2 R'" },
+            { id: 7, name: "Gc Perm", desc: { ru: "Перестановка G (c)", en: "G Permutation (c)", uk: "Перестановка G (c)", es: "Permutación G (c)" }, formula: "R2 U' R' U' R U R U R U' R" },
+            { id: 8, name: "Gd Perm", desc: { ru: "Перестановка G (d)", en: "G Permutation (d)", uk: "Перестановка G (d)", es: "Permutación G (d)" }, formula: "R U R' y' R2 U' R U' R' U' R' U R2" },
+            { id: 9, name: "H Perm", desc: { ru: "Перестановка H (ребра)", en: "H Permutation (edges)", uk: "Перестановка H (ребра)", es: "Permutación H (aristas)" }, formula: "M2 U M2 U2 M2 U M2" },
+            { id: 10, name: "Ja Perm", desc: { ru: "Перестановка J (a)", en: "J Permutation (a)", uk: "Перестановка J (a)", es: "Permutación J (a)" }, formula: "R' U L' U2 R U' R' U2 R L" },
+            { id: 11, name: "Jb Perm", desc: { ru: "Перестановка J (b)", en: "J Permutation (b)", uk: "Перестановка J (b)", es: "Permutación J (b)" }, formula: "R U R' F' R U R' U' R' F R2 U' R'" },
+            { id: 12, name: "Na Perm", desc: { ru: "Перестановка N (a)", en: "N Permutation (a)", uk: "Перестановка N (a)", es: "Permutación N (a)" }, formula: "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'" },
+            { id: 13, name: "Nb Perm", desc: { ru: "Перестановка N (b)", en: "N Permutation (b)", uk: "Перестановка N (b)", es: "Permutación N (b)" }, formula: "R' U R U' R' F' U' F R U R' F R' F' R U' R" },
+            { id: 14, name: "Ra Perm", desc: { ru: "Перестановка R (a)", en: "R Permutation (a)", uk: "Перестановка R (a)", es: "Permutación R (a)" }, formula: "R U' R' U' R U R D R' U' R D' R' U2 R'" },
+            { id: 15, name: "Rb Perm", desc: { ru: "Перестановка R (b)", en: "R Permutation (b)", uk: "Перестановка R (b)", es: "Permutación R (b)" }, formula: "R' U2 R U2 R' F R U R' U' R' F' R2" },
+            { id: 16, name: "T Perm", desc: { ru: "Перестановка T (базовая)", en: "T Permutation (basic)", uk: "Перестановка T (базова)", es: "Permutación T (básica)" }, formula: "R U R' U' R' F R2 U' R' U' R U R' F'" },
+            { id: 17, name: "Ua Perm", desc: { ru: "Перестановка U (a - против часовой)", en: "U Permutation (a - counter-clockwise)", uk: "Перестановка U (a - проти годинникової)", es: "Permutación U (a - antihorario)" }, formula: "R U' R U R U R U' R' U' R2" },
+            { id: 18, name: "Ub Perm", desc: { ru: "Перестановка U (b - по часовой)", en: "U Permutation (b - clockwise)", uk: "Перестановка U (b - за годинниковою)", es: "Permutación U (b - horario)" }, formula: "R2 U R U R' U' R' U' R' U R'" },
+            { id: 19, name: "V Perm", desc: { ru: "Перестановка V", en: "V Permutation", uk: "Перестановка V", es: "Permutación V" }, formula: "R' U R' U' y R' F' R2 U' R' U R' F R V" },
+            { id: 20, name: "Y Perm", desc: { ru: "Перестановка Y", en: "Y Permutation", uk: "Перестановка Y", es: "Permutación Y" }, formula: "F R U' R' U' R U R' F' R U R' U' R' F R F'" },
+            { id: 21, name: "Z Perm", desc: { ru: "Перестановка Z (ребра)", en: "Z Permutation (edges)", uk: "Перестановка Z (ребра)", es: "Permutación Z (aristas)" }, formula: "M2 U M2 U M' U2 M2 U2 M' U2" }
         ]
     };
 
@@ -487,6 +494,8 @@
             f2lName: "F2L (Первые два слоя - 41 случай)",
             ollName: "OLL (Ориентация последнего слоя - 57 случаев)",
             pllName: "PLL (Пермутация последнего слоя - 21 случай)",
+            title4lll: "Упрощенный CFOP (4LLL)",
+            sub4lll: "Базовые алгоритмы для быстрой сборки",
             backDetail: "← К списку этапов",
             searchPH: "Поиск алгоритма...",
             formulaLabel: "Формула (Алгоритм решения):",
@@ -495,6 +504,7 @@
             applyScrambleBtn: "Собрать ситуацию",
             backToList: "← К списку",
             customFormulaLabel: "Введите или вставьте формулу, чтобы получить ситуацию:",
+            spamWarning: "⚠️ Не спамьте на кнопки во время вращения кубика — алгоритм может сбиться!",
             applyFormulaBtn: "Применить",
             resetBtn: "Сброс"
         },
@@ -509,6 +519,8 @@
             f2lName: "F2L (First Two Layers - 41 Cases)",
             ollName: "OLL (Orientation - 57 Cases)",
             pllName: "PLL (Permutation - 21 Cases)",
+            title4lll: "Simplified CFOP (4LLL)",
+            sub4lll: "Basic algorithms for quick solving",
             backDetail: "← Back to CFOP",
             searchPH: "Search algorithm...",
             formulaLabel: "Formula (Solution Algorithm):",
@@ -517,6 +529,7 @@
             applyScrambleBtn: "Set up Case",
             backToList: "← Back to List",
             customFormulaLabel: "Enter or paste a formula to set up the situation:",
+            spamWarning: "⚠️ Do not spam buttons while the cube is rotating or the algorithm may break!",
             applyFormulaBtn: "Apply",
             resetBtn: "Reset"
         },
@@ -531,6 +544,8 @@
             f2lName: "F2L (Перші два шари - 41 випадок)",
             ollName: "OLL (Орієнтація - 57 випадків)",
             pllName: "PLL (Пермутація - 21 випадок)",
+            title4lll: "Спрощений CFOP (4LLL)",
+            sub4lll: "Базові алгоритми для швидкого збирання",
             backDetail: "← До списку",
             searchPH: "Пошук алгоритму...",
             formulaLabel: "Формула (Алгоритм розв'язання):",
@@ -539,6 +554,7 @@
             applyScrambleBtn: "Зібрати ситуацію",
             backToList: "← До списку",
             customFormulaLabel: "Введіть або вставте формулу, щоб отримати ситуацію:",
+            spamWarning: "⚠️ Не спаміть на кнопки під час обертання кубика — алгоритм може збитися!",
             applyFormulaBtn: "Застосувати",
             resetBtn: "Скидання"
         },
@@ -553,6 +569,8 @@
             f2lName: "F2L (Primeras Dos Capas - 41 Casos)",
             ollName: "OLL (Orientación - 57 Casos)",
             pllName: "PLL (Permutación - 21 Casos)",
+            title4lll: "CFOP Simplificado (4LLL)",
+            sub4lll: "Algoritmos básicos para armado rápido",
             backDetail: "← Volver",
             searchPH: "Buscar algoritmo...",
             formulaLabel: "Fórmula (Algoritmo de solución):",
@@ -561,6 +579,7 @@
             applyScrambleBtn: "Armar situación",
             backToList: "← Volver a la lista",
             customFormulaLabel: "Introduce o pega una fórmula para obtener la situación:",
+            spamWarning: "⚠️ ¡No spamees los botones mientras gira el cubo o el algoritmo puede fallar!",
             applyFormulaBtn: "Aplicar",
             resetBtn: "Reiniciar"
         }
@@ -569,7 +588,8 @@
     function setLang(lang) {
         currentLang = lang;
         document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active-lang'));
-        document.getElementById('btn-' + lang).classList.add('active-lang');
+        const btn = document.getElementById('btn-' + lang);
+        if (btn) btn.classList.add('active-lang');
 
         const t = translations[lang];
         document.getElementById('t-main-title').innerText = t.mainTitle;
@@ -577,11 +597,14 @@
         document.getElementById('t-btn-cfop').innerText = t.btnCfop;
         document.getElementById('t-btn-4lll').innerText = t.btn4lll;
         document.getElementById('t-back-main').innerText = t.backMain;
+        document.getElementById('t-back-4lll').innerText = t.backMain;
         document.getElementById('t-cfop-title').innerText = t.cfopTitle;
         document.getElementById('t-cfop-sub').innerText = t.cfopSub;
         document.getElementById('t-f2l-name').innerText = t.f2lName;
         document.getElementById('t-oll-name').innerText = t.ollName;
         document.getElementById('t-pll-name').innerText = t.pllName;
+        document.getElementById('t-4lll-title').innerText = t.title4lll;
+        document.getElementById('t-4lll-sub').innerText = t.sub4lll;
         document.getElementById('t-back-detail').innerText = t.backDetail;
         document.getElementById('search').placeholder = t.searchPH;
         document.getElementById('t-formula-label').innerText = t.formulaLabel;
@@ -590,14 +613,36 @@
         document.getElementById('t-apply-scramble-btn').innerText = t.applyScrambleBtn;
         document.getElementById('t-back-to-list').innerText = t.backToList;
         document.getElementById('t-custom-formula-label').innerText = t.customFormulaLabel;
+        document.getElementById('t-spam-warning').innerText = t.spamWarning;
         document.getElementById('t-apply-formula-btn').innerText = t.applyFormulaBtn;
         document.getElementById('t-reset-btn').innerText = t.resetBtn;
+
+        if (currentCategory && algorithmsData[currentCategory]) {
+            renderAlgorithms(algorithmsData[currentCategory]);
+        }
+        if (currentItemData) {
+            document.getElementById('detail-desc').innerText = typeof currentItemData.desc === 'object' ? (currentItemData.desc[currentLang] || currentItemData.desc['en']) : currentItemData.desc;
+        }
     }
 
     function showView(viewId) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.getElementById(viewId).classList.add('active');
+        const targetView = document.getElementById(viewId);
+        if (targetView) targetView.classList.add('active');
         window.scrollTo(0, 0);
+        
+        // Resize 3D renderer if going back to main view
+        if (viewId === 'view-main' && renderer && camera) {
+            const container = document.getElementById('cube-container');
+            if (container) {
+                const w = container.clientWidth || 300;
+                const h = container.clientHeight || 280;
+                renderer.setSize(w, h);
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+                renderer.render(scene, camera);
+            }
+        }
     }
 
     function openCategory(category) {
@@ -608,33 +653,47 @@
 
     function renderAlgorithms(items) {
         const container = document.getElementById('algorithms-list');
+        if (!container) return;
         container.innerHTML = '';
         items.forEach(item => {
             const card = document.createElement('div');
             card.className = 'case-card';
             card.onclick = () => openDetail(item);
-            card.innerHTML = `<h3>${item.name}</h3><p>${item.desc}</p>`;
+            const descText = typeof item.desc === 'object' ? (item.desc[currentLang] || item.desc['en']) : item.desc;
+            card.innerHTML = `<h3>${item.name}</h3><p>${descText}</p>`;
             container.appendChild(card);
         });
     }
 
     function filterAlgorithms() {
-        const query = document.getElementById('search').value.toLowerCase();
+        const searchInput = document.getElementById('search');
+        if (!searchInput || !currentCategory || !algorithmsData[currentCategory]) return;
+        const query = searchInput.value.toLowerCase();
         const items = algorithmsData[currentCategory];
-        const filtered = items.filter(i => i.name.toLowerCase().includes(query) || i.desc.toLowerCase().includes(query) || i.formula.toLowerCase().includes(query));
+        const filtered = items.filter(i => {
+            const descText = (typeof i.desc === 'object' ? (i.desc[currentLang] || i.desc['en']) : i.desc).toLowerCase();
+            return i.name.toLowerCase().includes(query) || descText.includes(query) || i.formula.toLowerCase().includes(query);
+        });
         renderAlgorithms(filtered);
     }
 
-    // Function to calculate inverse move sequence for scramble generation
-    function getInverseScramble(formula) {
-        let text = formula;
-        text = text.replace(/\(([^)]+)\)\s*3/g, "$1 $1 $1");
-        text = text.replace(/\(([^)]+)\)\s*2/g, "$1 $1");
-        text = text.replace(/[()]/g, ' ');
-
-        const tokens = text.split(/\s+/).filter(t => t.length > 0);
-        let inverseTokens = [];
+    function openDetail(item) {
+        currentItemData = item;
+        document.getElementById('detail-title').innerText = item.name;
+        document.getElementById('detail-desc').innerText = typeof item.desc === 'object' ? (item.desc[currentLang] || item.desc['en']) : item.desc;
+        document.getElementById('detail-formula').innerText = item.formula;
         
+        const scramble = getInverseScramble(item.formula);
+        document.getElementById('detail-scramble').innerText = scramble;
+
+        const formulaInput = document.getElementById('custom-formula-input');
+        if (formulaInput) formulaInput.value = item.formula;
+        showView('view-detail');
+    }
+
+    function getInverseScramble(formula) {
+        const tokens = formula.split(/\s+/).filter(t => t.length > 0);
+        let inverseTokens = [];
         for (let i = tokens.length - 1; i >= 0; i--) {
             let token = tokens[i];
             if (token.includes("'")) {
@@ -648,25 +707,12 @@
         return inverseTokens.join(' ');
     }
 
-    function openDetail(item) {
-        currentItemData = item;
-        document.getElementById('detail-title').innerText = item.name;
-        document.getElementById('detail-desc').innerText = item.desc;
-        document.getElementById('detail-formula').innerText = item.formula;
-        
-        const scramble = getInverseScramble(item.formula);
-        document.getElementById('detail-scramble').innerText = scramble;
-
-        const formulaInput = document.getElementById('custom-formula-input');
-        if (formulaInput) formulaInput.value = item.formula;
-        showView('view-detail');
-    }
-
     async function applyCaseScramble() {
         if (!currentItemData) return;
         const scramble = getInverseScramble(currentItemData.formula);
         const formulaInput = document.getElementById('custom-formula-input');
         if (formulaInput) formulaInput.value = scramble;
+        showView('view-main');
         await executeCustomFormula();
     }
 
@@ -691,7 +737,7 @@
 
     function resetCube() {
         if (isMoving) return;
-        if (cubeGroup) {
+        if (cubeGroup && scene) {
             scene.remove(cubeGroup);
         }
         cubies = [];
@@ -714,13 +760,14 @@
                     ];
                     const mesh = new THREE.Mesh(geom, materials);
                     mesh.position.set(x, y, z);
-                    mesh.userData = { origX: x, origY: y, origZ: z };
                     cubeGroup.add(mesh);
                     cubies.push(mesh);
                 }
             }
         }
-        renderer.render(scene, camera);
+        if (renderer && scene && camera) {
+            renderer.render(scene, camera);
+        }
         const formulaInput = document.getElementById('custom-formula-input');
         if (formulaInput) formulaInput.value = '';
     }
@@ -740,32 +787,52 @@
         setTimeout(() => btn.innerText = oldText, 1500);
     }
 
-    // Robust 3D Rubik's Cube Engine using state-based cubies
+    // 3D Engine state
     let scene, camera, renderer, cubeGroup;
     let cubies = [];
     let isMoving = false;
+    
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+    let cameraAngleX = 0.6;
+    let cameraAngleY = 0.8;
+    let cameraRadius = 7.2;
 
     const COLORS = {
-        R: 0xc41e3a, // Right - Red
-        L: 0xff5800, // Left - Orange
-        U: 0xffffff, // Up - White
-        D: 0xffd500, // Down - Yellow
-        F: 0x0051ba, // Front - Blue
-        B: 0x009e60, // Back - Green
-        IN: 0x111111 // Internal
+        R: 0xc41e3a, // Red
+        L: 0xff5800, // Orange
+        U: 0xffffff, // White
+        D: 0xffd500, // Yellow
+        F: 0x0051ba, // Blue
+        B: 0x009e60, // Green
+        IN: 0x111111 // Internal black
     };
+
+    function updateCameraPosition() {
+        if (!camera) return;
+        camera.position.x = cameraRadius * Math.sin(cameraAngleX) * Math.sin(cameraAngleY);
+        camera.position.y = cameraRadius * Math.cos(cameraAngleX);
+        camera.position.z = cameraRadius * Math.sin(cameraAngleX) * Math.cos(cameraAngleY);
+        camera.lookAt(0, 0, 0);
+        if (renderer && scene) {
+            renderer.render(scene, camera);
+        }
+    }
 
     function initRubikCube() {
         const container = document.getElementById('cube-container');
         if (!container) return;
 
         scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-        camera.position.set(4.5, 4.0, 5.5);
-        camera.lookAt(0, 0, 0);
+        const width = container.clientWidth || 300;
+        const height = container.clientHeight || 280;
+        camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+        updateCameraPosition();
 
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.innerHTML = '';
         container.appendChild(renderer.domElement);
 
         scene.add(new THREE.AmbientLight(0xffffff, 0.8));
@@ -792,13 +859,68 @@
                     ];
                     const mesh = new THREE.Mesh(geom, materials);
                     mesh.position.set(x, y, z);
-                    mesh.userData = { origX: x, origY: y, origZ: z };
                     cubeGroup.add(mesh);
                     cubies.push(mesh);
                 }
             }
         }
         renderer.render(scene, camera);
+
+        window.addEventListener('resize', () => {
+            if (!container || !renderer || !camera) return;
+            const newWidth = container.clientWidth || 300;
+            const newHeight = container.clientHeight || 280;
+            camera.aspect = newWidth / newHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(newWidth, newHeight);
+            renderer.render(scene, camera);
+        });
+
+        container.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const deltaX = e.clientX - previousMousePosition.x;
+            const deltaY = e.clientY - previousMousePosition.y;
+
+            cameraAngleY -= deltaX * 0.01;
+            cameraAngleX -= deltaY * 0.01;
+            cameraAngleX = Math.max(0.1, Math.min(Math.PI - 0.1, cameraAngleX));
+
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+            updateCameraPosition();
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        container.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                isDragging = true;
+                previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            }
+        }, { passive: true });
+
+        container.addEventListener('touchmove', (e) => {
+            if (!isDragging || e.touches.length !== 1) return;
+            const deltaX = e.touches[0].clientX - previousMousePosition.x;
+            const deltaY = e.touches[0].clientY - previousMousePosition.y;
+
+            cameraAngleY -= deltaX * 0.01;
+            cameraAngleX -= deltaY * 0.01;
+            cameraAngleX = Math.max(0.1, Math.min(Math.PI - 0.1, cameraAngleX));
+
+            previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            updateCameraPosition();
+        }, { passive: true });
+
+        container.addEventListener('touchend', () => {
+            isDragging = false;
+        });
     }
 
     function applyMove(moveStr) {
@@ -843,7 +965,7 @@
             pivot.add(c);
         });
 
-        const steps = 12;
+        const steps = 20;
         const stepAngle = angle / steps;
         let currentStep = 0;
 
