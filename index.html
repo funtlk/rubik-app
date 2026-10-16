@@ -126,11 +126,11 @@
 
     <!-- Главное меню -->
     <div id="view-main" class="view active">
-        <h1 id="t-main-title"> Кубик Рубика</h1>
+        <h1 id="t-main-title">🧩 Кубик Рубика</h1>
         <p class="subtitle" id="t-main-sub">Интерактивный справочник методов</p>
-        <button class="btn btn-primary" onclick="switchView('view-cfop')" id="t-btn-cfop">Метод CFOP (Фридрих)</button>
-        <button class="btn" onclick="showStub('Roux')">🔄 Roux Method (soon)</button>
-        <button class="btn" onclick="showStub('Beginner')">📖 Beginner Method (soon)</button>
+        <button class="btn btn-primary" onclick="switchView('view-cfop')" id="t-btn-cfop">🧩 Метод CFOP (Фридрих)</button>
+        <button class="btn" onclick="showStub('Roux')" id="t-btn-roux">🔄 Метод Roux (скоро)</button>
+        <button class="btn" onclick="showStub('Beginner')" id="t-btn-beginner">📖 Новичковый метод (скоро)</button>
         
         <div class="lang-container">
             <button class="lang-btn active-lang" id="btn-ru" onclick="setLang('ru')">🇷🇺 РУС</button>
@@ -145,7 +145,7 @@
         <button class="back-btn" onclick="switchView('view-main')" id="t-back-main">← Главное меню</button>
         <h1 id="t-cfop-title">Метод CFOP</h1>
         <p class="subtitle" id="t-cfop-sub">Выберите этап для изучения</p>
-        <button class="btn" onclick="openStage('4lll')"><span id="t-4lll-name">🔰 4LLL (Новичковый CFOP)</span> <span>›</span></button>
+        <button class="btn" onclick="openStage('4lll')"><span id="t-4lll-name">🔰 4LLL (Упрощенный CFOP)</span> <span>›</span></button>
         <button class="btn" onclick="openStage('f2l')"><span id="t-f2l-name">1. F2L (42 случая)</span> <span>›</span></button>
         <button class="btn" onclick="openStage('oll')"><span id="t-oll-name">2. OLL (57 случаев)</span> <span>›</span></button>
         <button class="btn btn-primary" onclick="openStage('pll')"><span id="t-pll-name">3. PLL (21 случай)</span> <span>›</span></button>
@@ -184,13 +184,15 @@
 
         const translations = {
             ru: {
-                mainTitle: " Кубик Рубика",
+                mainTitle: "🧩 Кубик Рубика",
                 mainSub: "Интерактивный справочник методов",
-                btnCfop: " Метод CFOP (Фридрих)",
+                btnCfop: "🧩 Метод CFOP (Фридрих)",
+                btnRoux: "🔄 Метод Roux (скоро)",
+                btnBeginner: "📖 Новичковый метод (скоро)",
                 backMain: "← Главное меню",
                 cfopTitle: "Метод CFOP",
                 cfopSub: "Выберите этап для изучения",
-                fourLllName: " 4LLL (Упрощенный CFOP)",
+                fourLllName: "🔰 4LLL (Упрощенный CFOP)",
                 f2lName: "1. F2L (42 случая)",
                 ollName: "2. OLL (57 случаев)",
                 pllName: "3. PLL (21 случай)",
@@ -203,13 +205,15 @@
                 soonStub: " появится в обновлении!"
             },
             en: {
-                mainTitle: " Rubik's Cube",
+                mainTitle: "🧩 Rubik's Cube",
                 mainSub: "Interactive Methods Guide",
-                btnCfop: " CFOP Method (Fridrich)",
+                btnCfop: "🧩 CFOP Method (Fridrich)",
+                btnRoux: "🔄 Roux Method (soon)",
+                btnBeginner: "📖 Beginner Method (soon)",
                 backMain: "← Main Menu",
                 cfopTitle: "CFOP Method",
                 cfopSub: "Select a stage to study",
-                fourLllName: "4LLL (Simplified CFOP)",
+                fourLllName: "🔰 4LLL (Simplified CFOP)",
                 f2lName: "1. F2L (42 cases)",
                 ollName: "2. OLL (57 cases)",
                 pllName: "3. PLL (21 cases)",
@@ -222,13 +226,15 @@
                 soonStub: " will be available soon!"
             },
             uk: {
-                mainTitle: " Кубик Рубика",
+                mainTitle: "🧩 Кубик Рубика",
                 mainSub: "Інтерактивний довідник методів",
-                btnCfop: " Метод CFOP (Фрідріх)",
+                btnCfop: "🧩 Метод CFOP (Фрідріх)",
+                btnRoux: "🔄 Метод Roux (скоро)",
+                btnBeginner: "📖 Новачковий метод (скоро)",
                 backMain: "← Головне меню",
                 cfopTitle: "Метод CFOP",
                 cfopSub: "Оберіть етап для вивчення",
-                fourLllName: " 4LLL (Спрощений CFOP)",
+                fourLllName: "🔰 4LLL (Спрощений CFOP)",
                 f2lName: "1. F2L (42 випадки)",
                 ollName: "2. OLL (57 випадків)",
                 pllName: "3. PLL (21 випадок)",
@@ -241,13 +247,15 @@
                 soonStub: " з'явиться в оновленні!"
             },
             es: {
-                mainTitle: " Cubo de Rubik",
+                mainTitle: "🧩 Cubo de Rubik",
                 mainSub: "Guía Interactiva de Métodos",
-                btnCfop: " Método CFOP (Fridrich)",
+                btnCfop: "🧩 Método CFOP (Fridrich)",
+                btnRoux: "🔄 Método Roux (pronto)",
+                btnBeginner: "📖 Método Principiante (pronto)",
                 backMain: "← Menú Principal",
                 cfopTitle: "Método CFOP",
                 cfopSub: "Selecciona una etapa",
-                fourLllName: " 4LLL (CFOP Simplificado)",
+                fourLllName: "🔰 4LLL (CFOP Simplificado)",
                 f2lName: "1. F2L (42 casos)",
                 ollName: "2. OLL (57 casos)",
                 pllName: "3. PLL (21 casos)",
@@ -264,7 +272,7 @@
         const db = {
             '4lll': {
                 title: { 
-                    ru: "Этап 4LLL (Упрощенный сбор CFOP)", 
+                    ru: "Этап 4LLL (Упрощенный CFOP)", 
                     en: "4LLL Stage (Simplified CFOP)", 
                     uk: "Етап 4LLL (Спрощений CFOP)", 
                     es: "Etapa 4LLL (CFOP Simplificado)" 
@@ -317,6 +325,8 @@
             document.getElementById('t-main-title').innerText = t.mainTitle;
             document.getElementById('t-main-sub').innerText = t.mainSub;
             document.getElementById('t-btn-cfop').innerText = t.btnCfop;
+            document.getElementById('t-btn-roux').innerText = t.btnRoux;
+            document.getElementById('t-btn-beginner').innerText = t.btnBeginner;
             document.getElementById('t-back-main').innerText = t.backMain;
             document.getElementById('t-cfop-title').innerText = t.cfopTitle;
             document.getElementById('t-cfop-sub').innerText = t.cfopSub;
