@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Кубик Рубика - Полный справочник CFOP и Симулятор</title>
+    <title>Кубик Рубика - Справочник CFOP и Симулятор</title>
     <style>
         :root {
             --bg-color: #121212;
@@ -250,7 +250,7 @@
                 <label id="t-custom-formula-label" style="font-size: 11px; color: var(--text-secondary); text-align: center;">Введите или вставьте формулу, чтобы собрать/воспроизвести ситуацию:</label>
                 <div id="t-spam-warning" style="font-size: 10px; color: #ff9f0a; text-align: center; margin-bottom: 2px;">⚠️ Не спамьте на кнопки во время вращения кубика — алгоритм может сбиться!</div>
                 <div style="display: flex; gap: 6px;">
-                    <input type="text" id="custom-formula-input" placeholder="Например: R U R' U'" style="flex: 1; padding: 8px 10px; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: monospace; font-size: 13px; outline: none;">
+                    <input type="text" id="custom-formula-input" value="x' R U' R' D R U R' D' R U R' D R U' R' D' x" style="flex: 1; padding: 8px 10px; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: monospace; font-size: 13px; outline: none;">
                     <button onclick="executeCustomFormula()" id="t-apply-formula-btn" style="background-color: var(--button-color); color: var(--button-text-color); border: none; border-radius: 8px; padding: 0 12px; font-weight: 600; font-size: 12px; cursor: pointer;">Применить</button>
                     <button onclick="resetCube()" id="t-reset-btn" style="background-color: #3a3a3c; color: var(--text-color); border: none; border-radius: 8px; padding: 0 12px; font-weight: 600; font-size: 12px; cursor: pointer;">Сброс</button>
                 </div>
@@ -273,22 +273,6 @@
                     <button class="ctrl-btn" onclick="applyMove('B')">B</button>
                     <button class="ctrl-btn" onclick="applyMove('B\'')">B'</button>
                 </div>
-                <div class="control-row">
-                    <button class="ctrl-btn" onclick="applyMove('r')">r</button>
-                    <button class="ctrl-btn" onclick="applyMove('r\'')">r'</button>
-                    <button class="ctrl-btn" onclick="applyMove('l')">l</button>
-                    <button class="ctrl-btn" onclick="applyMove('l\'')">l'</button>
-                    <button class="ctrl-btn" onclick="applyMove('u')">u</button>
-                    <button class="ctrl-btn" onclick="applyMove('u\'')">u'</button>
-                </div>
-                <div class="control-row">
-                    <button class="ctrl-btn" onclick="applyMove('d')">d</button>
-                    <button class="ctrl-btn" onclick="applyMove('d\'')">d'</button>
-                    <button class="ctrl-btn" onclick="applyMove('f')">f</button>
-                    <button class="ctrl-btn" onclick="applyMove('f\'')">f'</button>
-                    <button class="ctrl-btn" onclick="applyMove('b')">b</button>
-                    <button class="ctrl-btn" onclick="applyMove('b\'')">b'</button>
-                </div>
                 <div class="control-row special-row">
                     <button class="ctrl-btn spec" onclick="applyMove('x')">x</button>
                     <button class="ctrl-btn spec" onclick="applyMove('x\'')">x'</button>
@@ -307,9 +291,9 @@
             <h1 id="t-cfop-title">Метод CFOP</h1>
             <p id="t-cfop-sub">Выберите этап</p>
         </div>
-        <button class="menu-btn" onclick="openCategory('f2l')" id="t-f2l-name">F2L (Первые два слоя - 41 случай)</button>
-        <button class="menu-btn" onclick="openCategory('oll')" id="t-oll-name">OLL (Ориентация последнего слоя - 57 случаев)</button>
-        <button class="menu-btn" onclick="openCategory('pll')" id="t-pll-name">PLL (Пермутация последнего слоя - 21 случай)</button>
+        <button class="menu-btn" onclick="openCategory('f2l')" id="t-f2l-name">F2L (Первые два слоя)</button>
+        <button class="menu-btn" onclick="openCategory('oll')" id="t-oll-name">OLL (Ориентация последнего слоя)</button>
+        <button class="menu-btn" onclick="openCategory('pll')" id="t-pll-name">PLL (Пермутация последнего слоя)</button>
     </div>
 
     <div id="view-4lll" class="view">
@@ -355,25 +339,16 @@
     
     let algorithmsData = {
         f2l: [
-            { id: 1, name: "F2L 1", desc: { ru: "Базовый вправо (Угол и ребро на верхнем слое)", en: "Basic right (Corner and edge on top layer)", uk: "Базовий вправо (Кут і ребро на верхньому шарі)", es: "Básico derecha (Esquina y arista en capa superior)" }, formula: "R U R'" },
-            { id: 2, name: "F2L 2", desc: { ru: "Базовый влево", en: "Basic left", uk: "Базовий вліво", es: "Básico izquierda" }, formula: "L' U' L" },
-            { id: 3, name: "F2L 3", desc: { ru: "Слот в правый задний", en: "Back-right slot insertion", uk: "Слот у правий задній", es: "Inserción en slot trasero derecho" }, formula: "U' R U' R' U R U R'" },
-            { id: 4, name: "F2L 4", desc: { ru: "Разделение пары вправо", en: "Pair separation right", uk: "Розділення пари вправо", es: "Separación de pareja derecha" }, formula: "R U2 R' U' R U R'" },
-            { id: 5, name: "F2L 5", desc: { ru: "Разделение пары влево", en: "Pair separation left", uk: "Розділення пари вліво", es: "Separación de pareja izquierda" }, formula: "L' U2 L U L' U' L" }
+            { id: 1, name: "F2L 1", desc: { ru: "Базовый вправо", en: "Basic right" }, formula: "R U R'" },
+            { id: 2, name: "F2L 2", desc: { ru: "Базовый влево", en: "Basic left" }, formula: "L' U' L" }
         ],
         oll: [
-            { id: 1, name: "OLL 1", desc: { ru: "Точка (Точка)", en: "Dot (All oriented)", uk: "Точка (Точка)", es: "Punto" }, formula: "R U2 R2 F R F' U2 R' F R F'" },
-            { id: 21, name: "OLL 21", desc: { ru: "Крест (Все углы на месте)", en: "Cross (All corners on place)", uk: "Хрест (Усі кути на місці)", es: "Cruz (Todas las esquinas en su lugar)" }, formula: "R U2 R2 U' R2 U' R2 U2 R" },
-            { id: 26, name: "OLL 26", desc: { ru: "«Рыбка» базовая", en: "Basic 'Fish'", uk: "«Рибка» базова", es: "'Pescado' básico" }, formula: "R U2 R' U' R U' R'" },
-            { id: 27, name: "OLL 27", desc: { ru: "«Рыбка» обратная", en: "Reverse 'Fish'", uk: "«Рибка» зворотна", es: "'Pescado' inverso" }, formula: "R U R' U R U2 R'" }
+            { id: 21, name: "OLL 21", desc: { ru: "Крест" }, formula: "R U2 R2 U' R2 U' R2 U2 R" },
+            { id: 26, name: "OLL 26", desc: { ru: "Рыбка" }, formula: "R U2 R' U' R U' R'" }
         ],
         pll: [
-            { id: 3, name: "E Perm", desc: { ru: "Перестановка E (диагональные углы)", en: "E Permutation (diagonal corners)", uk: "Перестановка E (діагональні кути)", es: "Permutación E (esquinas diagonales)" }, formula: "x' R U' R' D R U R' D' R U R' D R U' R' D' x" },
-            { id: 9, name: "H Perm", desc: { ru: "Перестановка H (ребра)", en: "H Permutation (edges)", uk: "Перестановка H (ребра)", es: "Permutación H (aristas)" }, formula: "M2 U M2 U2 M2 U M2" },
-            { id: 11, name: "Jb Perm", desc: { ru: "Перестановка J (b)", en: "J Permutation (b)", uk: "Перестановка J (b)", es: "Permutación J (b)" }, formula: "R U R' F' R U R' U' R' F R2 U' R'" },
-            { id: 16, name: "T Perm", desc: { ru: "Перестановка T (базовая)", en: "T Permutation (basic)", uk: "Перестановка T (базова)", es: "Permutación T (básica)" }, formula: "R U R' U' R' F R2 U' R' U' R U R' F'" },
-            { id: 17, name: "Ua Perm", desc: { ru: "Перестановка U (a - против часовой)", en: "U Permutation (a - counter-clockwise)", uk: "Перестановка U (a - проти годинникової)", es: "Permutación U (a - antihorario)" }, formula: "R U' R U R U R U' R' U' R2" },
-            { id: 21, name: "Z Perm", desc: { ru: "Перестановка Z (ребра)", en: "Z Permutation (edges)", uk: "Перестановка Z (ребра)", es: "Permutación Z (aristas)" }, formula: "M2 U M2 U M' U2 M2 U2 M' U2" }
+            { id: 3, name: "E Perm", desc: { ru: "Перестановка E" }, formula: "x' R U' R' D R U R' D' R U R' D R U' R' D' x" },
+            { id: 16, name: "T Perm", desc: { ru: "Перестановка T" }, formula: "R U R' U' R' F R2 U' R' U' R U R' F'" }
         ]
     };
 
@@ -402,140 +377,26 @@
             spamWarning: "⚠️ Не спамьте на кнопки во время вращения кубика — алгоритм может сбиться!",
             applyFormulaBtn: "Применить",
             resetBtn: "Сброс"
-        },
-        en: {
-            mainTitle: "🧩 Rubik's Cube",
-            mainSub: "Interactive CFOP Guide & Simulator",
-            btnCfop: "🧩 CFOP Method",
-            btn4lll: "📗 4LLL Method",
-            backMain: "← Main Menu",
-            cfopTitle: "CFOP Method",
-            cfopSub: "Select a stage",
-            f2lName: "F2L (First Two Layers)",
-            ollName: "OLL (Orientation)",
-            pllName: "PLL (Permutation)",
-            title4lll: "Simplified CFOP (4LLL)",
-            sub4lll: "Basic algorithms for quick solving",
-            backDetail: "← Back to CFOP",
-            searchPH: "Search algorithm...",
-            formulaLabel: "Formula (Solution Algorithm):",
-            scrambleLabel: "Scramble (To set up the case):",
-            copyBtn: "Copy Formula",
-            applyScrambleBtn: "Set up Case",
-            backToList: "← Back to List",
-            customFormulaLabel: "Enter or paste a formula to set up the situation:",
-            spamWarning: "⚠️ Do not spam buttons while the cube is rotating or the algorithm may break!",
-            applyFormulaBtn: "Apply",
-            resetBtn: "Reset"
-        },
-        uk: {
-            mainTitle: "🧩 Кубик Рубика",
-            mainSub: "Інтерактивний довідник CFOP та Симулятор",
-            btnCfop: "🧩 Метод CFOP (Фрідріх)",
-            btn4lll: "📗 Метод 4LLL (Спрощений)",
-            backMain: "← На головну",
-            cfopTitle: "Метод CFOP",
-            cfopSub: "Виберіть етап",
-            f2lName: "F2L (Перші два шари)",
-            ollName: "OLL (Орієнтація)",
-            pllName: "PLL (Пермутація)",
-            title4lll: "Спрощений CFOP (4LLL)",
-            sub4lll: "Базові алгоритми для швидкого збирання",
-            backDetail: "← До списку",
-            searchPH: "Пошук алгоритму...",
-            formulaLabel: "Формула (Алгоритм розв'язання):",
-            scrambleLabel: "Скрамбл (Для створення ситуації):",
-            copyBtn: "Копіювати формулу",
-            applyScrambleBtn: "Зібрати ситуацію",
-            backToList: "← До списку",
-            customFormulaLabel: "Введіть або вставте формулу, щоб отримати ситуацію:",
-            spamWarning: "⚠️ Не спаміть на кнопки під час обертання кубика — алгоритм може збитися!",
-            applyFormulaBtn: "Застосувати",
-            resetBtn: "Скидання"
-        },
-        es: {
-            mainTitle: "🧩 Cubo de Rubik",
-            mainSub: "Guía Interactiva CFOP y Simulador",
-            btnCfop: "🧩 Método CFOP",
-            btn4lll: "📗 Método 4LLL",
-            backMain: "← Menú Principal",
-            cfopTitle: "Método CFOP",
-            cfopSub: "Selecciona una etapa",
-            f2lName: "F2L (Primeras Dos Capas)",
-            ollName: "OLL (Orientación)",
-            pllName: "PLL (Permutación)",
-            title4lll: "CFOP Simplificado (4LLL)",
-            sub4lll: "Algoritmos básicos para armado rápido",
-            backDetail: "← Volver",
-            searchPH: "Buscar algoritmo...",
-            formulaLabel: "Fórmula (Algoritmo de solución):",
-            scrambleLabel: "Scramble (Para armar la situación):",
-            copyBtn: "Copiar fórmula",
-            applyScrambleBtn: "Armar situación",
-            backToList: "← Volver a la lista",
-            customFormulaLabel: "Introduce o pega una fórmula para obtener la situación:",
-            spamWarning: "⚠️ ¡No spamees los botones mientras gira el cubo o el algoritmo puede fallar!",
-            applyFormulaBtn: "Aplicar",
-            resetBtn: "Reiniciar"
         }
     };
 
     function setLang(lang) {
         currentLang = lang;
-        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active-lang'));
-        const btn = document.getElementById('btn-' + lang);
-        if (btn) btn.classList.add('active-lang');
-
-        const t = translations[lang];
-        document.getElementById('t-main-title').innerText = t.mainTitle;
-        document.getElementById('t-main-sub').innerText = t.mainSub;
-        document.getElementById('t-btn-cfop').innerText = t.btnCfop;
-        document.getElementById('t-btn-4lll').innerText = t.btn4lll;
-        document.getElementById('t-back-main').innerText = t.backMain;
-        document.getElementById('t-back-4lll').innerText = t.backMain;
-        document.getElementById('t-cfop-title').innerText = t.cfopTitle;
-        document.getElementById('t-cfop-sub').innerText = t.cfopSub;
-        document.getElementById('t-f2l-name').innerText = t.f2lName;
-        document.getElementById('t-oll-name').innerText = t.ollName;
-        document.getElementById('t-pll-name').innerText = t.pllName;
-        document.getElementById('t-4lll-title').innerText = t.title4lll;
-        document.getElementById('t-4lll-sub').innerText = t.sub4lll;
-        document.getElementById('t-back-detail').innerText = t.backDetail;
-        document.getElementById('search').placeholder = t.searchPH;
-        document.getElementById('t-formula-label').innerText = t.formulaLabel;
-        document.getElementById('t-scramble-label').innerText = t.scrambleLabel;
-        document.getElementById('t-copy-btn').innerText = t.copyBtn;
-        document.getElementById('t-apply-scramble-btn').innerText = t.applyScrambleBtn;
-        document.getElementById('t-back-to-list').innerText = t.backToList;
-        document.getElementById('t-custom-formula-label').innerText = t.customFormulaLabel;
-        document.getElementById('t-spam-warning').innerText = t.spamWarning;
-        document.getElementById('t-apply-formula-btn').innerText = t.applyFormulaBtn;
-        document.getElementById('t-reset-btn').innerText = t.resetBtn;
-
         if (currentCategory && algorithmsData[currentCategory]) {
             renderAlgorithms(algorithmsData[currentCategory]);
-        }
-        if (currentItemData) {
-            document.getElementById('detail-desc').innerText = typeof currentItemData.desc === 'object' ? (currentItemData.desc[currentLang] || currentItemData.desc['en']) : currentItemData.desc;
         }
     }
 
     function showView(viewId) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        const targetView = document.getElementById(viewId);
-        if (targetView) targetView.classList.add('active');
+        document.getElementById(viewId).classList.add('active');
         window.scrollTo(0, 0);
-        
         if (viewId === 'view-main' && renderer && camera) {
             const container = document.getElementById('cube-container');
-            if (container) {
-                const w = container.clientWidth || 300;
-                const h = container.clientHeight || 280;
-                renderer.setSize(w, h);
-                camera.aspect = w / h;
-                camera.updateProjectionMatrix();
-                renderer.render(scene, camera);
-            }
+            renderer.setSize(container.clientWidth || 300, container.clientHeight || 280);
+            camera.aspect = (container.clientWidth || 300) / (container.clientHeight || 280);
+            camera.updateProjectionMatrix();
+            renderer.render(scene, camera);
         }
     }
 
@@ -553,101 +414,69 @@
             const card = document.createElement('div');
             card.className = 'case-card';
             card.onclick = () => openDetail(item);
-            const descText = typeof item.desc === 'object' ? (item.desc[currentLang] || item.desc['en']) : item.desc;
-            card.innerHTML = `<h3>${item.name}</h3><p>${descText}</p>`;
+            card.innerHTML = `<h3>${item.name}</h3><p>${item.desc.ru || ''}</p>`;
             container.appendChild(card);
         });
     }
 
     function filterAlgorithms() {
-        const searchInput = document.getElementById('search');
-        if (!searchInput || !currentCategory || !algorithmsData[currentCategory]) return;
-        const query = searchInput.value.toLowerCase();
-        const items = algorithmsData[currentCategory];
-        const filtered = items.filter(i => {
-            const descText = (typeof i.desc === 'object' ? (i.desc[currentLang] || i.desc['en']) : i.desc).toLowerCase();
-            return i.name.toLowerCase().includes(query) || descText.includes(query) || i.formula.toLowerCase().includes(query);
-        });
-        renderAlgorithms(filtered);
+        const query = document.getElementById('search').value.toLowerCase();
+        const items = algorithmsData[currentCategory] || [];
+        renderAlgorithms(items.filter(i => i.name.toLowerCase().includes(query) || i.formula.toLowerCase().includes(query)));
     }
 
     function openDetail(item) {
         currentItemData = item;
         document.getElementById('detail-title').innerText = item.name;
-        document.getElementById('detail-desc').innerText = typeof item.desc === 'object' ? (item.desc[currentLang] || item.desc['en']) : item.desc;
+        document.getElementById('detail-desc').innerText = item.desc.ru || '';
         document.getElementById('detail-formula').innerText = item.formula;
-        
-        const scramble = getInverseScramble(item.formula);
-        document.getElementById('detail-scramble').innerText = scramble;
-
-        const formulaInput = document.getElementById('custom-formula-input');
-        if (formulaInput) formulaInput.value = item.formula;
+        document.getElementById('detail-scramble').innerText = getInverseScramble(item.formula);
+        document.getElementById('custom-formula-input').value = item.formula;
         showView('view-detail');
     }
 
     function getInverseScramble(formula) {
-        let clean = formula.replace(/\(([^)]+)\)\s*3/g, "$1 $1 $1")
-                           .replace(/\(([^)]+)\)\s*2/g, "$1 $1")
-                           .replace(/[()]/g, ' ');
+        const clean = formula.replace(/[()]/g, ' ');
         const tokens = clean.split(/\s+/).filter(t => t.length > 0);
         let inverseTokens = [];
         for (let i = tokens.length - 1; i >= 0; i--) {
             let token = tokens[i];
-            if (token.includes("'")) {
-                inverseTokens.push(token.replace("'", ""));
-            } else if (token.includes("2")) {
-                inverseTokens.push(token);
-            } else {
-                inverseTokens.push(token + "'");
-            }
+            if (token.includes("'")) inverseTokens.push(token.replace("'", ""));
+            else if (token.includes("2")) inverseTokens.push(token);
+            else inverseTokens.push(token + "'");
         }
         return inverseTokens.join(' ');
     }
 
     async function applyCaseScramble() {
         if (!currentItemData) return;
-        const scramble = getInverseScramble(currentItemData.formula);
-        const formulaInput = document.getElementById('custom-formula-input');
-        if (formulaInput) formulaInput.value = scramble;
+        document.getElementById('custom-formula-input').value = getInverseScramble(currentItemData.formula);
         showView('view-main');
         await executeCustomFormula();
     }
 
     async function executeCustomFormula() {
         if (isMoving) return;
-        const input = document.getElementById('custom-formula-input');
-        if (!input) return;
-        
-        let text = input.value.trim();
-        text = text.replace(/\(([^)]+)\)\s*3/g, "$1 $1 $1");
-        text = text.replace(/\(([^)]+)\)\s*2/g, "$1 $1");
-        text = text.replace(/[()]/g, ' ');
-
-        const tokens = text.split(/\s+/).filter(t => t.length > 0);
+        const text = document.getElementById('custom-formula-input').value.trim();
+        const tokens = text.replace(/[()]/g, ' ').split(/\s+/).filter(t => t.length > 0);
         for (let token of tokens) {
-            while (isMoving) {
-                await new Promise(r => setTimeout(r, 15));
-            }
+            while (isMoving) await new Promise(r => setTimeout(r, 10));
             applyMove(token);
         }
     }
 
     function resetCube() {
         if (isMoving) return;
-        if (cubeGroup && scene) {
-            scene.remove(cubeGroup);
-        }
-        cubies = [];
+        if (cubeGroup) scene.remove(cubeGroup);
         cubeGroup = new THREE.Group();
         scene.add(cubeGroup);
+        cubies = [];
 
-        const size = 0.92;
-        const geom = new THREE.BoxGeometry(size, size, size);
-
+        const geom = new THREE.BoxGeometry(0.92, 0.92, 0.92);
         for (let x = -1; x <= 1; x++) {
             for (let y = -1; y <= 1; y++) {
                 for (let z = -1; z <= 1; z++) {
-                    const materials = [
+                    const mats = [
                         new THREE.MeshBasicMaterial({ color: x === 1 ? COLORS.R : COLORS.IN }),
                         new THREE.MeshBasicMaterial({ color: x === -1 ? COLORS.L : COLORS.IN }),
                         new THREE.MeshBasicMaterial({ color: y === 1 ? COLORS.U : COLORS.IN }),
@@ -655,170 +484,78 @@
                         new THREE.MeshBasicMaterial({ color: z === 1 ? COLORS.F : COLORS.IN }),
                         new THREE.MeshBasicMaterial({ color: z === -1 ? COLORS.B : COLORS.IN })
                     ];
-                    const mesh = new THREE.Mesh(geom, materials);
+                    const mesh = new THREE.Mesh(geom, mats);
                     mesh.position.set(x, y, z);
                     cubeGroup.add(mesh);
                     cubies.push(mesh);
                 }
             }
         }
-        if (renderer && scene && camera) {
-            renderer.render(scene, camera);
-        }
-        const formulaInput = document.getElementById('custom-formula-input');
-        if (formulaInput) formulaInput.value = '';
+        if (renderer) renderer.render(scene, camera);
+        document.getElementById('custom-formula-input').value = '';
     }
 
     function copyFormula() {
-        const formula = document.getElementById('detail-formula').innerText;
-        const textarea = document.createElement('textarea');
-        textarea.value = formula;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        
+        navigator.clipboard.writeText(document.getElementById('detail-formula').innerText);
         const btn = document.getElementById('t-copy-btn');
-        const oldText = btn.innerText;
-        btn.innerText = currentLang === 'ru' ? 'Скопировано!' : 'Copied!';
-        setTimeout(() => btn.innerText = oldText, 1500);
+        const old = btn.innerText;
+        btn.innerText = 'Скопировано!';
+        setTimeout(() => btn.innerText = old, 1500);
     }
 
     let scene, camera, renderer, cubeGroup;
     let cubies = [];
     let isMoving = false;
-    
     let isDragging = false;
-    let previousMousePosition = { x: 0, y: 0 };
-    let cameraAngleX = 0.6;
-    let cameraAngleY = 0.8;
-    let cameraRadius = 7.2;
+    let prevMouse = { x: 0, y: 0 };
+    let rotX = 0.6, rotY = 0.8, radius = 7.2;
 
     const COLORS = {
-        R: 0xc41e3a,
-        L: 0xff5800,
-        U: 0xffffff,
-        D: 0xffd500,
-        F: 0x0051ba,
-        B: 0x009e60,
-        IN: 0x111111
+        R: 0xc41e3a, L: 0xff5800, U: 0xffffff,
+        D: 0xffd500, F: 0x0051ba, B: 0x009e60, IN: 0x111111
     };
 
-    function updateCameraPosition() {
+    function updateCamera() {
         if (!camera) return;
-        camera.position.x = cameraRadius * Math.sin(cameraAngleX) * Math.sin(cameraAngleY);
-        camera.position.y = cameraRadius * Math.cos(cameraAngleX);
-        camera.position.z = cameraRadius * Math.sin(cameraAngleX) * Math.cos(cameraAngleY);
+        camera.position.set(
+            radius * Math.sin(rotX) * Math.sin(rotY),
+            radius * Math.cos(rotX),
+            radius * Math.sin(rotX) * Math.cos(rotY)
+        );
         camera.lookAt(0, 0, 0);
-        if (renderer && scene) {
-            renderer.render(scene, camera);
-        }
+        if (renderer) renderer.render(scene, camera);
     }
 
     function initRubikCube() {
         const container = document.getElementById('cube-container');
-        if (!container) return;
-
         scene = new THREE.Scene();
-        const width = container.clientWidth || 300;
-        const height = container.clientHeight || 280;
-        camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-        updateCameraPosition();
+        camera = new THREE.PerspectiveCamera(45, (container.clientWidth || 300) / (container.clientHeight || 280), 0.1, 1000);
+        updateCamera();
 
         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(width, height);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        container.innerHTML = '';
+        renderer.setSize(container.clientWidth || 300, container.clientHeight || 280);
         container.appendChild(renderer.domElement);
 
         scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
-        dirLight.position.set(10, 20, 15);
-        scene.add(dirLight);
+        const light = new THREE.DirectionalLight(0xffffff, 0.7);
+        light.position.set(10, 20, 15);
+        scene.add(light);
 
-        cubeGroup = new THREE.Group();
-        scene.add(cubeGroup);
+        resetCube();
 
-        const size = 0.92;
-        const geom = new THREE.BoxGeometry(size, size, size);
-
-        for (let x = -1; x <= 1; x++) {
-            for (let y = -1; y <= 1; y++) {
-                for (let z = -1; z <= 1; z++) {
-                    const materials = [
-                        new THREE.MeshBasicMaterial({ color: x === 1 ? COLORS.R : COLORS.IN }),
-                        new THREE.MeshBasicMaterial({ color: x === -1 ? COLORS.L : COLORS.IN }),
-                        new THREE.MeshBasicMaterial({ color: y === 1 ? COLORS.U : COLORS.IN }),
-                        new THREE.MeshBasicMaterial({ color: y === -1 ? COLORS.D : COLORS.IN }),
-                        new THREE.MeshBasicMaterial({ color: z === 1 ? COLORS.F : COLORS.IN }),
-                        new THREE.MeshBasicMaterial({ color: z === -1 ? COLORS.B : COLORS.IN })
-                    ];
-                    const mesh = new THREE.Mesh(geom, materials);
-                    mesh.position.set(x, y, z);
-                    cubeGroup.add(mesh);
-                    cubies.push(mesh);
-                }
-            }
-        }
-        renderer.render(scene, camera);
-
-        window.addEventListener('resize', () => {
-            if (!container || !renderer || !camera) return;
-            const newWidth = container.clientWidth || 300;
-            const newHeight = container.clientHeight || 280;
-            camera.aspect = newWidth / newHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(newWidth, newHeight);
-            renderer.render(scene, camera);
-        });
-
-        container.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            previousMousePosition = { x: e.clientX, y: e.clientY };
-        });
-
-        window.addEventListener('mousemove', (e) => {
+        container.addEventListener('mousedown', e => { isDragging = true; prevMouse = { x: e.clientX, y: e.clientY }; });
+        window.addEventListener('mousemove', e => {
             if (!isDragging) return;
-            const deltaX = e.clientX - previousMousePosition.x;
-            const deltaY = e.clientY - previousMousePosition.y;
-
-            cameraAngleY -= deltaX * 0.01;
-            cameraAngleX -= deltaY * 0.01;
-            cameraAngleX = Math.max(0.1, Math.min(Math.PI - 0.1, cameraAngleX));
-
-            previousMousePosition = { x: e.clientX, y: e.clientY };
-            updateCameraPosition();
+            rotY -= (e.clientX - prevMouse.x) * 0.01;
+            rotX -= (e.clientY - prevMouse.y) * 0.01;
+            rotX = Math.max(0.1, Math.min(Math.PI - 0.1, rotX));
+            prevMouse = { x: e.clientX, y: e.clientY };
+            updateCamera();
         });
-
-        window.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
-
-        container.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1) {
-                isDragging = true;
-                previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-            }
-        }, { passive: true });
-
-        container.addEventListener('touchmove', (e) => {
-            if (!isDragging || e.touches.length !== 1) return;
-            const deltaX = e.touches[0].clientX - previousMousePosition.x;
-            const deltaY = e.touches[0].clientY - previousMousePosition.y;
-
-            cameraAngleY -= deltaX * 0.01;
-            cameraAngleX -= deltaY * 0.01;
-            cameraAngleX = Math.max(0.1, Math.min(Math.PI - 0.1, cameraAngleX));
-
-            previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-            updateCameraPosition();
-        }, { passive: true });
-
-        container.addEventListener('touchend', () => {
-            isDragging = false;
-        });
+        window.addEventListener('mouseup', () => isDragging = false);
     }
 
+    // ИСПРАВЛЕННЫЙ МЕТОД ВРАЩЕНИЯ С ИДЕАЛЬНЫМ РАСЧЕТОМ ДЛЯ ВСЕГО КУБИКА (x, y, z)
     function applyMove(moveStr) {
         if (isMoving) return;
         isMoving = true;
@@ -828,10 +565,10 @@
         const isDouble = moveStr.includes("2");
 
         let axis = new THREE.Vector3();
-        let filter = c => false;
         let angle = (isPrime ? Math.PI / 2 : -Math.PI / 2);
         if (isDouble) angle *= 2;
 
+        let filter = c => false;
         let isWholeCube = false;
 
         switch (base) {
@@ -841,18 +578,6 @@
             case 'D': axis.set(0, -1, 0); filter = c => c.position.y < -0.5; angle = -angle; break;
             case 'F': axis.set(0, 0, 1); filter = c => c.position.z > 0.5; break;
             case 'B': axis.set(0, 0, -1); filter = c => c.position.z < -0.5; angle = -angle; break;
-
-            case 'r': axis.set(1, 0, 0); filter = c => c.position.x > -0.5; break;
-            case 'l': axis.set(-1, 0, 0); filter = c => c.position.x < 0.5; angle = -angle; break;
-            case 'u': axis.set(0, 1, 0); filter = c => c.position.y > -0.5; break;
-            case 'd': axis.set(0, -1, 0); filter = c => c.position.y < 0.5; angle = -angle; break;
-            case 'f': axis.set(0, 0, 1); filter = c => c.position.z > -0.5; break;
-            case 'b': axis.set(0, 0, -1); filter = c => c.position.z < 0.5; angle = -angle; break;
-
-            case 'M': axis.set(-1, 0, 0); filter = c => Math.abs(c.position.x) < 0.5; angle = -angle; break;
-            case 'E': axis.set(0, -1, 0); filter = c => Math.abs(c.position.y) < 0.5; angle = -angle; break;
-            case 'S': axis.set(0, 0, 1); filter = c => Math.abs(c.position.z) < 0.5; break;
-
             case 'x': axis.set(1, 0, 0); isWholeCube = true; break;
             case 'y': axis.set(0, 1, 0); isWholeCube = true; angle = -angle; break;
             case 'z': axis.set(0, 0, 1); isWholeCube = true; break;
@@ -908,22 +633,10 @@
     window.onload = function() {
         initRubikCube();
         const list4lll = [
-            { id: 1, name: "OLL 21 (Крест)", desc: "Стандартный крест", formula: "R U2 R2 U' R2 U' R2 U2 R" },
-            { id: 2, name: "OLL 27 (Рыбка)", desc: "Классическая рыбка", formula: "R U R' U R U2 R'" },
-            { id: 3, name: "PLL T-Perm", desc: "Перестановка T", formula: "R U R' U' R' F R2 U' R' U' R U R' F'" },
-            { id: 4, name: "PLL U-Perm", desc: "Перестановка U", formula: "R U' R U R U R U' R' U' R2" }
+            { id: 1, name: "OLL 21 (Крест)", desc: { ru: "Стандартный крест" }, formula: "R U2 R2 U' R2 U' R2 U2 R" },
+            { id: 3, name: "PLL E-Perm", desc: { ru: "Перестановка E" }, formula: "x' R U' R' D R U R' D' R U R' D R U' R' D' x" }
         ];
         algorithmsData['4lll'] = list4lll;
-        const container4lll = document.getElementById('list-4lll-container');
-        if (container4lll) {
-            list4lll.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'case-card';
-                card.onclick = () => { currentCategory = '4lll'; openDetail(item); };
-                card.innerHTML = `<h3>${item.name}</h3><p>${item.desc}</p>`;
-                container4lll.appendChild(card);
-            });
-        }
     };
 </script>
 
