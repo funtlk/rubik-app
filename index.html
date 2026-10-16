@@ -240,6 +240,14 @@
         <button class="menu-btn" onclick="showView('view-4lll')" id="t-btn-4lll" style="background-color: #2c2c2e; color: #fff;">📗 Метод 4LLL (Упрощенный CFOP)</button>
 
         <div class="cube-section">
+            <div style="width: 100%; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px;">
+                <label id="t-custom-formula-label" style="font-size: 11px; color: var(--text-secondary); text-align: center;">Введите или вставьте формулу, чтобы собрать/воспроизвести ситуацию:</label>
+                <div style="display: flex; gap: 6px;">
+                    <input type="text" id="custom-formula-input" placeholder="Например: R U R' U'" style="flex: 1; padding: 8px 10px; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: monospace; font-size: 13px; outline: none;">
+                    <button onclick="executeCustomFormula()" id="t-apply-formula-btn" style="background-color: var(--button-color); color: var(--button-text-color); border: none; border-radius: 8px; padding: 0 12px; font-weight: 600; font-size: 12px; cursor: pointer;">Применить</button>
+                    <button onclick="resetCube()" id="t-reset-btn" style="background-color: #3a3a3c; color: var(--text-color); border: none; border-radius: 8px; padding: 0 12px; font-weight: 600; font-size: 12px; cursor: pointer;">Сброс</button>
+                </div>
+            </div>
             <div id="cube-container"></div>
             <div class="controls-panel">
                 <div class="control-row">
@@ -318,10 +326,17 @@
             <h2 id="detail-title" style="margin:0; font-size: 20px;">Название</h2>
             <p id="detail-desc" style="color: var(--text-secondary); margin:0; font-size: 14px;"></p>
             <div>
-                <span style="font-size: 13px; color: var(--text-secondary);" id="t-formula-label">Формула:</span>
+                <span style="font-size: 13px; color: var(--text-secondary);" id="t-formula-label">Формула (Алгоритм решения):</span>
                 <div class="formula-box" id="detail-formula">R U R'</div>
             </div>
-            <button class="copy-btn" onclick="copyFormula()" id="t-copy-btn">Копировать</button>
+            <div>
+                <span style="font-size: 13px; color: var(--text-secondary);" id="t-scramble-label">Скрамбл (Для создания ситуации):</span>
+                <div class="formula-box" id="detail-scramble" style="color: #4da3ff;">R U R'</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="copy-btn" onclick="copyFormula()" id="t-copy-btn" style="flex: 1;">Копировать формулу</button>
+                <button class="copy-btn" onclick="applyCaseScramble()" id="t-apply-scramble-btn" style="background-color: #34c759; flex: 1;">Собрать ситуацию</button>
+            </div>
         </div>
     </div>
 </div>
@@ -329,6 +344,7 @@
 <script>
     let currentLang = 'ru';
     let currentCategory = '';
+    let currentItemData = null;
     
     // Complete CFOP Algorithms Data (F2L: 41, OLL: 57, PLL: 21)
     let algorithmsData = {
@@ -473,9 +489,14 @@
             pllName: "PLL (Пермутация последнего слоя - 21 случай)",
             backDetail: "← К списку этапов",
             searchPH: "Поиск алгоритма...",
-            formulaLabel: "Формула:",
-            copyBtn: "Копировать",
-            backToList: "← К списку"
+            formulaLabel: "Формула (Алгоритм решения):",
+            scrambleLabel: "Скрамбл (Для создания ситуации):",
+            copyBtn: "Копировать формулу",
+            applyScrambleBtn: "Собрать ситуацию",
+            backToList: "← К списку",
+            customFormulaLabel: "Введите или вставьте формулу, чтобы получить ситуацию:",
+            applyFormulaBtn: "Применить",
+            resetBtn: "Сброс"
         },
         en: {
             mainTitle: "🧩 Rubik's Cube",
@@ -490,9 +511,14 @@
             pllName: "PLL (Permutation - 21 Cases)",
             backDetail: "← Back to CFOP",
             searchPH: "Search algorithm...",
-            formulaLabel: "Formula:",
-            copyBtn: "Copy",
-            backToList: "← Back to List"
+            formulaLabel: "Formula (Solution Algorithm):",
+            scrambleLabel: "Scramble (To set up the case):",
+            copyBtn: "Copy Formula",
+            applyScrambleBtn: "Set up Case",
+            backToList: "← Back to List",
+            customFormulaLabel: "Enter or paste a formula to set up the situation:",
+            applyFormulaBtn: "Apply",
+            resetBtn: "Reset"
         },
         uk: {
             mainTitle: "🧩 Кубик Рубика",
@@ -507,9 +533,14 @@
             pllName: "PLL (Пермутація - 21 випадок)",
             backDetail: "← До списку",
             searchPH: "Пошук алгоритму...",
-            formulaLabel: "Формула:",
-            copyBtn: "Копіювати",
-            backToList: "← До списку"
+            formulaLabel: "Формула (Алгоритм розв'язання):",
+            scrambleLabel: "Скрамбл (Для створення ситуації):",
+            copyBtn: "Копіювати формулу",
+            applyScrambleBtn: "Зібрати ситуацію",
+            backToList: "← До списку",
+            customFormulaLabel: "Введіть або вставте формулу, щоб отримати ситуацію:",
+            applyFormulaBtn: "Застосувати",
+            resetBtn: "Скидання"
         },
         es: {
             mainTitle: "🧩 Cubo de Rubik",
@@ -524,9 +555,14 @@
             pllName: "PLL (Permutación - 21 Casos)",
             backDetail: "← Volver",
             searchPH: "Buscar algoritmo...",
-            formulaLabel: "Fórmula:",
-            copyBtn: "Copiar",
-            backToList: "← Volver a la lista"
+            formulaLabel: "Fórmula (Algoritmo de solución):",
+            scrambleLabel: "Scramble (Para armar la situación):",
+            copyBtn: "Copiar fórmula",
+            applyScrambleBtn: "Armar situación",
+            backToList: "← Volver a la lista",
+            customFormulaLabel: "Introduce o pega una fórmula para obtener la situación:",
+            applyFormulaBtn: "Aplicar",
+            resetBtn: "Reiniciar"
         }
     };
 
@@ -549,8 +585,13 @@
         document.getElementById('t-back-detail').innerText = t.backDetail;
         document.getElementById('search').placeholder = t.searchPH;
         document.getElementById('t-formula-label').innerText = t.formulaLabel;
+        document.getElementById('t-scramble-label').innerText = t.scrambleLabel;
         document.getElementById('t-copy-btn').innerText = t.copyBtn;
+        document.getElementById('t-apply-scramble-btn').innerText = t.applyScrambleBtn;
         document.getElementById('t-back-to-list').innerText = t.backToList;
+        document.getElementById('t-custom-formula-label').innerText = t.customFormulaLabel;
+        document.getElementById('t-apply-formula-btn').innerText = t.applyFormulaBtn;
+        document.getElementById('t-reset-btn').innerText = t.resetBtn;
     }
 
     function showView(viewId) {
@@ -584,11 +625,104 @@
         renderAlgorithms(filtered);
     }
 
+    // Function to calculate inverse move sequence for scramble generation
+    function getInverseScramble(formula) {
+        let text = formula;
+        text = text.replace(/\(([^)]+)\)\s*3/g, "$1 $1 $1");
+        text = text.replace(/\(([^)]+)\)\s*2/g, "$1 $1");
+        text = text.replace(/[()]/g, ' ');
+
+        const tokens = text.split(/\s+/).filter(t => t.length > 0);
+        let inverseTokens = [];
+        
+        for (let i = tokens.length - 1; i >= 0; i--) {
+            let token = tokens[i];
+            if (token.includes("'")) {
+                inverseTokens.push(token.replace("'", ""));
+            } else if (token.includes("2")) {
+                inverseTokens.push(token);
+            } else {
+                inverseTokens.push(token + "'");
+            }
+        }
+        return inverseTokens.join(' ');
+    }
+
     function openDetail(item) {
+        currentItemData = item;
         document.getElementById('detail-title').innerText = item.name;
         document.getElementById('detail-desc').innerText = item.desc;
         document.getElementById('detail-formula').innerText = item.formula;
+        
+        const scramble = getInverseScramble(item.formula);
+        document.getElementById('detail-scramble').innerText = scramble;
+
+        const formulaInput = document.getElementById('custom-formula-input');
+        if (formulaInput) formulaInput.value = item.formula;
         showView('view-detail');
+    }
+
+    async function applyCaseScramble() {
+        if (!currentItemData) return;
+        const scramble = getInverseScramble(currentItemData.formula);
+        const formulaInput = document.getElementById('custom-formula-input');
+        if (formulaInput) formulaInput.value = scramble;
+        await executeCustomFormula();
+    }
+
+    async function executeCustomFormula() {
+        if (isMoving) return;
+        const input = document.getElementById('custom-formula-input');
+        if (!input) return;
+        
+        let text = input.value.trim();
+        text = text.replace(/\(([^)]+)\)\s*3/g, "$1 $1 $1");
+        text = text.replace(/\(([^)]+)\)\s*2/g, "$1 $1");
+        text = text.replace(/[()]/g, ' ');
+
+        const tokens = text.split(/\s+/).filter(t => t.length > 0);
+        for (let token of tokens) {
+            while (isMoving) {
+                await new Promise(r => setTimeout(r, 50));
+            }
+            applyMove(token);
+        }
+    }
+
+    function resetCube() {
+        if (isMoving) return;
+        if (cubeGroup) {
+            scene.remove(cubeGroup);
+        }
+        cubies = [];
+        cubeGroup = new THREE.Group();
+        scene.add(cubeGroup);
+
+        const size = 0.92;
+        const geom = new THREE.BoxGeometry(size, size, size);
+
+        for (let x = -1; x <= 1; x++) {
+            for (let y = -1; y <= 1; y++) {
+                for (let z = -1; z <= 1; z++) {
+                    const materials = [
+                        new THREE.MeshBasicMaterial({ color: x === 1 ? COLORS.R : COLORS.IN }),
+                        new THREE.MeshBasicMaterial({ color: x === -1 ? COLORS.L : COLORS.IN }),
+                        new THREE.MeshBasicMaterial({ color: y === 1 ? COLORS.U : COLORS.IN }),
+                        new THREE.MeshBasicMaterial({ color: y === -1 ? COLORS.D : COLORS.IN }),
+                        new THREE.MeshBasicMaterial({ color: z === 1 ? COLORS.F : COLORS.IN }),
+                        new THREE.MeshBasicMaterial({ color: z === -1 ? COLORS.B : COLORS.IN })
+                    ];
+                    const mesh = new THREE.Mesh(geom, materials);
+                    mesh.position.set(x, y, z);
+                    mesh.userData = { origX: x, origY: y, origZ: z };
+                    cubeGroup.add(mesh);
+                    cubies.push(mesh);
+                }
+            }
+        }
+        renderer.render(scene, camera);
+        const formulaInput = document.getElementById('custom-formula-input');
+        if (formulaInput) formulaInput.value = '';
     }
 
     function copyFormula() {
@@ -748,12 +882,13 @@
             { id: 3, name: "PLL T-Perm", desc: "Перестановка T", formula: "R U R' U' R' F R2 U' R' U' R U R' F'" },
             { id: 4, name: "PLL U-Perm", desc: "Перестановка U", formula: "R U' R U R U R U' R' U' R2" }
         ];
+        algorithmsData['4lll'] = list4lll;
         const container4lll = document.getElementById('list-4lll-container');
         if (container4lll) {
             list4lll.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'case-card';
-                card.onclick = () => openDetail(item);
+                card.onclick = () => { currentCategory = '4lll'; openDetail(item); };
                 card.innerHTML = `<h3>${item.name}</h3><p>${item.desc}</p>`;
                 container4lll.appendChild(card);
             });
