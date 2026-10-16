@@ -3,80 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Кубик Рубика — Тест</title>
+    <title>Кубик Рубика — CFOP</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #1a1a1a);
+            --text-color: var(--tg-theme-text-color, #f1f1f1);
+            --hint-color: var(--tg-theme-hint-color, #aaaaaa);
+            --button-color: var(--tg-theme-button-color, #007aff);
+            --button-text-color: var(--tg-theme-button-text-color, #ffffff);
+            --card-bg: var(--tg-theme-secondary-bg-color, #2a2a2a);
+        }
         body {
-            background-color: #1a1a1a;
-            color: #ffffff;
-            font-family: sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             padding: 16px;
+            margin: 0;
             box-sizing: border-box;
         }
         .view { display: none; }
         .view.active { display: block; }
+        h1 { text-align: center; font-size: 22px; margin-bottom: 16px; }
+        .subtitle { text-align: center; color: var(--hint-color); font-size: 14px; margin-bottom: 20px; }
         .btn {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             width: 100%;
-            padding: 16px;
-            margin-bottom: 12px;
-            background-color: #007aff;
-            color: #ffffff;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
             border: none;
             border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        .btn-primary {
+            background-color: var(--button-color);
+            color: var(--button-text-color);
+            justify-content: center;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--button-color);
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 600;
+            padding: 0;
+            margin-bottom: 16px;
             cursor: pointer;
         }
-        #debug-log {
-            background: #333;
-            color: #00ff00;
-            padding: 10px;
-            border-radius: 8px;
+        .card {
+            background-color: var(--card-bg);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 14px;
+        }
+        .formula-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             font-family: monospace;
-            font-size: 12px;
+            background: rgba(128,128,128,0.2);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 15px;
+            margin-top: 8px;
+        }
+        .copy-btn {
+            background: var(--button-color);
+            color: var(--button-text-color);
+            border: none;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(128,128,128,0.3);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-size: 15px;
             margin-bottom: 16px;
-            word-break: break-all;
+            box-sizing: border-box;
+            outline: none;
         }
     </style>
 </head>
 <body>
-    <div id="debug-log">Статус: Загрузка...</div>
 
+    <!-- Главное меню -->
     <div id="view-main" class="view active">
-        <h1>Главное меню</h1>
-        <button class="btn" onclick="tryNavigate('view-cfop')">Открыть CFOP</button>
+        <h1>🧩 Кубик Рубика</h1>
+        <p class="subtitle">Справочник методов</p>
+        <button class="btn btn-primary" onclick="switchView('view-cfop')">Метод CFOP</button>
     </div>
 
+    <!-- Меню CFOP -->
     <div id="view-cfop" class="view">
-        <h1>Этапы CFOP</h1>
-        <button class="btn" onclick="tryNavigate('view-main')">← Назад в меню</button>
+        <button class="back-btn" onclick="switchView('view-main')">← Назад</button>
+        <h1>Метод CFOP</h1>
+        <p class="subtitle">Выберите этап</p>
+        <button class="btn" onclick="openStage('f2l')"><span>1. F2L (42 случая)</span> <span>›</span></button>
+        <button class="btn" onclick="openStage('oll')"><span>2. OLL (57 случаев)</span> <span>›</span></button>
+        <button class="btn btn-primary" onclick="openStage('pll')"><span>3. PLL (21 случай)</span> <span>›</span></button>
+    </div>
+
+    <!-- Список алгоритмов -->
+    <div id="view-list" class="view">
+        <button class="back-btn" onclick="switchView('view-cfop')">← Назад к этапам</button>
+        <h1 id="stage-title">Список</h1>
+        <input type="text" id="search" class="search-box" placeholder="Поиск..." oninput="filterList()">
+        <div id="list-container"></div>
+    </div>
+
+    <!-- Детали алгоритма -->
+    <div id="view-detail" class="view">
+        <button class="back-btn" onclick="switchView('view-list')">← К списку</button>
+        <div class="card">
+            <h2 id="det-title" style="margin-top:0;">Название</h2>
+            <p id="det-desc" style="color: var(--hint-color); font-size: 14px;"></p>
+            <div class="formula-box">
+                <span id="det-formula"></span>
+                <button class="copy-btn" onclick="copyText()">Копировать</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        function log(msg) {
-            document.getElementById('debug-log').innerText = "Статус: " + msg;
-            console.log(msg);
-        }
-
         try {
-            let tg = window.Telegram.WebApp;
-            tg.ready();
-            tg.expand();
-            log("Telegram WebApp инициализирован");
-        } catch (e) {
-            log("Ошибка Telegram: " + e.message);
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+        } catch(e) {}
+
+        let currentStageKey = 'pll';
+
+        const db = {
+            f2l: {
+                title: "F2L (42 случая)",
+                items: {
+                    'F2L 1': { f: "U R U' R'", d: "Базовый случай" },
+                    'F2L 2': { f: "y' U' L' U L", d: "Зеркальный базовый" },
+                    'F2L 3': { f: "y' F' U' F", d: "Через фасад" },
+                    'F2L 4': { f: "R U R'", d: "Прямой загон" }
+                }
+            },
+            oll: {
+                title: "OLL (57 случаев)",
+                items: {
+                    'OLL 21': { f: "R U2 R' U' R U R' U' R U' R'", d: "Крест — Распорка" },
+                    'OLL 24': { f: "r U R' U' r' F R F'", d: "Крест — Вертолет" },
+                    'OLL 25': { f: "F' r U R' U' r' F R", d: "Крест — Восьмерка" },
+                    'OLL 27': { f: "R U R' U R U2 R'", d: "Правая рыбка" }
+                }
+            },
+            pll: {
+                title: "PLL (21 случай)",
+                items: {
+                    'H-Perm': { f: "M2' U M2' U2 M2' U M2'", d: "Противоположные ребра" },
+                    'Z-Perm': { f: "M2' U M2' U' M' U2' M2' U2' M'", d: "Соседние ребра" },
+                    'Ua-Perm': { f: "R2 U' R' U' R U R U R U' R", d: "Цикл ребер против часовой" },
+                    'T-Perm': { f: "R U R' U' R' F R2 U' R' U' R U R' F'", d: "Диагональный обмен" }
+                }
+            }
+        };
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            window.scrollTo(0,0);
         }
 
-        function tryNavigate(viewId) {
-            log("Клик по кнопке! Переход на: " + viewId);
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            let target = document.getElementById(viewId);
-            if (target) {
-                target.classList.add('active');
-                log("Успешно переключено на " + viewId);
-            } else {
-                log("ОШИБКА: Элемент " + viewId + " не найден!");
+        function openStage(stage) {
+            currentStageKey = stage;
+            document.getElementById('stage-title').innerText = db[stage].title;
+            document.getElementById('search').value = '';
+            renderItems(db[stage].items);
+            switchView('view-list');
+        }
+
+        function renderItems(items) {
+            let container = document.getElementById('list-container');
+            container.innerHTML = '';
+            for (let name in items) {
+                let btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.innerHTML = `<span>${name}</span> <span style="color:var(--hint-color); font-size:13px;">${items[name].d}</span>`;
+                btn.onclick = () => showDetail(name, items[name]);
+                container.appendChild(btn);
             }
+        }
+
+        function filterItems() {
+            let q = document.getElementById('search').value.toLowerCase();
+            let all = db[currentStageKey].items;
+            let filtered = {};
+            for (let name in all) {
+                if (name.toLowerCase().includes(q) || all[name].d.toLowerCase().includes(q)) {
+                    filtered[name] = all[name];
+                }
+            }
+            renderItems(filtered);
+        }
+
+        function showDetail(name, item) {
+            document.getElementById('det-title').innerText = name;
+            document.getElementById('det-desc').innerText = item.d;
+            document.getElementById('det-formula').innerText = item.f;
+            switchView('view-detail');
+        }
+
+        function copyText() {
+            let text = document.getElementById('det-formula').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Формула скопирована!");
+            });
         }
     </script>
 </body>
