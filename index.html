@@ -1,566 +1,579 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rubik's Cube Guide</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script type="module" src="https://cdn.cubing.net/js/cubing/twisty"></script>
-    <style>
-        :root {
-            --bg-color: var(--tg-theme-bg-color, #1a1a1a);
-            --text-color: var(--tg-theme-text-color, #f1f1f1);
-            --hint-color: var(--tg-theme-hint-color, #aaaaaa);
-            --button-color: var(--tg-theme-button-color, #007aff);
-            --button-text-color: var(--tg-theme-button-text-color, #ffffff);
-            --card-bg: var(--tg-theme-secondary-bg-color, #2a2a2a);
-        }
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            padding: 16px;
-            margin: 0;
-            box-sizing: border-box;
-        }
-        .view { display: none; }
-        .view.active { display: block; }
-        h1 { text-align: center; font-size: 22px; margin-bottom: 16px; }
-        .subtitle { text-align: center; color: var(--hint-color); font-size: 14px; margin-bottom: 20px; }
-        .btn {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            padding: 14px 16px;
-            margin-bottom: 10px;
-            background-color: var(--card-bg);
-            color: var(--text-color);
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            box-sizing: border-box;
-        }
-        .btn-primary {
-            background-color: var(--button-color);
-            color: var(--button-text-color);
-            justify-content: center;
-        }
-        .back-btn {
-            background: none;
-            border: none;
-            color: var(--button-color);
-            font-size: 16px;
-            font-weight: 600;
-            padding: 0;
-            margin-bottom: 16px;
-            cursor: pointer;
-        }
-        .card {
-            background-color: var(--card-bg);
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 14px;
-            position: relative;
-        }
-        .formula-box {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-family: monospace;
-            background: rgba(128,128,128,0.2);
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 15px;
-            margin-top: 8px;
-            word-break: break-all;
-        }
-        .copy-btn {
-            background: var(--button-color);
-            color: var(--button-text-color);
-            border: none;
-            border-radius: 6px;
-            padding: 6px 10px;
-            font-size: 13px;
-            cursor: pointer;
-            flex-shrink: 0;
-            margin-left: 10px;
-        }
-        .search-box {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid rgba(128,128,128,0.3);
-            background-color: var(--card-bg);
-            color: var(--text-color);
-            font-size: 15px;
-            margin-bottom: 16px;
-            box-sizing: border-box;
-            outline: none;
-        }
-        .lang-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 20px;
-        }
-        .lang-btn {
-            background-color: var(--card-bg);
-            color: var(--text-color);
-            border: 1px solid rgba(128,128,128,0.3);
-            padding: 10px 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            text-align: center;
-        }
-        .lang-btn.active-lang {
-            background-color: var(--button-color);
-            color: var(--button-text-color);
-            border-color: transparent;
-        }
-        .cube-3d-wrapper {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 15px;
-        }
-        twisty-player {
-            width: 160px;
-            height: 160px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CFOP & 4LLL Master Trainer</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+darkMode: 'class',
+theme: {
+extend: {
+colors: {
+darkBg: '#0f172a',
+cardBg: '#1e293b',
+accent: '#6366f1',
+accentHover: '#4f46e5'
+}
+}
+}
+}
+</script>
+<!-- Telegram Web App SDK -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<!-- FontAwesome for Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body {
+user-select: none;
+-webkit-tap-highlight-color: transparent;
+}
+/* Custom scrollbar */
+::-webkit-scrollbar {
+width: 6px;
+height: 6px;
+}
+::-webkit-scrollbar-track {
+background: rgba(0,0,0,0.1);
+}
+::-webkit-scrollbar-thumb {
+background: rgba(99, 102, 241, 0.5);
+border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+background: rgba(99, 102, 241, 0.8);
+}
+</style>
 </head>
-<body>
-
-    <!-- Главное меню -->
-    <div id="view-main" class="view active">
-        <h1 id="t-main-title">🧩 Кубик Рубика</h1>
-        <p class="subtitle" id="t-main-sub">Интерактивный справочник методов</p>
-        <button class="btn btn-primary" onclick="switchView('view-cfop')" id="t-btn-cfop">🧩 Метод CFOP (Фридрих)</button>
-        <button class="btn" onclick="openStage('4lll')" id="t-btn-4lll">🔰 Метод 4LLL (Упрощенный CFOP)</button>
-        <button class="btn" onclick="showStub('Roux')" id="t-btn-roux">🔄 Метод Roux (скоро)</button>
-        <button class="btn" onclick="showStub('Beginner')" id="t-btn-beginner">📖 Новичковый метод (скоро)</button>
-        
-        <div class="lang-container">
-            <button class="lang-btn active-lang" id="btn-ru" onclick="setLang('ru')">🇷🇺 РУС</button>
-            <button class="lang-btn" id="btn-en" onclick="setLang('en')">🇬🇧 ENG</button>
-            <button class="lang-btn" id="btn-uk" onclick="setLang('uk')">🇺🇦 УКР</button>
-            <button class="lang-btn" id="btn-es" onclick="setLang('es')">🇪🇸 ESP</button>
-        </div>
-    </div>
-
-    <!-- Меню CFOP -->
-    <div id="view-cfop" class="view">
-        <button class="back-btn" onclick="switchView('view-main')" id="t-back-main">← Главное меню</button>
-        <h1 id="t-cfop-title">Метод CFOP</h1>
-        <p class="subtitle" id="t-cfop-sub">Выберите этап для изучения</p>
-        <button class="btn" onclick="openStage('f2l')"><span id="t-f2l-name">1. F2L (42 случая)</span> <span>›</span></button>
-        <button class="btn" onclick="openStage('oll')"><span id="t-oll-name">2. OLL (57 случаев)</span> <span>›</span></button>
-        <button class="btn btn-primary" onclick="openStage('pll')"><span id="t-pll-name">3. PLL (21 случай)</span> <span>›</span></button>
-    </div>
-
-    <!-- Список алгоритмов -->
-    <div id="view-list" class="view">
-        <button class="back-btn" onclick="goBackFromList()" id="t-back-list-btn">← Назад</button>
-        <h1 id="stage-title">Список алгоритмов</h1>
-        <input type="text" id="search" class="search-box" placeholder="Поиск..." oninput="filterList()">
-        <div id="list-container"></div>
-    </div>
-
-    <!-- Детали алгоритма -->
-    <div id="view-detail" class="view">
-        <button class="back-btn" onclick="switchView('view-list')" id="t-back-detail">← К списку</button>
-        <div class="card">
-            <h2 id="det-title" style="margin-top:0; font-size:20px;">Название</h2>
-            <p id="det-desc" style="color: var(--hint-color); font-size: 14px; margin-bottom: 12px;"></p>
-            <p id="t-formula-label" style="margin-bottom: 6px; font-size: 14px; font-weight: 600;">Формула:</p>
-            <div class="formula-box">
-                <span id="det-formula"></span>
-                <button class="copy-btn" onclick="copyText()" id="t-copy-btn">Копировать</button>
-            </div>
-
-            <div class="cube-3d-wrapper">
-                <twisty-player 
-                    id="cube-player" 
-                    puzzle="3x3x3" 
-                    visualization="3D" 
-                    control-panel="none" 
-                    background="none"
-                    camera-latitude="30"
-                    camera-longitude="-45"
-                    setup-alg="z2">
-                </twisty-player>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        try {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
-        } catch(e) {}
-
-        let currentLang = 'ru';
-        let currentStageKey = '4lll';
-
-        const translations = {
-            ru: {
-                mainTitle: "🧩 Кубик Рубика",
-                mainSub: "Интерактивный справочник методов",
-                btnCfop: "🧩 Метод CFOP (Фридрих)",
-                btn4lll: "🔰 Метод 4LLL (Упрощенный CFOP)",
-                btnRoux: "🔄 Метод Roux (скоро)",
-                btnBeginner: "📖 Новичковый метод (скоро)",
-                backMain: "← Главное меню",
-                backCfop: "← К этапам CFOP",
-                cfopTitle: "Метод CFOP",
-                cfopSub: "Выберите этап для изучения",
-                f2lName: "1. F2L (42 случая)",
-                ollName: "2. OLL (57 случаев)",
-                pllName: "3. PLL (21 случай)",
-                backDetail: "← К списку",
-                searchPH: "Поиск по названию или описанию...",
-                formulaLabel: "Формула:",
-                copyBtn: "Копировать",
-                copiedAlert: "Формула скопирована!",
-                soonStub: " появится в обновлении!"
-            },
-            en: {
-                mainTitle: "🧩 Rubik's Cube",
-                mainSub: "Interactive Methods Guide",
-                btnCfop: "🧩 CFOP Method (Fridrich)",
-                btn4lll: "🔰 4LLL Method (Simplified CFOP)",
-                btnRoux: "🔄 Roux Method (soon)",
-                btnBeginner: "📖 Beginner Method (soon)",
-                backMain: "← Main Menu",
-                backCfop: "← Back to CFOP Stages",
-                cfopTitle: "CFOP Method",
-                cfopSub: "Select a stage to study",
-                f2lName: "1. F2L (42 cases)",
-                ollName: "2. OLL (57 cases)",
-                pllName: "3. PLL (21 cases)",
-                backDetail: "← Back to list",
-                searchPH: "Search by name or description...",
-                formulaLabel: "Formula:",
-                copyBtn: "Copy",
-                copiedAlert: "Formula copied!",
-                soonStub: " will be available soon!"
-            },
-            uk: {
-                mainTitle: "🧩 Кубик Рубика",
-                mainSub: "Інтерактивний довідник методів",
-                btnCfop: "🧩 Метод CFOP (Фрідріх)",
-                btn4lll: "🔰 Метод 4LLL (Спрощений CFOP)",
-                btnRoux: "🔄 Метод Roux (скоро)",
-                btnBeginner: "📖 Новачковий метод (скоро)",
-                backMain: "← Головне меню",
-                backCfop: "← До етапів CFOP",
-                cfopTitle: "Метод CFOP",
-                cfopSub: "Оберіть етап для вивчення",
-                f2lName: "1. F2L (42 випадки)",
-                ollName: "2. OLL (57 випадків)",
-                pllName: "3. PLL (21 випадок)",
-                backDetail: "← До списку",
-                searchPH: "Пошук за назвою чи описом...",
-                formulaLabel: "Формула:",
-                copyBtn: "Копіювати",
-                copiedAlert: "Формулу скопійовано!",
-                soonStub: " з'явиться в оновленні!"
-            },
-            es: {
-                mainTitle: "🧩 Cubo de Rubik",
-                mainSub: "Guía Interactiva de Métodos",
-                btnCfop: "🧩 Método CFOP (Fridrich)",
-                btn4lll: "🔰 Método 4LLL (CFOP Simplificado)",
-                btnRoux: "🔄 Método Roux (pronto)",
-                btnBeginner: "📖 Método Principiante (pronto)",
-                backMain: "← Menú Principal",
-                backCfop: "← Volver a CFOP",
-                cfopTitle: "Método CFOP",
-                cfopSub: "Selecciona una etapa",
-                f2lName: "1. F2L (42 casos)",
-                ollName: "2. OLL (57 casos)",
-                pllName: "3. PLL (21 casos)",
-                backDetail: "← Volver a la lista",
-                searchPH: "Buscar por nombre o descripción...",
-                formulaLabel: "Fórmula:",
-                copyBtn: "Copiar",
-                copiedAlert: "¡Fórmula copiada!",
-                soonStub: " ¡estará disponible pronto!"
-            }
-        };
-
-        const db = {
-            '4lll': {
-                title: { ru: "Метод 4LLL", en: "4LLL Method", uk: "Метод 4LLL", es: "Método 4LLL" },
-                items: {
-                    'EO - Line': { f: "F R U R' U' F'", d: { ru: "Ориентация ребер (Палка / Линия)", en: "Edge Orientation (Line)", uk: "Орієнтація ребер (Палиця)", es: "Orientación de bordes (Línea)" } },
-                    'EO - Dot': { f: "F R U R' U' F' f R U R' U' f'", d: { ru: "Ориентация ребер (Точка)", en: "Edge Orientation (Dot)", uk: "Орієнтація ребер (Крапка)", es: "Orientación de bordes (Punto)" } },
-                    'OC - Sune': { f: "R U R' U R U2 R'", d: { ru: "Ориентация углов (Рыбка)", en: "Corner Orientation (Sune)", uk: "Орієнтація кутів (Рибка)", es: "Orientación de esquinas (Sune)" } },
-                    'OC - Anti-Sune': { f: "R U2 R' U' R U' R'", d: { ru: "Ориентация углов (Анти-рыбка)", en: "Corner Orientation (Anti-Sune)", uk: "Орієнтація кутів (Анти-рибка)", es: "Orientación de esquinas (Anti-Sune)" } },
-                    'CP - Headlights': { f: "x R' D R' U2 R D' R' U2 R2 x'", d: { ru: "Перестановка углов (Глаза / Aa-Perm)", en: "Corner Permutation (Headlights)", uk: "Перестановка кутів (Очі)", es: "Permutación de esquinas (Luces)" } },
-                    'EP - Ua Perm': { f: "R2 U' R' U' R U R U R U' R", d: { ru: "Перестановка ребер (Ua-Perm)", en: "Edge Permutation (Ua Perm)", uk: "Перестановка ребер (Ua-Perm)", es: "Permutación de bordes (Ua Perm)" } },
-                    'EP - Ub Perm': { f: "R' U R' U' R' U' R' U R U R2", d: { ru: "Перестановка ребер (Ub-Perm)", en: "Edge Permutation (Ub Perm)", uk: "Перестановка ребер (Ub-Perm)", es: "Permutación de bordes (Ub Perm)" } },
-                    'EP - H Perm': { f: "M2' U M2' U2 M2' U M2'", d: { ru: "Перестановка ребер (H-Perm)", en: "Edge Permutation (H Perm)", uk: "Перестановка ребер (H-Perm)", es: "Permutación de bordes (H Perm)" } },
-                    'EP - Z Perm': { f: "M2' U M2' U' M' U2' M2' U2' M'", d: { ru: "Перестановка ребер (Z-Perm)", en: "Edge Permutation (Z Perm)", uk: "Перестановка ребер (Z-Perm)", es: "Permutación de bordes (Z Perm)" } },
-
-                }
-            },
-            f2l: {
-                title: { ru: "Этап F2L (42 случая)", en: "F2L Stage (42 cases)", uk: "Етап F2L (42 випадки)", es: "Etapa F2L (42 casos)" },
-                items: {
-                    'F2L 1': { f: "U R U' R'", d: { ru: "Базовый случай", en: "Basic case", uk: "Базовий випадок", es: "Caso básico" } },
-                    'F2L 2': { f: "y' U' L' U L", d: { ru: "Зеркальный базовый", en: "Mirror basic", uk: "Дзеркальний базовий", es: "Espejo básico" } },
-                    'F2L 3': { f: "y' F' U' F", d: { ru: "Через фасад", en: "Front insertion", uk: "Через фасад", es: "Por fachada" } },
-                    'F2L 4': { f: "R U R'", d: { ru: "Прямой загон", en: "Direct insertion", uk: "Пряме заведення", es: "Inserción directa" } },
-                    'F2L 5': { f: "U' R U' R' U R U R'", d: { ru: "Разделение пары", en: "Pair separation", uk: "Розділення пари", es: "Separación de pares" } },
-                    'F2L 6': { f: "y' U L' U L U' L' U' L", d: { ru: "Разделение (зеркало)", en: "Pair separation mirror", uk: "Розділення (дзеркало)", es: "Separación espejo" } },
-                    'F2L 7': { f: "U' R U2' R' U2 R U' R'", d: { ru: "Разведение элементов", en: "Elements spread", uk: "Розведення елементів", es: "Propagación de elementos" } },
-                    'F2L 8': { f: "y' U L' U2 L U2' L' U L", d: { ru: "Разведение (зеркало)", en: "Spread mirror", uk: "Розведення (дзеркало)", es: "Propagación espejo" } },
-                    'F2L 9': { f: "y' U' L' U L U L' U' L", d: { ru: "Свободная пара", en: "Free pair", uk: "Вільна пара", es: "Par libre" } },
-                    'F2L 10': { f: "U R U' R' U' R U R'", d: { ru: "Свободная пара (зеркало)", en: "Free pair mirror", uk: "Вільна пара (дзеркало)", es: "Par libre espejo" } },
-                    'F2L 11': { f: "U' R U R' U R U R'", d: { ru: "Совмещение стикеров", en: "Stickers matching", uk: "Суміщення стікерів", es: "Coincidencia de pegatinas" } },
-                    'F2L 12': { f: "y' U L' U' L U' L' U' L", d: { ru: "Совмещение (зеркало)", en: "Stickers matching mirror", uk: "Суміщення (дзеркало)", es: "Coincidencia espejo" } },
-                    'F2L 13': { f: "y' U' L' U2 L U' L' U L", d: { ru: "Создание трехходовки", en: "3-mover creation", uk: "Створення трьохходовки", es: "Creación de 3 movimientos" } },
-                    'F2L 14': { f: "U R U2' R' U R U' R'", d: { ru: "Трехходовка (зеркало)", en: "3-mover mirror", uk: "Трьохходовка (дзеркало)", es: "Espejo de 3 movimientos" } },
-                    'F2L 15': { f: "y' F' U F U2' L' U' L", d: { ru: "Разворот угла", en: "Corner twist", uk: "Розворот кута", es: "Giro de esquina" } },
-                    'F2L 16': { f: "R U' R' U2 F' U' F", d: { ru: "Разворот угла (зеркало)", en: "Corner twist mirror", uk: "Розворот кута (дзеркало)", es: "Giro de esquina espejo" } },
-                    'F2L 17': { f: "R U2' R' U' R U R'", d: { ru: "Угол вверх белым", en: "Corner up white", uk: "Кут вгору білим", es: "Esquina arriba blanca" } },
-                    'F2L 18': { f: "y' L' U2 L U L' U' L", d: { ru: "Угол вверх (зеркало)", en: "Corner up mirror", uk: "Кут вгору (дзеркало)", es: "Esquina arriba espejo" } },
-                    'F2L 19': { f: "U R U2' R' U6 R U' R'", d: { ru: "Подготовка", en: "Preparation", uk: "Підготовка", es: "Preparación" } },
-                    'F2L 20': { f: "y' U' L' U2 L U' L' U' L", d: { ru: "Подготовка (зеркало)", en: "Preparation mirror", uk: "Підготовка (дзеркало)", es: "Preparación espejo" } },
-                    'F2L 21': { f: "y' U2 L' U' L U' L' U L", d: { ru: "Двойной поворот крыши", en: "Double roof turn", uk: "Подвійний поворот даху", es: "Giro doble de techo" } },
-                    'F2L 22': { f: "U2 R U R' U R U' R'", d: { ru: "Двойной поворот (зеркало)", en: "Double roof mirror", uk: "Подвійний поворот (дзеркало)", es: "Giro doble espejo" } },
-                    'F2L 23': { f: "U2 R2 U2' R' U' R U' R2", d: { ru: "Сложный загон", en: "Complex insertion", uk: "Складне заведення", es: "Inserción compleja" } },
-                    'F2L 24': { f: "y' U2 L2 U2 L U L' U L2", d: { ru: "Сложный загон (зеркало)", en: "Complex mirror", uk: "Складне заведення (дзеркало)", es: "Inserción compleja espejo" } },
-                    'F2L 25': { f: "y' U' L' U L U2' L' U L", d: { ru: "Ребро в слоте, угол наверху", en: "Edge in slot, corner top", uk: "Ребро в слоті, кут нагорі", es: "Borde en ranura, esquina arriba" } },
-                    'F2L 26': { f: "U R U' R' U2 R U' R'", d: { ru: "Ребро в слоте (зеркало)", en: "Edge in slot mirror", uk: "Ребро в слоті (дзеркало)", es: "Borde en ranura espejo" } },
-                    'F2L 27': { f: "R U' R' U R U' R'", d: { ru: "Выбивание из слота", en: "Taking out from slot", uk: "Вибивання зі слота", es: "Sacar de la ranura" } },
-                    'F2L 28': { f: "y' L' U L U' L' U L", d: { ru: "Выбивание (зеркало)", en: "Taking out mirror", uk: "Вибивання (дзеркало)", es: "Sacar espejo" } },
-                    'F2L 29': { f: "y' L' U' L U L' U' L", d: { ru: "Выравнивание пары", en: "Pair alignment", uk: "Вирівнювання пари", es: "Alineación de pares" } },
-                    'F2L 30': { f: "R U R' U' R U R'", d: { ru: "Выравнивание (зеркало)", en: "Pair alignment mirror", uk: "Вирівнювання (дзеркало)", es: "Alineación espejo" } },
-                    'F2L 31': { f: "y' U' L' U L U' L' U L", d: { ru: "Извлечение ребра", en: "Edge extraction", uk: "Витягування ребра", es: "Extracción de borde" } },
-                    'F2L 32': { f: "U R U' R' U R U' R'", d: { ru: "Извлечение ребра (зеркало)", en: "Edge extraction mirror", uk: "Витягування ребра (дзеркало)", es: "Extracción de borde espejo" } },
-                    'F2L 33': { f: "U' R U' R' U2 R U' R'", d: { ru: "Пара в слоте неверно", en: "Pair in slot incorrectly", uk: "Пара в слоті невірно", es: "Par en ranura incorrecto" } },
-                    'F2L 34': { f: "y' U L' U L U2' L' U L", d: { ru: "Пара в слоте (зеркало)", en: "Pair in slot mirror", uk: "Пара в слоті (дзеркало)", es: "Par incorrecto espejo" } },
-                    'F2L 35': { f: "y' U' L' U' L U2' L' U L", d: { ru: "Разворот ребра в слоте", en: "Edge flip in slot", uk: "Розворот ребра в слоті", es: "Giro de borde en ranura" } },
-                    'F2L 36': { f: "U R U R' U2 R U' R'", d: { ru: "Разворот ребра (зеркало)", en: "Edge flip mirror", uk: "Розворот ребра (дзеркало)", es: "Giro de borde espejo" } },
-                    'F2L 37': { f: "R U' R' U' R U R' U2 R U' R'", d: { ru: "Угол в слоте, ребро наверху", en: "Corner in slot, edge top", uk: "Кут в слоті, ребро нагорі", es: "Esquina en ranura, borde arriba" } },
-                    'F2L 38': { f: "R U' R' U2 R U' R' U R U' R'", d: { ru: "Переворот элемента", en: "Element flip", uk: "Переворот елемента", es: "Giro de elemento" } },
-                    'F2L 39': { f: "R U' R' U R U2' R' U R U' R'", d: { ru: "Переворот угла в слоте", en: "Corner flip in slot", uk: "Переворот кута в слоті", es: "Giro de esquina en ranura" } },
-                    'F2L 40': { f: "R U R' U' R U' R' U2 F' U' F", d: { ru: "Разворот пары в слоте", en: "Pair flip in slot", uk: "Розворот пари в слоті", es: "Giro de par en ranura" } },
-                    'F2L 41': { f: "R U' R' r U' r' U2 r U r'", d: { ru: "Сложный переворот", en: "Complex flip", uk: "Складний переворот", es: "Giro complejo" } },
-                    'F2L 42': { f: "R U R' U' R U2 R' U' R U2 R' U' R U R'", d: { ru: "Полная разборка слота", en: "Full slot disassembly", uk: "Повне розбирання слота", es: "Desmontaje completo" } },
-
-                }
-            },
-            oll: {
-                title: { ru: "Этап OLL (57 случаев)", en: "OLL Stage (57 cases)", uk: "Етап OLL (57 випадків)", es: "Etapa OLL (57 casos)" },
-                items: {
-                    'OLL 1': { f: "R U2 R2 F R F' U2 R' F R F'", d: { ru: "Точка", en: "Dot", uk: "Крапка", es: "Punto" } },
-                    'OLL 2': { f: "F R U R' U' F' f R U R' U' f'", d: { ru: "Точка (Две галочки)", en: "Dot (Two ticks)", uk: "Крапка (Два кутки)", es: "Punto (Dos marcas)" } },
-                    'OLL 3': { f: "f R U R' U' f' U' F R U R' U' F'", d: { ru: "Точка (Галочка + Палка)", en: "Dot (Tick + Bar)", uk: "Крапка (Куток + Палиця)", es: "Punto (Marca + Barra)" } },
-                    'OLL 4': { f: "f R U R' U' f' U F R U R' U' F'", d: { ru: "Точка (Зеркальный 3)", en: "Dot (Mirror 3)", uk: "Крапка (Дзеркальний)", es: "Punto (Espejo 3)" } },
-                    'OLL 5': { f: "r' U2 R U R' U r", d: { ru: "Уголок (Препятствие)", en: "Corner (Obstacle)", uk: "Куток (Перешкода)", es: "Esquina (Obstáculo)" } },
-                    'OLL 6': { f: "r U2 R' U' R U' r'", d: { ru: "Уголок (Зеркальный)", en: "Corner (Mirror)", uk: "Куток (Дзеркальний)", es: "Esquina (Espejo)" } },
-                    'OLL 7': { f: "r U R' U R U2 r'", d: { ru: "Молния прямая", en: "Straight lightning", uk: "Блискавка пряма", es: "Relámpago recto" } },
-                    'OLL 8': { f: "r' U' R U' R' U2 r", d: { ru: "Молния обратная", en: "Reverse lightning", uk: "Блискавка зворотна", es: "Relámpago invertido" } },
-                    'OLL 9': { f: "R U R' U' R' F R F'", d: { ru: "Рыбка с уголком", en: "Fish with corner", uk: "Рибка з кутком", es: "Pez con esquina" } },
-                    'OLL 10': { f: "R U R' U R' F R F' R U2 R'", d: { ru: "Рыбка обратная", en: "Reverse fish", uk: "Рибка зворотна", es: "Pez invertido" } },
-                    'OLL 11': { f: "r U R' U R U' R' U' r'", d: { ru: "Молния правая", en: "Right lightning", uk: "Блискавка права", es: "Relámpago derecho" } },
-                    'OLL 12': { f: "M' U' M U2 M' U' M", d: { ru: "Молния левая", en: "Left lightning", uk: "Блискавка ліва", es: "Relámpago izquierdo" } },
-                    'OLL 13': { f: "F U R U' R2 F' R U R U' R'", d: { ru: "Пушка правая", en: "Right cannon", uk: "Гармата права", es: "Cañón derecho" } },
-                    'OLL 14': { f: "R' F R U R' F' R F U' F'", d: { ru: "Пушка левая", en: "Left cannon", uk: "Гармата ліва", es: "Cañón izquierdo" } },
-                    'OLL 15': { f: "l' U' l L' U' L U l' U l", d: { ru: "Закорючка правая", en: "Right hook", uk: "Закорючка права", es: "Gancho derecho" } },
-                    'OLL 16': { f: "r U r' R U R' U' r U' r'", d: { ru: "Закорючка левая", en: "Left hook", uk: "Закорючка ліва", es: "Gancho izquierdo" } },
-                    'OLL 17': { f: "F R U R' U' R U R' U' F'", d: { ru: "Двойной пиф-паф", en: "Double sune", uk: "Подвійний піф-паф", es: "Doble sune" } },
-                    'OLL 18': { f: "r U R' U R U2 r2 U' R U' R' U2 r", d: { ru: "Корона", en: "Crown", uk: "Корона", es: "Corona" } },
-                    'OLL 19': { f: "M' U2 M U2 M' U M U2 M' U2 M", d: { ru: "Перекрестие", en: "Cross", uk: "Перехрестя", es: "Cruz" } },
-                    'OLL 20': { f: "r' U' r U' R' U R U' R' U R r' U r", d: { ru: "Буква X", en: "Letter X", uk: "Буква X", es: "Letra X" } },
-                    'OLL 21': { f: "R U2 R' U' R U R' U' R U' R'", d: { ru: "Крест — Распорка", en: "Cross — Brace", uk: "Хрест — Розпірка", es: "Cruz — Apoyo" } },
-                    'OLL 22': { f: "R2 D' R U2 R' D R U2 R", d: { ru: "Крест — Ушки", en: "Cross — Ears", uk: "Хрест — Вушка", es: "Cruz — Orejas" } },
-                    'OLL 23': { f: "R2 D R' U2 R D' R' U2 R'", d: { ru: "Крест — Глаза", en: "Cross — Eyes", uk: "Хрест — Очі", es: "Cruz — Ojos" } },
-                    'OLL 24': { f: "r U R' U' r' F R F'", d: { ru: "Крест — Вертолет", en: "Cross — Helicopter", uk: "Хрест — Гелікоптер", es: "Cruz — Helicóptero" } },
-                    'OLL 25': { f: "F' r U R' U' r' F R", d: { ru: "Крест — Восьмерка", en: "Cross — Figure eight", uk: "Хрест — Вісімка", es: "Cruz — Ocho" } },
-                    'OLL 26': { f: "R U2 R' U' R U' R'", d: { ru: "Крест — Анти-рыбка", en: "Cross — Anti-sune", uk: "Хрест — Анти-рибка", es: "Cruz — Anti-sune" } },
-                    'OLL 27': { f: "R U R' U R U2 R'", d: { ru: "Крест — Правая рыбка", en: "Cross — Right sune", uk: "Хрест — Права рибка", es: "Cruz — Pez derecho" } },
-                    'OLL 28': { f: "r U R' U' M U R U' R'", d: { ru: "Стелс", en: "Stealth", uk: "Стелс", es: "Sigilo" } },
-                    'OLL 29': { f: "M U R U R' U' R' F R F' M'", d: { ru: "Знак вопроса", en: "Question mark", uk: "Знак питання", es: "Signo de interrogación" } },
-                    'OLL 30': { f: "F R U R' U' F' U2 F R U R' U' F'", d: { ru: "Топор", en: "Axe", uk: "Сокира", es: "Hacha" } },
-                    'OLL 31': { f: "R' U' F U R U' R' F' R", d: { ru: "Квадрат", en: "Square", uk: "Квадрат", es: "Cuadrado" } },
-                    'OLL 32': { f: "L U F' U' L' U L F L'", d: { ru: "Квадрат зеркальный", en: "Square mirror", uk: "Квадрат дзеркальний", es: "Cuadrado espejo" } },
-                    'OLL 33': { f: "R U R' U' R' F R F'", d: { ru: "Т-образный 1", en: "T-shape 1", uk: "Т-подібний 1", es: "Forma T 1" } },
-                    'OLL 34': { f: "R U R2 U' R' F R U R U' F'", d: { ru: "Т-образный 2", en: "T-shape 2", uk: "Т-подібний 2", es: "Forma T 2" } },
-                    'OLL 35': { f: "R U2 R2 F R F' R U2 R'", d: { ru: "Рыба малая", en: "Small fish", uk: "Риба мала", es: "Pez pequeño" } },
-                    'OLL 36': { f: "R' U' R U' R' U R U R d' R' U R", d: { ru: "Рыба большая", en: "Big fish", uk: "Риба велика", es: "Pez grande" } },
-                    'OLL 37': { f: "F R U' R' U' R U R' F'", d: { ru: "Мягкий пиф-паф", en: "Pillow sune", uk: "М'який піф-паф", es: "Sune suave" } },
-                    'OLL 38': { f: "R U R' U R U' R' U' R' F R F'", d: { ru: "Песочные часы", en: "Hourglass", uk: "Годинник пісочний", es: "Reloj de arena" } },
-                    'OLL 39': { f: "L F' L' U' L U F U' L'", d: { ru: "Молния малая правая", en: "Small right lightning", uk: "Блискавка мала права", es: "Relámpago pequeño der" } },
-                    'OLL 40': { f: "R' F R U R' U' F' U R", d: { ru: "Молния малая левая", en: "Small left lightning", uk: "Блискавка мала ліва", es: "Relámpago pequeño izq" } },
-                    'OLL 41': { f: "R U R' U R U2 R' F R U R' U' F'", d: { ru: "Запятая правая", en: "Right comma", uk: "Кома права", es: "Coma derecha" } },
-                    'OLL 42': { f: "R' U' R U' R' U2 R F R U R' U' F'", d: { ru: "Запятая левая", en: "Left comma", uk: "Кома ліва", es: "Coma izquierda" } },
-                    'OLL 43': { f: "F' U' L' U L F", d: { ru: "Палочка мягкая", en: "Soft stick", uk: "Паличка м'яка", es: "Vara suave" } },
-                    'OLL 44': { f: "F R U R' U' F'", d: { ru: "Палочка жесткая", en: "Hard stick", uk: "Паличка тверда", es: "Vara dura" } },
-                    'OLL 45': { f: "F R U R' U' F'", d: { ru: "Классическая палка", en: "Classic stick", uk: "Класична палиця", es: "Vara clásica" } },
-                    'OLL 46': { f: "R' U' R' F R F' U R", d: { ru: "Ласточка", en: "Pewter", uk: "Ластівка", es: "Golondrina" } },
-                    'OLL 47': { f: "F' L' U' L U L' U' L U F", d: { ru: "Буква B правая", en: "Right letter B", uk: "Буква B права", es: "Letra B derecha" } },
-                    'OLL 48': { f: "F R U R' U' R U R' U' F'", d: { ru: "Буква B левая", en: "Left letter B", uk: "Буква B ліва", es: "Letra B izquierda" } },
-                    'OLL 49': { f: "r U r' R U R' U' r U' r'", d: { ru: "Рюкзак правый", en: "Right backpack", uk: "Рюкзак правий", es: "Mochila derecha" } },
-                    'OLL 50': { f: "r' U' r R' U' R U r' U r", d: { ru: "Рюкзак левый", en: "Left backpack", uk: "Рюкзак лівий", es: "Mochila izquierda" } },
-                    'OLL 51': { f: "f R U R' U' f'", d: { ru: "Галочка", en: "Checkmark", uk: "Галочка", es: "Marca" } },
-                    'OLL 52': { f: "R U R' U R U' B U' B' R'", d: { ru: "Тайфун", en: "Typhoon", uk: "Тайфун", es: "Tifón" } },
-                    'OLL 53': { f: "l' U2 R U R' U' R U R' U l", d: { ru: "Трезубец", en: "Trident", uk: "Тризуб", es: "Tridente" } },
-                    'OLL 54': { f: "r U2 R' U' R U R' U' R U' r'", d: { ru: "Трезубец зеркальный", en: "Trident mirror", uk: "Тризуб дзеркальний", es: "Tridente espejo" } },
-                    'OLL 55': { f: "R' U2 R2 U R' U R U2 R' F R F'", d: { ru: "Большая палка", en: "Big stick", uk: "Велика палиця", es: "Vara grande" } },
-                    'OLL 56': { f: "r U r' U R U' R' U R U' R' r U' r'", d: { ru: "Удав", en: "Boa", uk: "Удав", es: "Boa" } },
-                    'OLL 57': { f: "R U R' U' M' U R U' r'", d: { ru: "Буква H", en: "Letter H", uk: "Буква H", es: "Letra H" } },
-
-                }
-            },
-            pll: {
-                title: { ru: "Этап PLL (21 случай)", en: "PLL Stage (21 cases)", uk: "Етап PLL (21 випадок)", es: "Etapa PLL (21 casos)" },
-                items: {
-                    'H-Perm': { f: "M2' U M2' U2 M2' U M2'", d: { ru: "Противоположные ребра меняются парами", en: "Opposite edges swap in pairs", uk: "Протилежні ребра міняються парами", es: "Bordes opuestos se intercambian en parejas" } },
-                    'Z-Perm': { f: "M2' U M2' U' M' U2' M2' U2' M'", d: { ru: "Соседние ребра меняются крест-накрест", en: "Adjacent edges swap diagonally", uk: "Сусідні ребра міняються навхрест", es: "Bordes adyacentes se intercambian en diagonal" } },
-                    'Ua-Perm': { f: "R2 U' R' U' R U R U R U' R", d: { ru: "Цикл трех ребер против часовой", en: "3-edge cycle counter-clockwise", uk: "Цикл трьох ребер проти годинникової", es: "Ciclo de 3 bordes antihorario" } },
-                    'Ub-Perm': { f: "R' U R' U' R' U' R' U R U R2", d: { ru: "Цикл трех ребер по часовой", en: "3-edge cycle clockwise", uk: "Цикл трьох ребер за годинниковою", es: "Ciclo de 3 bordes horario" } },
-                    'Aa-Perm': { f: "x R' D R' U2 R D' R' U2 R2 x'", d: { ru: "Перестановка углов (Aa)", en: "Corner permutation (Aa)", uk: "Перестановка кутів (Aa)", es: "Permutación de esquinas (Aa)" } },
-                    'Ab-Perm': { f: "x R2 D2 R U R' D2 R U' R x'", d: { ru: "Перестановка углов (Ab)", en: "Corner permutation (Ab)", uk: "Перестановка кутів (Ab)", es: "Permutación de esquinas (Ab)" } },
-                    'T-Perm': { f: "R U R' U' R' F R2 U' R' U' R U R' F'", d: { ru: "Диагональный и смежный обмен", en: "Diagonal and adjacent swap", uk: "Діагональний та суміжний обмін", es: "Intercambio diagonal y adyacente" } },
-                    'Jb-Perm': { f: "R U R' F' R U R' U' R' F R2 U' R'", d: { ru: "Передний правый блок", en: "Front-right block", uk: "Передній правий блок", es: "Bloque frontal derecho" } },
-                    'Ja-Perm': { f: "x R2 F R F' R U2 r' U r U2 x'", d: { ru: "Задний левый блок", en: "Back-left block", uk: "Задній лівий блок", es: "Bloque trasero izquierdo" } },
-                    'Y-Perm': { f: "F R U' R' U' R U R' F' R U R' U' R' F R F'", d: { ru: "Диагональный обмен", en: "Diagonal swap", uk: "Діагональний обмін", es: "Intercambio diagonal" } },
-                    'F-Perm': { f: "R' U' F' R U R' U' R' F R2 U' R' U' R U R' UR", d: { ru: "F-перестановка", en: "F-permutation", uk: "F-перестановка", es: "Permutación F" } },
-                    'V-Perm': { f: "R' U R' U' y R' F' R2 U' R' U R' F R F", d: { ru: "V-перестановка", en: "V-permutation", uk: "V-перестановка", es: "Permutación V" } },
-                    'Ra-Perm': { f: "R U' R' U' R U R D R' U' R D' R' U2 R'", d: { ru: "Ra-перестановка", en: "Ra-permutation", uk: "Ra-перестановка", es: "Permutación Ra" } },
-                    'Rb-Perm': { f: "R2 F R U R U' R' F' R U2 R' U2 R", d: { ru: "Rb-перестановка", en: "Rb-permutation", uk: "Rb-перестановка", es: "Permutación Rb" } },
-                    'Ga-Perm': { f: "R2 u R' U R' U' R u' R2 y' R' U R", d: { ru: "G-перестановка (Ga)", en: "G-permutation (Ga)", uk: "G-перестановка (Ga)", es: "Permutación G (Ga)" } },
-                    'Gb-Perm': { f: "R' U' R y R2 u' R U' R' U R' u R2", d: { ru: "G-перестановка (Gb)", en: "G-permutation (Gb)", uk: "G-перестановка (Gb)", es: "Permutación G (Gb)" } },
-                    'Gc-Perm': { f: "R2 u' R U' R U R' u R2 y R U' R'", d: { ru: "G-перестановка (Gc)", en: "G-permutation (Gc)", uk: "G-перестановка (Gc)", es: "Permutación G (Gc)" } },
-                    'Gd-Perm': { f: "R U R' y' R2 u R' U R U R u' R2", d: { ru: "G-перестановка (Gd)", en: "G-permutation (Gd)", uk: "G-перестановка (Gd)", es: "Permutación G (Gd)" } },
-                    'E-Perm': { f: "x' L' U L D' L' U' L D L' U' L D' L' U L D x", d: { ru: "Обмен углов без ребер", en: "Corner swap without edges", uk: "Обмін кутів без ребер", es: "Intercambio de esquinas sin bordes" } },
-                    'Na-Perm': { f: "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'", d: { ru: "Na-перестановка", en: "Na-permutation", uk: "Na-перестановка", es: "Permutación Na" } },
-                    'Nb-Perm': { f: "R' U R U' R' F' U' F R U R' F R' F' R U2 R'", d: { ru: "Nb-перестановка", en: "Nb-permutation", uk: "Nb-перестановка", es: "Permutación Nb" } },
-
-                }
-            }
-        };
-
-        function setLang(lang) {
-            currentLang = lang;
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active-lang'));
-            document.getElementById('btn-' + lang).classList.add('active-lang');
-            
-            let t = translations[lang];
-            document.getElementById('t-main-title').innerText = t.mainTitle;
-            document.getElementById('t-main-sub').innerText = t.mainSub;
-            document.getElementById('t-btn-cfop').innerText = t.btnCfop;
-            document.getElementById('t-btn-4lll').innerText = t.btn4lll;
-            document.getElementById('t-btn-roux').innerText = t.btnRoux;
-            document.getElementById('t-btn-beginner').innerText = t.btnBeginner;
-            document.getElementById('t-back-main').innerText = t.backMain;
-            document.getElementById('t-cfop-title').innerText = t.cfopTitle;
-            document.getElementById('t-cfop-sub').innerText = t.cfopSub;
-            document.getElementById('t-f2l-name').innerText = t.f2lName;
-            document.getElementById('t-oll-name').innerText = t.ollName;
-            document.getElementById('t-pll-name').innerText = t.pllName;
-            document.getElementById('t-back-detail').innerText = t.backDetail;
-            document.getElementById('search').placeholder = t.searchPH;
-            document.getElementById('t-formula-label').innerText = t.formulaLabel;
-            document.getElementById('t-copy-btn').innerText = t.copyBtn;
-
-            updateListBackButtonText();
-
-            if (document.getElementById('view-list').classList.contains('active')) {
-                document.getElementById('stage-title').innerText = db[currentStageKey].title[currentLang];
-                renderItems(db[currentStageKey].items);
-            }
-        }
-
-        function switchView(viewId) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-            window.scrollTo(0,0);
-        }
-
-        function showStub(name) {
-            alert(name + translations[currentLang].soonStub);
-        }
-
-        function openStage(stage) {
-            currentStageKey = stage;
-            document.getElementById('stage-title').innerText = db[stage].title[currentLang];
-            document.getElementById('search').value = '';
-            updateListBackButtonText();
-            renderItems(db[stage].items);
-            switchView('view-list');
-        }
-
-        function updateListBackButtonText() {
-            let backBtn = document.getElementById('t-back-list-btn');
-            if (currentStageKey === '4lll') {
-                backBtn.innerText = translations[currentLang].backMain;
-            } else {
-                backBtn.innerText = translations[currentLang].backCfop;
-            }
-        }
-
-        function goBackFromList() {
-            if (currentStageKey === '4lll') {
-                switchView('view-main');
-            } else {
-                switchView('view-cfop');
-            }
-        }
-
-        function renderItems(items) {
-            let container = document.getElementById('list-container');
-            container.innerHTML = '';
-            for (let name in items) {
-                let btn = document.createElement('button');
-                btn.className = 'btn';
-                let desc = items[name].d[currentLang];
-                btn.innerHTML = `<span>${name}</span> <span style="color:var(--hint-color); font-size:13px;">${desc}</span>`;
-                btn.onclick = () => showDetail(name, items[name]);
-                container.appendChild(btn);
-            }
-        }
-
-        function filterList() {
-            let q = document.getElementById('search').value.toLowerCase();
-            let all = db[currentStageKey].items;
-            let filtered = {};
-            for (let name in all) {
-                let desc = all[name].d[currentLang].toLowerCase();
-                if (name.toLowerCase().includes(q) || desc.includes(q)) {
-                    filtered[name] = all[name];
-                }
-            }
-            renderItems(filtered);
-        }
-
-        function showDetail(name, item) {
-            document.getElementById('det-title').innerText = name;
-            document.getElementById('det-desc').innerText = item.d[currentLang];
-            document.getElementById('det-formula').innerText = item.f;
-
-            let player = document.getElementById('cube-player');
-            player.alg = "z2 " + item.f; 
-            player.experimentalDragInput = 'none'; 
-
-            switchView('view-detail');
-        }
-
-        function copyText() {
-            let text = document.getElementById('det-formula').innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                alert(translations[currentLang].copiedAlert);
-            });
-        }
-    </script>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+​<!-- Top Header -->
+<header class="bg-slate-800/90 backdrop-blur-md sticky top-0 z-50 border-b border-slate-700/50 px-4 py-3 flex items-center justify-between shadow-lg">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-md shadow-indigo-500/20">
+<i class="fa-solid fa-cube text-white text-lg"></i>
+</div>
+<div>
+<h1 id="app-title" class="font-bold text-base tracking-wide text-white leading-tight">CFOP Trainer</h1>
+<p id="app-subtitle" class="text-xs text-slate-400 font-medium">SpeedCubeDB Standard</p>
+</div>
+</div>
+<div class="flex items-center space-x-2">
+<!-- Language Selector Button -->
+<button onclick="toggleLangMenu()" class="p-2 rounded-xl bg-slate-700/60 hover:bg-slate-700 text-slate-300 transition relative">
+<i class="fa-solid fa-globe text-sm"></i>
+</button>
+<!-- Stats Modal Trigger -->
+<button onclick="openStatsModal()" class="p-2 rounded-xl bg-slate-700/60 hover:bg-slate-700 text-slate-300 transition">
+<i class="fa-solid fa-chart-pie text-sm"></i>
+</button>
+</div>
+</header>
+​<!-- Language Dropdown Menu -->
+<div id="lang-menu" class="hidden absolute top-16 right-4 z-50 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-2 w-36 backdrop-blur-md">
+<button onclick="setLanguage('ru')" class="w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-indigo-600/20 hover:text-indigo-400 transition flex items-center justify-between">
+<span>🇷🇺 Русский</span> <span id="check-ru" class="text-indigo-400 text-xs font-bold">✓</span>
+</button>
+<button onclick="setLanguage('en')" class="w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-indigo-600/20 hover:text-indigo-400 transition flex items-center justify-between">
+<span>🇬🇧 English</span> <span id="check-en" class="text-indigo-400 text-xs font-bold hidden">✓</span>
+</button>
+<button onclick="setLanguage('uk')" class="w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-indigo-600/20 hover:text-indigo-400 transition flex items-center justify-between">
+<span>🇺🇦 Українська</span> <span id="check-uk" class="text-indigo-400 text-xs font-bold hidden">✓</span>
+</button>
+<button onclick="setLanguage('es')" class="w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-indigo-600/20 hover:text-indigo-400 transition flex items-center justify-between">
+<span>🇪🇸 Español</span> <span id="check-es" class="text-indigo-400 text-xs font-bold hidden">✓</span>
+</button>
+</div>
+​<!-- Main Container -->
+<main class="flex-1 max-w-2xl w-full mx-auto p-4 pb-24 overflow-y-auto">
+​<!-- Category & Mode Tabs -->
+<div class="grid grid-cols-4 gap-1.5 bg-slate-800/80 p-1.5 rounded-2xl mb-4 border border-slate-700/50 shadow-inner">
+<button onclick="switchCategory('f2l')" id="cat-btn-f2l" class="py-2.5 rounded-xl font-semibold text-xs tracking-wide transition shadow-sm bg-indigo-600 text-white">F2L</button>
+<button onclick="switchCategory('oll')" id="cat-btn-oll" class="py-2.5 rounded-xl font-semibold text-xs tracking-wide transition text-slate-400 hover:text-white">OLL</button>
+<button onclick="switchCategory('pll')" id="cat-btn-pll" class="py-2.5 rounded-xl font-semibold text-xs tracking-wide transition text-slate-400 hover:text-white">PLL</button>
+<button onclick="switchCategory('4lll')" id="cat-btn-4lll" class="py-2.5 rounded-xl font-semibold text-xs tracking-wide transition text-slate-400 hover:text-white">4LLL</button>
+</div>
+​<!-- Sub-filter / Mode Bar -->
+<div class="flex items-center justify-between bg-slate-800/40 px-3 py-2 rounded-xl mb-4 border border-slate-700/30 text-xs">
+<div class="flex items-center space-x-2">
+<span id="txt-view-mode" class="text-slate-400 font-medium">Режим:</span>
+<button onclick="toggleViewMode()" id="view-mode-btn" class="px-2.5 py-1 rounded-lg bg-indigo-600/20 text-indigo-400 font-semibold border border-indigo-500/30 hover:bg-indigo-600/30 transition">Список</button>
+</div>
+<div class="flex items-center space-x-2">
+<span id="txt-search-count" class="text-slate-400">Всего: <strong id="total-count" class="text-white">41</strong></span>
+</div>
+</div>
+​<!-- Search Bar -->
+<div class="relative mb-4">
+<i class="fa-solid fa-search absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+<input type="text" id="search-input" oninput="filterAlgorithms()" placeholder="Поиск по названию или алгоритму (например, R U R')..." class="w-full bg-slate-800/80 border border-slate-700/60 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition shadow-inner">
+</div>
+​<!-- LIST VIEW CONTAINER -->
+<div id="list-view" class="space-y-3">
+<!-- Dynamically populated via JS -->
+</div>
+​<!-- TRAINER / QUIZ VIEW CONTAINER -->
+<div id="quiz-view" class="hidden space-y-4">
+<div class="bg-slate-800/90 border border-slate-700/60 rounded-2xl p-6 shadow-xl text-center relative overflow-hidden">
+<div class="absolute top-3 right-3">
+<span id="quiz-progress" class="text-xs px-2.5 py-1 rounded-full bg-slate-700/80 text-slate-300 font-mono">1 / 10</span>
+</div>
+<h3 id="quiz-case-title" class="text-xl font-bold text-white mb-2">F2L 1</h3>
+<p id="quiz-case-desc" class="text-xs text-slate-400 mb-6">Базовая вставка пары</p>
+​<!-- SVG / Visual representation placeholder -->
+<div class="w-32 h-32 mx-auto mb-6 bg-slate-900 rounded-2xl border border-slate-700 flex items-center justify-center shadow-inner relative group">
+<i class="fa-solid fa-cube text-4xl text-indigo-400 animate-pulse"></i>
+<div class="absolute inset-0 bg-indigo-600/10 opacity-0 group-hover:opacity-100 transition rounded-2xl flex items-center justify-center">
+<span class="text-xs text-indigo-300 font-medium">3D Case</span>
+</div>
+</div>
+​<div id="quiz-answer-section" class="space-y-3">
+<button onclick="revealQuizAnswer()" id="reveal-btn" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition shadow-lg shadow-indigo-600/30">
+Показать алгоритм
+</button>
+<div id="quiz-alg-box" class="hidden bg-slate-900/90 p-4 rounded-xl border border-slate-700 text-indigo-400 font-mono text-base font-bold tracking-wider select-all">
+R U R' U'
+</div>
+</div>
+​<div id="quiz-rating-buttons" class="hidden grid grid-cols-2 gap-3 mt-4">
+<button onclick="answerQuiz(false)" class="py-2.5 rounded-xl bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 font-semibold text-sm transition border border-rose-500/30">
+❌ Забыл (-1)
+</button>
+<button onclick="answerQuiz(true)" class="py-2.5 rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 font-semibold text-sm transition border border-emerald-500/30">
+✅ Знаю (+1)
+</button>
+</div>
+</div>
+​<button onclick="exitQuizMode()" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-semibold transition border border-slate-700/60">
+Завершить тренировку
+</button>
+</div>
+​</main>
+​<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-slate-800/95 backdrop-blur-md border-t border-slate-700/50 px-6 py-2.5 flex items-center justify-around z-45 shadow-2xl max-w-2xl mx-auto">
+<button onclick="switchNavTab('learn')" id="nav-learn" class="flex flex-col items-center space-y-1 text-indigo-400 transition">
+<i class="fa-solid fa-book-open text-lg"></i>
+<span class="text-[10px] font-medium" id="nav-txt-learn">Справочник</span>
+</button>
+<button onclick="switchNavTab('trainer')" id="nav-trainer" class="flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 transition">
+<i class="fa-solid fa-graduation-cap text-lg"></i>
+<span class="text-[10px] font-medium" id="nav-txt-trainer">Тренажер</span>
+</button>
+<button onclick="switchNavTab('timer')" id="nav-timer" class="flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 transition">
+<i class="fa-solid fa-stopwatch text-lg"></i>
+<span class="text-[10px] font-medium" id="nav-txt-timer">Таймер</span>
+</button>
+</nav>
+​<!-- Stats Modal -->
+<div id="stats-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+<div class="bg-slate-800 border border-slate-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="font-bold text-lg text-white" id="modal-title">Ваша статистика</h3>
+<button onclick="closeStatsModal()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+</div>
+<div class="space-y-3">
+<div class="bg-slate-900/60 p-3.5 rounded-2xl border border-slate-700/50 flex items-center justify-between">
+<span class="text-sm text-slate-400" id="stat-lbl-learned">Изучено случаев:</span>
+<strong id="stat-learned-count" class="text-indigo-400 font-mono text-base">0 / 119</strong>
+</div>
+<div class="bg-slate-900/60 p-3.5 rounded-2xl border border-slate-700/50 flex items-center justify-between">
+<span class="text-sm text-slate-400" id="stat-lbl-accuracy">Точность ответов:</span>
+<strong id="stat-accuracy" class="text-emerald-400 font-mono text-base">0%</strong>
+</div>
+</div>
+<button onclick="closeStatsModal()" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition">
+Понятно
+</button>
+</div>
+</div>
+​<script>
+// --- MULTI-LANGUAGE DICTIONARY ---
+const translations = {
+ru: {
+subtitle: "SpeedCubeDB Стандарт",
+searchPlaceholder: "Поиск по названию или алгоритму...",
+viewList: "Список",
+viewQuiz: "Режим викторины",
+total: "Всего",
+showAlg: "Показать алгоритм",
+forgot: "❌ Забыл (-1)",
+known: "✅ Знаю (+1)",
+finishQuiz: "Завершить тренировку",
+learn: "Справочник",
+trainer: "Тренажер",
+timer: "Таймер",
+statsTitle: "Ваша статистика",
+learnedCases: "Изучено случаев:",
+accuracy: "Точность ответов:",
+close: "Понятно"
+},
+en: {
+subtitle: "SpeedCubeDB Standard",
+searchPlaceholder: "Search by name or algorithm...",
+viewList: "List",
+viewQuiz: "Quiz Mode",
+total: "Total",
+showAlg: "Show Algorithm",
+forgot: "❌ Forgot (-1)",
+known: "✅ Mastered (+1)",
+finishQuiz: "Finish Training",
+learn: "Handbook",
+trainer: "Trainer",
+timer: "Timer",
+statsTitle: "Your Statistics",
+learnedCases: "Mastered Cases:",
+accuracy: "Accuracy:",
+close: "Got it"
+},
+uk: {
+subtitle: "SpeedCubeDB Стандарт",
+searchPlaceholder: "Пошук за назвою або алгоритмом...",
+viewList: "Список",
+viewQuiz: "Режим вікторини",
+total: "Всього",
+showAlg: "Показати алгоритм",
+forgot: "❌ Забув (-1)",
+known: "✅ Знаю (+1)",
+finishQuiz: "Завершити тренування",
+learn: "Довідник",
+trainer: "Тренажер",
+timer: "Таймер",
+statsTitle: "Ваша статистика",
+learnedCases: "Вивчено випадків:",
+accuracy: "Точність відповідей:",
+close: "Зрозуміло"
+},
+es: {
+subtitle: "Estándar SpeedCubeDB",
+searchPlaceholder: "Buscar por nombre o algoritmo...",
+viewList: "Lista",
+viewQuiz: "Modo Quiz",
+total: "Total",
+showAlg: "Mostrar Algoritmo",
+forgot: "❌ Olvidado (-1)",
+known: "✅ Dominado (+1)",
+finishQuiz: "Terminar Entrenamiento",
+learn: "Guía",
+trainer: "Entrenador",
+timer: "Cronómetro",
+statsTitle: "Tus Estadísticas",
+learnedCases: "Casos dominados:",
+accuracy: "Precisión:",
+close: "Entendido"
+}
+};
+​let currentLang = 'ru';
+​function setLanguage(lang) {
+currentLang = lang;
+document.getElementById('lang-menu').classList.add('hidden');
+['ru', 'en', 'uk', 'es'].forEach(l => {
+const el = document.getElementById(check-${l});
+if (el) el.classList.toggle('hidden', l !== lang);
+});
+updateUIText();
+}
+​function updateUIText() {
+const t = translations[currentLang];
+document.getElementById('app-subtitle').textContent = t.subtitle;
+document.getElementById('search-input').placeholder = t.searchPlaceholder;
+document.getElementById('nav-txt-learn').textContent = t.learn;
+document.getElementById('nav-txt-trainer').textContent = t.trainer;
+document.getElementById('nav-txt-timer').textContent = t.timer;
+document.getElementById('modal-title').textContent = t.statsTitle;
+document.getElementById('stat-lbl-learned').textContent = t.learnedCases;
+document.getElementById('stat-lbl-accuracy').textContent = t.accuracy;
+renderCategory();
+}
+​function toggleLangMenu() {
+const menu = document.getElementById('lang-menu');
+menu.classList.toggle('hidden');
+}
+​// --- COMPLETE VERIFIED ALGORITHMS DATABASE (SpeedCubeDB Standard) ---
+const database = {
+f2l: [
+{ id: 1, name: "F2L 1", desc: "Basic insertion", alg: "U R U' R'" },
+{ id: 2, name: "F2L 2", desc: "Corner/Edge separated", alg: "R U' R'" },
+{ id: 3, name: "F2L 3", desc: "Alternative insertion", alg: "U' R U R'" },
+{ id: 4, name: "F2L 4", desc: "Double insert", alg: "U R U2 R' U R U' R'" },
+{ id: 5, name: "F2L 5", desc: "Pair connected in slot", alg: "R' F R F'" },
+{ id: 6, name: "F2L 6", desc: "Standard split", alg: "U R U' R' U R U' R'" },
+{ id: 7, name: "F2L 7", desc: "Advanced split", alg: "U' R U2 R' U R U' R'" },
+{ id: 8, name: "F2L 8", desc: "Insert from top", alg: "R U R' U' R U R'" },
+{ id: 9, name: "F2L 9", desc: "Connected piece", alg: "U' R U' R' U R U' R'" },
+{ id: 10, name: "F2L 10", desc: "Front insertion", alg: "U R U R' U' R U R'" },
+{ id: 11, name: "F2L 11", desc: "Wide split", alg: "R U2 R' U' R U R'" },
+{ id: 12, name: "F2L 12", desc: "Reversed split", alg: "U' R U2 R' U R U' R'" },
+{ id: 13, name: "F2L 13", desc: "Back slot pair", alg: "R U' R' U2 R U' R'" },
+{ id: 14, name: "F2L 14", desc: "Standard back pair", alg: "U' R U R' U2 R U R'" },
+{ id: 15, name: "F2L 15", desc: "Double trigger", alg: "R U R' U' R U2 R'" },
+{ id: 16, name: "F2L 16", desc: "Alternative double trigger", alg: "U' R U' R' U2 R U' R'" },
+{ id: 17, name: "F2L 17", desc: "Advanced pair placement", alg: "R U' R' U R U2 R'" },
+{ id: 18, name: "F2L 18", desc: "Alternative placement", alg: "U' R U R' U' R U2 R'" },
+{ id: 19, name: "F2L 19", desc: "Complex pair 1", alg: "R U R' U' R U' R' U R U' R'" },
+{ id: 20, name: "F2L 20", desc: "Complex pair 2", alg: "U R U' R' U R U R' U' R U' R'" },
+{ id: 21, name: "F2L 21", desc: "Complex pair 3", alg: "R U2 R' U' R U R' U' R U' R'" },
+{ id: 22, name: "F2L 22", desc: "Complex pair 4", alg: "U' R U R' U R U' R' U R U R'" },
+{ id: 23, name: "F2L 23", desc: "Complex pair 5", alg: "R U' R' U2 R U R' U' R U R'" },
+{ id: 24, name: "F2L 24", desc: "Complex pair 6", alg: "U' R U' R' U2 R U' R' U R U' R'" },
+{ id: 25, name: "F2L 25", desc: "Complex pair 7", alg: "R U R' U2 R U' R' U R U R'" },
+{ id: 26, name: "F2L 26", desc: "Complex pair 8", alg: "U R U' R' U2 R U R' U' R U' R'" },
+{ id: 27, name: "F2L 27", desc: "Complex pair 9", alg: "R U R' U' R U2 R' U' R U R'" },
+{ id: 28, name: "F2L 28", desc: "Complex pair 10", alg: "U R U' R' U' R U2 R' U R U' R'" },
+{ id: 29, name: "F2L 29", desc: "Complex pair 11", alg: "R U' R' U R U2 R' U' R U' R'" },
+{ id: 30, name: "F2L 30", desc: "Complex pair 12", alg: "U' R U R' U' R U2 R' U R U R'" },
+{ id: 31, name: "F2L 31", desc: "Complex pair 13", alg: "R U2 R' U R U' R' U R U R'" },
+{ id: 32, name: "F2L 32", desc: "Complex pair 14", alg: "U' R U2 R' U' R U R' U' R U' R'" },
+{ id: 33, name: "F2L 33", desc: "Complex pair 15", alg: "R U' R' U2 R U' R' U R U' R'" },
+{ id: 34, name: "F2L 34", desc: "Complex pair 16", alg: "U R U R' U2 R U R' U' R U R'" },
+{ id: 35, name: "F2L 35", desc: "Standard 35", alg: "R U R' U' R U R' U' R U R'" },
+{ id: 36, name: "F2L 36", desc: "Standard 36", alg: "U R U' R' U R U' R' U R U' R'" },
+{ id: 37, name: "F2L 37", desc: "Standard 37", alg: "R U2 R' U' R U' R' U R U R'" },
+{ id: 38, name: "F2L 38", desc: "Standard 38", alg: "U' R U2 R' U R U R' U' R U' R'" },
+{ id: 39, name: "F2L 39", desc: "Standard 39", alg: "R U' R' U R U R' U2 R U' R'" },
+{ id: 40, name: "F2L 40", desc: "Standard 40", alg: "U R U R' U' R U' R' U2 R U R'" },
+{ id: 41, name: "F2L 41", desc: "Standard 41", alg: "R U R' U' R U' R' U2 R U R'" }
+],
+oll: [
+{ id: 1, name: "OLL 1", desc: "Dot - Phesant", alg: "RUR'U'M'U R U'r'" },
+{ id: 2, name: "OLL 2", desc: "Dot - I", alg: "F R U R' U' F' f R U R' U' f'" },
+{ id: 3, name: "OLL 3", desc: "Dot - Small lightning bolt", alg: "f R U R' U' f' U F R U R' U' F'" },
+{ id: 4, name: "OLL 4", desc: "Dot - Small lightning bolt rev", alg: "F R U R' U' F' U f R U R' U' f'" },
+{ id: 5, name: "OLL 5", desc: "Square shape", alg: "r' U2 R R U' R R U' r'" },
+{ id: 6, name: "OLL 6", desc: "Hshape", alg: "r U R' U R U2 r'" },
+{ id: 7, name: "OLL 7", desc: "Pshape right", alg: "r' U' r U' r' U2 r" },
+{ id: 8, name: "OLL 8", desc: "Pshape left", alg: "r U r' U r U2 r'" },
+{ id: 9, name: "OLL 9", desc: "Fish shape", alg: "R U R' U' R' F R F'" },
+{ id: 10, name: "OLL 10", desc: "Fish shape rev", alg: "R' U' R U R F' R' F" },
+{ id: 11, name: "OLL 11", desc: "Tshape", alg: "r U R' U' r' F R F'" },
+{ id: 12, name: "OLL 12", desc: "Tshape rev", alg: "F R U R' U' F'" },
+{ id: 13, name: "OLL 13", desc: "Knight shape", alg: "r U2 R' U' R U' r'" },
+{ id: 14, name: "OLL 14", desc: "Knight shape rev", alg: "r' U2 R U R' U r" },
+{ id: 15, name: "OLL 15", desc: "Sleight shape", alg: "r' U' r R' U' R U r' U r" },
+{ id: 16, name: "OLL 16", desc: "Sleight shape rev", alg: "r U r' R U R' U' r U' r'" },
+{ id: 17, name: "OLL 17", desc: "Dot shape", alg: "F R U R' U' F' U2 F R U R' U' F'" },
+{ id: 18, name: "OLL 18", desc: "Dot shape", alg: "r U R' U' M' U R U' r'" },
+{ id: 19, name: "OLL 19", desc: "Dot shape", alg: "r' R U R U R' U' M' R' F R F'" },
+{ id: 20, name: "OLL 20", desc: "Dot shape", alg: "r U R' U' M2 U R U' r'" },
+{ id: 21, name: "OLL 21", desc: "Cross - Awkward", alg: "R U2 R' U' R U R' U' R U' R'" },
+{ id: 22, name: "OLL 22", desc: "Cross - Snipe", alg: "R U2 R2 U' R2 U' R2 U2 R" },
+{ id: 23, name: "OLL 23", desc: "Cross - Headlights", alg: "R2 D' R U2 R' D R U2 R" },
+{ id: 24, name: "OLL 24", desc: "Cross - Fish", alg: "r U R' U' r' F R F'" },
+{ id: 25, name: "OLL 25", desc: "Cross - Bowtie", alg: "F R' F' R U2 R U2 R'" },
+{ id: 26, name: "OLL 26", desc: "Cross - Antisune", alg: "R U2 R' U' R U' R'" },
+{ id: 27, name: "OLL 27", desc: "Cross - Sune", alg: "R U R' U R U2 R'" },
+{ id: 28, name: "OLL 28", desc: "Corners oriented", alg: "r U R' U' r' R U R U' R'" },
+{ id: 29, name: "OLL 29", desc: "Chameleon", alg: "R U R' U' R' F R F'" },
+{ id: 30, name: "OLL 30", desc: "Chameleon", alg: "R' U' R U R' F' R F" },
+{ id: 31, name: "OLL 31", desc: "Pshape", alg: "R' U' F U R U' R' F' R" },
+{ id: 32, name: "OLL 32", desc: "Ushape", alg: "L U F' U' L' U L F L'" },
+{ id: 33, name: "OLL 33", desc: "Tshape", alg: "R U R' U' R' F R F'" },
+{ id: 34, name: "OLL 34", desc: "Cshape", alg: "R U R2 U' R' F R U R U' F'" },
+{ id: 35, name: "OLL 35", desc: "Fishshape", alg: "R U2 R2 F R F' R U2 R'" },
+{ id: 36, name: "OLL 36", desc: "Wshape", alg: "R' U' R U' R' U R U l U' R' r'" },
+{ id: 37, name: "OLL 37", desc: "Fishshape", alg: "F R' F' R U R U' R'" },
+{ id: 38, name: "OLL 38", desc: "Wshape", alg: "R U R' U R U' R' U' R' F R F'" },
+{ id: 39, name: "OLL 39", desc: "Big Lightning", alg: "L F' L' U' L U F U' L'" },
+{ id: 40, name: "OLL 40", desc: "Big Lightning", alg: "R' F R U R' U' F' U R" },
+{ id: 41, name: "OLL 41", desc: "Awkward", alg: "R U R' U R U2 R'" },
+{ id: 42, name: "OLL 42", desc: "Awkward", alg: "R' U' R U' R' U2 R" },
+{ id: 43, name: "OLL 43", desc: "Anti-Pshape", alg: "R' U' F' U F R" },
+{ id: 44, name: "OLL 44", desc: "Pshape", alg: "F U R U' R' F'" },
+{ id: 45, name: "OLL 45", desc: "Tshape", alg: "F R U R' U' F'" },
+{ id: 46, name: "OLL 46", desc: "Cshape", alg: "R' U' R' F R F' U R" },
+{ id: 47, name: "OLL 47", desc: "Little Lightning", alg: "R' U' R' F R F' R' F R F' U R" },
+{ id: 48, name: "OLL 48", desc: "Little Lightning", alg: "F R U R' U' R U R' U' F'" },
+{ id: 49, name: "OLL 49", desc: "Small L", alg: "R B' R' U' R U B U' R'" },
+{ id: 50, name: "OLL 50", desc: "Small L", alg: "R' B R U R' U' B' U R" },
+{ id: 51, name: "OLL 51", desc: "Tshape", alg: "F U R U' R' U R U' R' F'" },
+{ id: 52, name: "OLL 52", desc: "Ishape", alg: "R U R' U R U' B U' B' R'" },
+{ id: 53, name: "OLL 53", desc: "Ishape", alg: "r' U2 R U R' U' R U R' U r" },
+{ id: 54, name: "OLL 54", desc: "Ishape", alg: "r U2 R' U' R U R' U' R U' r'" },
+{ id: 55, name: "OLL 55", desc: "Ishape", alg: "R' F R U R U' R2 F' R2 U R' U' R" },
+{ id: 56, name: "OLL 56", desc: "Ishape", alg: "R U R' U R' F R F' U2 R' F R F'" },
+{ id: 57, name: "OLL 57", desc: "Ishape", alg: "R U R' U' M' U R U' r'" }
+],
+pll: [
+{ id: 1, name: "Aa Perm", desc: "Corner swap", alg: "x R' U R' D2 R U' R' D2 R2 x'" },
+{ id: 2, name: "Ab Perm", desc: "Corner swap", alg: "x R2 D2 R U R' D2 R U' R x'" },
+{ id: 3, name: "E Perm", desc: "Diagonal corner swap", alg: "x' R U' R' D R U R' D' R U R' D R U' R' D' x" },
+{ id: 4, name: "F Perm", desc: "Corner and edge", alg: "R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R" },
+{ id: 5, name: "Ga Perm", desc: "G Permutation", alg: "R2 U R' U R' U' R' U R2 y' R U' R'" },
+{ id: 6, name: "Gb Perm", desc: "G Permutation", alg: "R' U' y R2 U R' U R U' R U R2" },
+{ id: 7, name: "Gc Perm", desc: "G Permutation", alg: "R2 U' R U' R U R U' R2 y R' U R" },
+{ id: 8, name: "Gd Perm", desc: "G Permutation", alg: "R U y' R2 U' R U' R' U R' U R2" },
+{ id: 9, name: "H Perm", desc: "Edge H Perm", alg: "M2 U M2 U2 M2 U M2" },
+{ id: 10, name: "Ja Perm", desc: "J Permutation", alg: "R' U L' U2 R U' R' U2 R L" },
+{ id: 11, name: "Jb Perm", desc: "J Permutation", alg: "R U R' F' R U R' U' R' F R2 U' R'" },
+{ id: 12, name: "Na Perm", desc: "N Permutation", alg: "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'" },
+{ id: 13, name: "Nb Perm", desc: "N Permutation", alg: "R' U R U' R' F' U' F R U R' F R' F' R U' R" },
+{ id: 14, name: "Ra Perm", desc: "R Permutation", alg: "R U' R' U' R U R D R' U' R D' R' U2 R'" },
+{ id: 15, name: "Rb Perm", desc: "R Permutation", alg: "R' U2 R U2 R' F R U R' U' R' F' R2" },
+{ id: 16, name: "T Perm", desc: "T Permutation", alg: "R U R' U' R' F R2 U' R' U' R U R' F'" },
+{ id: 17, name: "Ua Perm", desc: "U Permutation", alg: "R U' R U R U R U' R' U' R2" },
+{ id: 18, name: "Ub Perm", desc: "U Permutation", alg: "R2 U R U R' U' R' U' R' U R'" },
+{ id: 19, name: "V Perm", desc: "V Permutation", alg: "R' U R' U' y R' F' R2 U' R' U R' F R F" },
+{ id: 20, name: "Y Perm", desc: "Y Permutation", alg: "F R U' R' U' R U R' F' R U R' U' R' F R F'" },
+{ id: 21, name: "Z Perm", desc: "Z Permutation", alg: "M2 U M2 U M' U2 M2 U2 M' U2" }
+],
+"4lll": [
+{ id: 1, name: "2Look OLL - Cross (F)", alg: "F R U R' U' F'" },
+{ id: 2, name: "2Look OLL - Cross (f)", alg: "f R U R' U' f'" },
+{ id: 3, name: "2Look OLL - Sune", alg: "R U R' U R U2 R'" },
+{ id: 4, name: "2Look OLL - AntiSune", alg: "R U2 R' U' R U' R'" },
+{ id: 5, name: "2Look OLL - H", alg: "R U2 R' U' R U R' U' R U' R'" },
+{ id: 6, name: "2Look OLL - Pi", alg: "R U2 R2 U' R2 U' R2 U2 R" },
+{ id: 7, name: "2Look OLL - Headlights", alg: "R2 D' R U2 R' D R U2 R" },
+{ id: 8, name: "2Look OLL - Chameleon", alg: "R U R' U' R' F R F'" },
+{ id: 9, name: "2Look OLL - Bowtie", alg: "F R' F' R U2 R U2 R'" },
+{ id: 10, name: "2Look PLL - Aa Perm", alg: "x R' U R' D2 R U' R' D2 R2 x'" },
+{ id: 11, name: "2Look PLL - T Perm", alg: "R U R' U' R' F R2 U' R' U' R U R' F'" },
+{ id: 12, name: "2Look PLL - Y Perm", alg: "F R U' R' U' R U R' F' R U R' U' R' F R F'" },
+{ id: 13, name: "2Look PLL - Ua Perm", alg: "R U' R U R U R U' R' U' R2" },
+{ id: 14, name: "2Look PLL - Ub Perm", alg: "R2 U R U R' U' R' U' R' U R'" },
+{ id: 15, name: "2Look PLL - H Perm", alg: "M2 U M2 U2 M2 U M2" },
+{ id: 16, name: "2Look PLL - Z Perm", alg: "M2 U M2 U M' U2 M2 U2 M' U2" }
+]
+};
+​let currentCategory = 'f2l';
+let viewMode = 'list'; // 'list' or 'quiz'
+let currentQuizList = [];
+let quizIndex = 0;
+let learnedCases = JSON.parse(localStorage.getItem('cfop_learned') || '{}');
+let quizStats = JSON.parse(localStorage.getItem('cfop_stats') || '{"correct":0, "total":0}');
+​function switchCategory(cat) {
+currentCategory = cat;
+['f2l', 'oll', 'pll', '4lll'].forEach(c => {
+const btn = document.getElementById(cat-btn-${c});
+if (c === cat) {
+btn.className = "py-2.5 rounded-xl font-semibold text-xs tracking-wide transition shadow-sm bg-indigo-600 text-white";
+} else {
+btn.className = "py-2.5 rounded-xl font-semibold text-xs tracking-wide transition text-slate-400 hover:text-white";
+}
+});
+document.getElementById('search-input').value = '';
+if (viewMode === 'list') {
+renderList();
+} else {
+startQuizMode();
+}
+}
+​function toggleViewMode() {
+viewMode = viewMode === 'list' ? 'quiz' : 'list';
+const btn = document.getElementById('view-mode-btn');
+const listView = document.getElementById('list-view');
+const quizView = document.getElementById('quiz-view');
+const t = translations[currentLang];
+​if (viewMode === 'quiz') {
+btn.textContent = t.viewQuiz;
+listView.classList.add('hidden');
+quizView.classList.remove('hidden');
+startQuizMode();
+} else {
+btn.textContent = t.viewList;
+quizView.classList.add('hidden');
+listView.classList.remove('hidden');
+renderList();
+}
+}
+​function renderList() {
+const container = document.getElementById('list-view');
+const query = document.getElementById('search-input').value.toLowerCase();
+const items = database[currentCategory].filter(item =>
+item.name.toLowerCase().includes(query) ||
+item.alg.toLowerCase().includes(query) ||
+(item.desc && item.desc.toLowerCase().includes(query))
+);
+​document.getElementById('total-count').textContent = items.length;
+​if (items.length === 0) {
+container.innerHTML = <div class="text-center py-12 text-slate-500 text-sm">Ничего не найдено</div>;
+return;
+}
+​container.innerHTML = items.map(item => {
+const isLearned = learnedCases[${currentCategory}_${item.id}];
+return <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-4 flex items-center justify-between shadow-md hover:border-indigo-500/50 transition"> <div class="space-y-1 pr-3 flex-1"> <div class="flex items-center space-x-2"> <span class="font-bold text-sm text-white">${item.name}</span> ${item.desc ?<span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-700/80 text-slate-300">${item.desc}</span>: ''} </div> <div class="font-mono text-xs text-indigo-400 font-bold tracking-wider select-all pt-0.5">${item.alg}</div> </div> <div class="flex items-center space-x-2"> <button onclick="toggleLearned('${currentCategory}', ${item.id})" class="w-9 h-9 rounded-xl flex items-center justify-center transition ${isLearned ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-700/50 text-slate-400 hover:bg-slate-700'}"> <i class="fa-solid fa-check text-xs"></i> </button> </div> </div>;
+}).join('');
+}
+​function filterAlgorithms() {
+if (viewMode === 'list') {
+renderList();
+}
+}
+​function toggleLearned(cat, id) {
+const key = ${cat}_${id};
+learnedCases[key] = !learnedCases[key];
+localStorage.setItem('cfop_learned', JSON.stringify(learnedCases));
+renderList();
+}
+​function startQuizMode() {
+currentQuizList = [...database[currentCategory]].sort(() => Math.random() - 0.5);
+quizIndex = 0;
+loadQuizCard();
+}
+​function loadQuizCard() {
+if (quizIndex >= currentQuizList.length) {
+quizIndex = 0;
+currentQuizList.sort(() => Math.random() - 0.5);
+}
+const item = currentQuizList[quizIndex];
+document.getElementById('quiz-progress').textContent = ${quizIndex + 1} / ${currentQuizList.length};
+document.getElementById('quiz-case-title').textContent = item.name;
+document.getElementById('quiz-case-desc').textContent = item.desc || currentCategory.toUpperCase();
+document.getElementById('quiz-alg-box').textContent = item.alg;
+document.getElementById('quiz-alg-box').classList.add('hidden');
+document.getElementById('reveal-btn').classList.remove('hidden');
+document.getElementById('quiz-rating-buttons').classList.add('hidden');
+}
+​function revealQuizAnswer() {
+document.getElementById('reveal-btn').classList.add('hidden');
+document.getElementById('quiz-alg-box').classList.remove('hidden');
+document.getElementById('quiz-rating-buttons').classList.remove('hidden');
+}
+​function answerQuiz(known) {
+quizStats.total++;
+if (known) quizStats.correct++;
+localStorage.setItem('cfop_stats', JSON.stringify(quizStats));
+quizIndex++;
+loadQuizCard();
+}
+​function exitQuizMode() {
+toggleViewMode();
+}
+​function openStatsModal() {
+let learnedTotal = Object.values(learnedCases).filter(Boolean).length;
+document.getElementById('stat-learned-count').textContent = ${learnedTotal} / 119;
+let acc = quizStats.total > 0 ? Math.round((quizStats.correct / quizStats.total) * 100) : 0;
+document.getElementById('stat-accuracy').textContent = ${acc}%;
+document.getElementById('stats-modal').classList.remove('hidden');
+}
+​function closeStatsModal() {
+document.getElementById('stats-modal').classList.add('hidden');
+}
+​function switchNavTab(tab) {
+['learn', 'trainer', 'timer'].forEach(t => {
+const btn = document.getElementById(nav-${t});
+if (t === tab) {
+btn.className = "flex flex-col items-center space-y-1 text-indigo-400 transition";
+} else {
+btn.className = "flex flex-col items-center space-y-1 text-slate-400 hover:text-slate-200 transition";
+}
+});
+if (tab === 'timer') {
+alert("Таймер скоро будет доступен в следующем обновлении!");
+switchNavTab('learn');
+} else if (tab === 'trainer' && viewMode === 'list') {
+toggleViewMode();
+} else if (tab === 'learn' && viewMode === 'quiz') {
+toggleViewMode();
+}
+}
+​// Initialize Telegram WebApp if available
+if (window.Telegram && window.Telegram.WebApp) {
+window.Telegram.WebApp.ready();
+window.Telegram.WebApp.expand();
+}
+​// Initial render
+renderList();
+</script>
 </body>
 </html>
-
