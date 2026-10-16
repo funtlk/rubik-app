@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -59,6 +60,10 @@
             font-weight: 600;
             cursor: pointer;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            user-select: none;
+        }
+        .btn * {
+            pointer-events: none;
         }
         .btn-primary {
             background-color: var(--button-color);
@@ -95,6 +100,7 @@
             margin-left: 10px;
             cursor: pointer;
             flex-shrink: 0;
+            pointer-events: auto !important;
         }
         .back-btn {
             background: none;
@@ -214,6 +220,119 @@
                     'F2L 27': { formula: "R U' R' U R U' R'", desc: "Выбивание из слота" },
                     'F2L 28': { formula: "y' L' U L U' L' U L", desc: "Выбивание из слота (Зеркальный)" },
                     'F2L 29': { formula: "y' L' U' L U L' U' L", desc: "Выравнивание пары" },
+                    'F2L 30': { formula: "R U R' U' R U R'", desc: "Выравнивание пары (Зеркальный)" },
+                    'F2L 31': { formula: "y' U' L' U L U' L' U L", desc: "Извлечение ребра" },
+                    'F2L 32': { formula: "U R U' R' U R U' R'", desc: "Извлечение ребра (Зеркальный)" },
+                    'F2L 33': { formula: "U' R U' R' U2 R U' R'", desc: "Пара в слоте неправильно" },
+                    'F2L 34': { formula: "y' U L' U L U2' L' U L", desc: "Пара в слоте неправильно (Зеркальный)" },
+                    'F2L 35': { formula: "y' U' L' U' L U2' L' U L", desc: "Разворот ребра в слоте" },
+                    'F2L 36': { formula: "U R U R' U2 R U' R'", desc: "Разворот ребра в слоте (Зеркальный)" },
+                    'F2L 37': { formula: "R U' R' U' R U R' U2 R U' R'", desc: "Угол в слоте, ребро на крыше" },
+                    'F2L 38': { formula: "R U' R' U2 R U' R' U R U' R'", desc: "Переворот элемента" },
+                    'F2L 39': { formula: "R U' R' U R U2' R' U R U' R'", desc: "Переворот угла в слоте" },
+                    'F2L 40': { formula: "R U R' U' R U' R' U2 F' U' F", desc: "Разворот пары в слоте" },
+                    'F2L 41': { formula: "R U' R' r U' r' U2 r U r'", desc: "Сложный переворот в слоте" },
+                    'F2L 42': { formula: "R U R' U' R U2 R' U' R U2 R' U' R U R'", desc: "Полная разборка слота" }
+                }
+            },
+            oll: {
+                title: "Этап OLL (57 случаев)",
+                items: {
+                    'OLL 1': { formula: "R U2 R2 F R F' U2 R' F R F'", desc: "Точка (Пятно)" },
+                    'OLL 2': { formula: "F R U R' U' F' f R U R' U' f'", desc: "Точка (Две галочки)" },
+                    'OLL 3': { formula: "f R U R' U' f' U' F R U R' U' F'", desc: "Точка (Галочка + Палка)" },
+                    'OLL 4': { formula: "f R U R' U' f' U F R U R' U' F'", desc: "Точка (Зеркальный 3)" },
+                    'OLL 5': { formula: "r' U2 R U R' U r", desc: "Уголок (Препятствие)" },
+                    'OLL 6': { formula: "r U2 R' U' R U' r'", desc: "Уголок (Зеркальный 5)" },
+                    'OLL 7': { formula: "r U R' U R U2 r'", desc: "Молния прямая" },
+                    'OLL 8': { formula: "r' U' R U' R' U2 r", desc: "Молния обратная" },
+                    'OLL 9': { formula: "R U R' U' R' F R F'", desc: "Рыбка с уголком" },
+                    'OLL 10': { formula: "R U R' U R' F R F' R U2 R'", desc: "Рыбка обратная" },
+                    'OLL 11': { formula: "r U R' U R U' R' U' r'", desc: "Молния правая" },
+                    'OLL 12': { formula: "M' U' M U2 M' U' M", desc: "Молния левая" },
+                    'OLL 13': { formula: "F U R U' R2 F' R U R U' R'", desc: "Пушка правая" },
+                    'OLL 14': { formula: "R' F R U R' F' R F U' F'", desc: "Пушка левая" },
+                    'OLL 15': { formula: "l' U' l L' U' L U l' U l", desc: "Закорючка правая" },
+                    'OLL 16': { formula: "r U r' R U R' U' r U' r'", desc: "Закорючка левая" },
+                    'OLL 17': { formula: "F R U R' U' R U R' U' F'", desc: "Двойной пиф-паф" },
+                    'OLL 18': { formula: "r U R' U R U2 r2 U' R U' R' U2 r", desc: "Корона" },
+                    'OLL 19': { formula: "M' U2 M U2 M' U M U2 M' U2 M", desc: "Перекрестие" },
+                    'OLL 20': { formula: "r' U' r U' R' U R U' R' U R r' U r", desc: "Буква X" },
+                    'OLL 21': { formula: "R U2 R' U' R U R' U' R U' R'", desc: "Крест — Распорка" },
+                    'OLL 22': { formula: "R2 D' R U2 R' D R U2 R", desc: "Крест — Ушки" },
+                    'OLL 23': { formula: "R2 D R' U2 R D' R' U2 R'", desc: "Крест — Глаза" },
+                    'OLL 24': { formula: "r U R' U' r' F R F'", desc: "Крест — Вертолет" },
+                    'OLL 25': { formula: "F' r U R' U' r' F R", desc: "Крест — Восьмерка" },
+                    'OLL 26': { formula: "R U2 R' U' R U' R'", desc: "Крест — Анти-рыбка" },
+                    'OLL 27': { formula: "R U R' U R U2 R'", desc: "Крест — Правая рыбка" },
+                    'OLL 28': { formula: "r U R' U' M U R U' R'", desc: "Стелс" },
+                    'OLL 29': { formula: "M U R U R' U' R' F R F' M'", desc: "Знак вопроса" },
+                    'OLL 30': { formula: "F R U R' U' F' U2 F R U R' U' F'", desc: "Топор" },
+                    'OLL 31': { formula: "R' U' F U R U' R' F' R", desc: "Квадрат" },
+                    'OLL 32': { formula: "L U F' U' L' U L F L'", desc: "Квадрат зеркальный" },
+                    'OLL 33': { formula: "R U R' U' R' F R F'", desc: "Т-образный 1" },
+                    'OLL 34': { formula: "R U R2 U' R' F R U R U' F'", desc: "Т-образный 2" },
+                    'OLL 35': { formula: "R U2 R2 F R F' R U2 R'", desc: "Рыба малая" },
+                    'OLL 36': { formula: "R' U' R U' R' U R U R d' R' U R", desc: "Рыба большая" },
+                    'OLL 37': { formula: "F R U' R' U' R U R' F'", desc: "Мягкий пиф-паф" },
+                    'OLL 38': { formula: "R U R' U R U' R' U' R' F R F'", desc: "Песочные часы" },
+                    'OLL 39': { formula: "L F' L' U' L U F U' L'", desc: "Молния малая правая" },
+                    'OLL 40': { formula: "R' F R U R' U' F' U R", desc: "Молния малая левая" },
+                    'OLL 41': { formula: "R U R' U R U2 R' F R U R' U' F'", desc: "Запятая правая" },
+                    'OLL 42': { formula: "R' U' R U' R' U2 R F R U R' U' F'", desc: "Запятая левая" },
+                    'OLL 43': { formula: "F' U' L' U L F", desc: "Палочка мягкая" },
+                    'OLL 44': { formula: "F R U R' U' F'", desc: "Палочка жесткая" },
+                    'OLL 45': { formula: "F R U R' U' F'", desc: "Классическая палка" },
+                    'OLL 46': { formula: "R' U' R' F R F' U R", desc: "Ласточка" },
+                    'OLL 47': { formula: "F' L' U' L U L' U' L U F", desc: "Буква B правая" },
+                    'OLL 48': { formula: "F R U R' U' R U R' U' F'", desc: "Буква B левая" },
+                    'OLL 49': { formula: "r U r' R U R' U' r U' r'", desc: "Рюкзак правый" },
+                    'OLL 50': { formula: "r' U' r R' U' R U r' U r", desc: "Рюкзак левый" },
+                    'OLL 51': { formula: "f R U R' U' f'", desc: "Галочка" },
+                    'OLL 52': { formula: "R U R' U R U' B U' B' R'", desc: "Тайфун" },
+                    'OLL 53': { formula: "l' U2 R U R' U' R U R' U l", desc: "Трезубец" },
+                    'OLL 54': { formula: "r U2 R' U' R U R' U' R U' r'", desc: "Трезубец зеркальный" },
+                    'OLL 55': { formula: "R' U2 R2 U R' U R U2 R' F R F'", desc: "Большая палка" },
+                    'OLL 56': { formula: "r U r' U R U' R' U R U' R' r U' r'", desc: "Удав" },
+                    'OLL 57': { formula: "R U R' U' M' U R U' r'", desc: "Буква H" }
+                }
+            },
+            pll: {
+                title: "Этап PLL (21 случай)",
+                items: {
+                    'H-Perm': { formula: "M2' U M2' U2 M2' U M2'", desc: "Противоположные ребра меняются парами" },
+                    'Z-Perm': { formula: "M2' U M2' U' M' U2' M2' U2' M'", desc: "Соседние ребра меняются крест-накрест" },
+                    'Ua-Perm': { formula: "R2 U' R' U' R U R U R U' R", desc: "Цикл трех ребер против часовой" },
+                    'Ub-Perm': { formula: "R' U R' U' R' U' R' U R U R2", desc: "Цикл трех ребер по часовой" },
+                    'Aa-Perm': { formula: "x R' D R' U2 R D' R' U2 R2 x'", desc: "Пермутация углов (Aa)" },
+                    'Ab-Perm': { formula: "x R2 D2 R U R' D2 R U' R x'", desc: "Пермутация углов (Ab)" },
+                    'T-Perm': { formula: "R U R' U' R' F R2 U' R' U' R U R' F'", desc: "Диагональный и смежный обмен" },
+                    'Jb-Perm': { formula: "R U R' F' R U R' U' R' F R2 U' R'", desc: "Блок спереди-справа" },
+                    'Ja-Perm': { formula: "x R2 F R F' R U2 r' U r U2 x'", desc: "Блок сзади-слева" },
+                    'Y-Perm': { formula: "F R U' R' U' R U R' F' R U R' U' R' F R F'", desc: "Диагональный обмен" },
+                    'F-Perm': { formula: "R' U' F' R U R' U' R' F R2 U' R' U' R U R' UR", desc: "F-пермутация" },
+                    'V-Perm': { formula: "R' U R' U' y R' F' R2 U' R' U R' F R F", desc: "V-пермутация" },
+                    'Ra-Perm': { formula: "R U' R' U' R U R D R' U' R D' R' U2 R'", desc: "Ra-пермутация" },
+                    'Rb-Perm': { formula: "R2 F R U R U' R' F' R U2 R' U2 R", desc: "Rb-пермутация" },
+                    'Ga-Perm': { formula: "R2 u R' U R' U' R u' R2 y' R' U R", desc: "G-пермутация (Ga)" },
+                    'Gb-Perm': { formula: "R' U' R y R2 u' R U' R' U R' u R2", desc: "G-пермутация (Gb)" },
+                    'Gc-Perm': { formula: "R2 u' R U' R U R' u R2 y R U' R'", desc: "G-пермутация (Gc)" },
+                    'Gd-Perm': { formula: "R U R' y' R2 u R' U R U R u' R2", desc: "G-пермутация (Gd)" },
+                    'E-Perm': { formula: "x' L' U L D' L' U' L D L' U' L D' L' U L D x", desc: "Обмен углов без ребер" },
+                    'Na-Perm': { formula: "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'", desc: "Na-пермутация" },
+                    'Nb-Perm': { formula: "R' U R U' R' F' U' F R U R' F R' F' R U2 R'", desc: "Nb-пермутация" }
+                }
+            }
+        };
+
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function showStub(name) {
+            showToa 29': { formula: "y' L' U' L U L' U' L", desc: "Выравнивание пары" },
                     'F2L 30': { formula: "R U R' U' R U R'", desc: "Выравнивание пары (Зеркальный)" },
                     'F2L 31': { formula: "y' U' L' U L U' L' U L", desc: "Извлечение ребра" },
                     'F2L 32': { formula: "U R U' R' U R U' R'", desc: "Извлечение ребра (Зеркальный)" },
