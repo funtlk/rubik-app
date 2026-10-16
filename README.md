@@ -1,2 +1,299 @@
-# rubik-app
-rubik's cube tutorial
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кубик Рубика — CFOP Справочник</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #1a1a1a);
+            --text-color: var(--tg-theme-text-color, #f1f1f1);
+            --hint-color: var(--tg-theme-hint-color, #aaaaaa);
+            --button-color: var(--tg-theme-button-color, #007aff);
+            --button-text-color: var(--tg-theme-button-text-color, #ffffff);
+            --card-bg: var(--tg-theme-secondary-bg-color, #2a2a2a);
+            --border-radius: 14px;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 16px;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .view { display: none; opacity: 0; transition: opacity 0.2s ease-in-out; }
+        .view.active { display: block; opacity: 1; }
+        h1 { text-align: center; font-size: 22px; font-weight: 700; margin: 0 0 16px 0; color: var(--text-color); }
+        p.subtitle { text-align: center; color: var(--hint-color); font-size: 14px; margin-top: -10px; margin-bottom: 20px; }
+        .search-box {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(128,128,128,0.3);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-size: 15px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        .btn {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 10px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-primary {
+            background-color: var(--button-color);
+            color: var(--button-text-color);
+            justify-content: center;
+        }
+        .card {
+            background-color: var(--card-bg);
+            padding: 18px;
+            border-radius: var(--border-radius);
+            margin-bottom: 14px;
+        }
+        .formula-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            background: rgba(128,128,128,0.15);
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 15px;
+            word-break: break-all;
+            margin-top: 10px;
+            border: 1px solid rgba(128,128,128,0.2);
+        }
+        .copy-btn {
+            background: var(--button-color);
+            color: var(--button-text-color);
+            border: none;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-left: 10px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--button-color);
+            font-size: 16px;
+            font-weight: 600;
+            padding: 0;
+            margin-bottom: 16px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        #toast {
+            visibility: hidden;
+            min-width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 20px;
+            padding: 10px;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 14px;
+        }
+        #toast.show {
+            visibility: visible;
+            animation: fadein 0.3s, fadeout 0.3s 1.7s;
+        }
+        @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
+        @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
+    </style>
+</head>
+<body>
+    <div id="view-main" class="view active">
+        <h1>🧩 Кубик Рубика</h1>
+        <p class="subtitle">Интерактивный справочник методов</p>
+        <button class="btn btn-primary" onclick="showView('view-cfop')">🧩 Метод CFOP (Фридрих)</button>
+        <button class="btn" onclick="showStub('Метод Roux')">🔄 Метод Roux (скоро)</button>
+        <button class="btn" onclick="showStub('Новичковый метод')">📖 Новичковый метод (скоро)</button>
+    </div>
+
+    <div id="view-cfop" class="view">
+        <button class="back-btn" onclick="showView('view-main')">← Главное меню</button>
+        <h1>Метод CFOP</h1>
+        <p class="subtitle">Выберите этап для изучения</p>
+        <button class="btn" onclick="openStage('f2l')"><span>1. F2L (Первые два слоя)</span> <span>›</span></button>
+        <button class="btn" onclick="openStage('oll')"><span>2. OLL (Ориентация последнего слоя)</span> <span>›</span></button>
+        <button class="btn btn-primary" onclick="openStage('pll')"><span>3. PLL (Пермутация — 21 шт.)</span> <span>›</span></button>
+    </div>
+
+    <div id="view-list" class="view">
+        <button class="back-btn" onclick="showView('view-cfop')">← К этапам CFOP</button>
+        <h1 id="stage-title">Список алгоритмов</h1>
+        <input type="text" id="search-input" class="search-box" placeholder="Поиск по названию или описанию..." oninput="filterAlgorithms()">
+        <div id="algorithms-container"></div>
+    </div>
+
+    <div id="view-detail" class="view">
+        <button class="back-btn" onclick="showView('view-list')">← К списку</button>
+        <div class="card">
+            <h2 id="detail-title" style="margin-top:0; font-size: 20px;">Название</h2>
+            <p id="detail-desc" style="color: var(--hint-color); font-size: 14px; margin-bottom: 12px;"></p>
+            <p style="margin-bottom: 6px; font-size: 14px; font-weight: 600;">Формула:</p>
+            <div class="formula-box">
+                <span id="detail-formula"></span>
+                <button class="copy-btn" onclick="copyFormula()">Копировать</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">Формула скопирована!</div>
+
+    <script>
+        try {
+            let tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+        } catch (e) {
+            console.log("Telegram WebApp not available");
+        }
+
+        let currentStage = 'pll';
+
+        const database = {
+            f2l: {
+                title: "Этап F2L",
+                items: {
+                    'F2L 1 (Базовый)': { formula: "U R U' R'", desc: "Угол и ребро на верхнем слое, совпадают цвета" },
+                    'F2L 2 (Базовый)': { formula: "y' U' L' U L", desc: "Зеркальный базовый случай" },
+                    'F2L 3 (Угол вверху, белым в сторону)': { formula: "F' U' F", desc: "Быстрый загон через фасад" },
+                    'F2L 4 (Пара разделена)': { formula: "(R U R' U') (R U R' U') R U R'", desc: "Тройной пиф-паф" },
+                    'F2L 5 (Угол белым вверх)': { formula: "U2 R U R' U R U' R'", desc: "Выведение угла белым стикером наверх" },
+                    'F2L 6 (Ребро в слоте)': { formula: "R U' R' U R U' R'", desc: "Выбивание ребра из слота" }
+                }
+            },
+            oll: {
+                title: "Этап OLL",
+                items: {
+                    'OLL 21 (Крест - Распорка)': { formula: "R U2 R' U' R U R' U' R U' R'", desc: "Все углы развернуты" },
+                    'OLL 22 (Крест - Ушки)': { formula: "R2 D' R U2 R' D R U2 R", desc: "Два угла смотрят в стороны" },
+                    'OLL 23 (Крест - Глаза)': { formula: "R2 D R' U2 R D' R' U2 R'", desc: "Два угла смотрят вперед" },
+                    'OLL 24 (Рыбка)': { formula: "R U R' U R U2 R'", desc: "Классическая правая Рыбка (Sune)" },
+                    'OLL 25 (Анти-рыбка)': { formula: "R U2 R' U' R U' R'", desc: "Анти-рыбка (Anti-Sune)" },
+                    'OLL 33 (T-форма)': { formula: "(R U R' U') R' F R F'", desc: "T-образная ситуация на крыше" },
+                    'OLL 45 (Точка)': { formula: "F R U R' U' F'", desc: "Часы/Палочка (Мягкий пиф-паф)" },
+                    'OLL 57 (H-форма)': { formula: "R U R' U' M' U R U' r'", desc: "Буква H на верхней грани" }
+                }
+            },
+            pll: {
+                title: "Этап PLL (21 алгоритм)",
+                items: {
+                    'H-Perm': { formula: "M2' U M2' U2 M2' U M2'", desc: "Противоположные ребра меняются парами" },
+                    'Z-Perm': { formula: "M2' U M2' U' M' U2' M2' U2' M'", desc: "Соседние ребра меняются крест-накрест" },
+                    'Ua-Perm': { formula: "R2 U' R' U' R U R U R U' R", desc: "Цикл трех ребер против часовой" },
+                    'Ub-Perm': { formula: "R' U R' U' R' U' R' U R U R2", desc: "Цикл трех ребер по часовой" },
+                    'Aa-Perm': { formula: "x R' D R' U2 R D' R' U2 R2 x'", desc: "Пермутация углов (Aa)" },
+                    'Ab-Perm': { formula: "x R2 D2 R U R' D2 R U' R x'", desc: "Пермутация углов (Ab)" },
+                    'T-Perm': { formula: "R U R' U' R' F R2 U' R' U' R U R' F'", desc: "Диагональный и смежный обмен" },
+                    'Jb-Perm': { formula: "R U R' F' R U R' U' R' F R2 U' R'", desc: "Блок спереди-справа" },
+                    'Ja-Perm': { formula: "x R2 F R F' R U2 r' U r U2 x'", desc: "Блок сзади-слева" },
+                    'Y-Perm': { formula: "F R U' R' U' R U R' F' R U R' U' R' F R F'", desc: "Диагональный обмен" },
+                    'F-Perm': { formula: "R' U' F' R U R' U' R' F R2 U' R' U' R U R' UR", desc: "F-пермутация" },
+                    'V-Perm': { formula: "R' U R' U' y R' F' R2 U' R' U R' F R F", desc: "V-пермутация" },
+                    'Ra-Perm': { formula: "R U' R' U' R U R D R' U' R D' R' U2 R'", desc: "Ra-пермутация" },
+                    'Rb-Perm': { formula: "R2 F R U R U' R' F' R U2 R' U2 R", desc: "Rb-пермутация" },
+                    'Ga-Perm': { formula: "R2 u R' U R' U' R u' R2 y' R' U R", desc: "G-пермутация (Ga)" },
+                    'Gb-Perm': { formula: "R' U' R y R2 u' R U' R' U R' u R2", desc: "G-пермутация (Gb)" },
+                    'Gc-Perm': { formula: "R2 u' R U' R U R' u R2 y R U' R'", desc: "G-пермутация (Gc)" },
+                    'Gd-Perm': { formula: "R U R' y' R2 u R' U R U R u' R2", desc: "G-пермутация (Gd)" },
+                    'E-Perm': { formula: "x' L' U L D' L' U' L D L' U' L D' L' U L D x", desc: "Обмен ребер крест-накрест без углов" },
+                    'Na-Perm': { formula: "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'", desc: "Na-пермутация" },
+                    'Nb-Perm': { formula: "R' U R U' R' F' U' F R U R' F R' F' R U2 R'", desc: "Nb-пермутация" }
+                }
+            }
+        };
+
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function showStub(name) {
+            showToast(name + " появится в обновлении!");
+        }
+
+        function openStage(stageKey) {
+            currentStage = stageKey;
+            document.getElementById('stage-title').innerText = database[stageKey].title;
+            document.getElementById('search-input').value = '';
+            renderList(database[stageKey].items);
+            showView('view-list');
+        }
+
+        function renderList(items) {
+            const container = document.getElementById('algorithms-container');
+            container.innerHTML = '';
+            for (let name in items) {
+                let btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.innerHTML = `<span>${name}</span> <span style="font-size: 13px; color: var(--hint-color);">${items[name].desc}</span>`;
+                btn.onclick = () => showAlgorithm(name, items[name]);
+                container.appendChild(btn);
+            }
+        }
+
+        function filterAlgorithms() {
+            let query = document.getElementById('search-input').value.toLowerCase();
+            let allItems = database[currentStage].items;
+            let filtered = {};
+
+            for (let name in allItems) {
+                if (name.toLowerCase().includes(query) || allItems[name].desc.toLowerCase().includes(query)) {
+                    filtered[name] = allItems[name];
+                }
+            }
+            renderList(filtered);
+        }
+
+        function showAlgorithm(name, item) {
+            document.getElementById('detail-title').innerText = name;
+            document.getElementById('detail-desc').innerText = item.desc;
+            document.getElementById('detail-formula').innerText = item.formula;
+            showView('view-detail');
+        }
+
+        function copyFormula() {
+            let text = document.getElementById('detail-formula').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("Формула скопирована!");
+            });
+        }
+
+        function showToast(message) {
+            let toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2000);
+        }
+    </script>
+</body>
+</html>
+
