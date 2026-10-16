@@ -355,31 +355,25 @@
     
     let algorithmsData = {
         f2l: [
-            { id: 1, name: "F2L 1", desc: { ru: "Базовый вправо", en: "Basic right", uk: "Базовий вправо", es: "Básico derecha" }, formula: "R U R'" },
+            { id: 1, name: "F2L 1", desc: { ru: "Базовый вправо (Угол и ребро на верхнем слое)", en: "Basic right (Corner and edge on top layer)", uk: "Базовий вправо (Кут і ребро на верхньому шарі)", es: "Básico derecha (Esquina y arista en capa superior)" }, formula: "R U R'" },
             { id: 2, name: "F2L 2", desc: { ru: "Базовый влево", en: "Basic left", uk: "Базовий вліво", es: "Básico izquierda" }, formula: "L' U' L" },
             { id: 3, name: "F2L 3", desc: { ru: "Слот в правый задний", en: "Back-right slot insertion", uk: "Слот у правий задній", es: "Inserción en slot trasero derecho" }, formula: "U' R U' R' U R U R'" },
             { id: 4, name: "F2L 4", desc: { ru: "Разделение пары вправо", en: "Pair separation right", uk: "Розділення пари вправо", es: "Separación de pareja derecha" }, formula: "R U2 R' U' R U R'" },
-            { id: 5, name: "F2L 5", desc: { ru: "Разделение пары влево", en: "Pair separation left", uk: "Розділення пари вліво", es: "Separación de pareja izquierda" }, formula: "L' U2 L U L' U' L" },
-            { id: 6, name: "F2L 6", desc: { ru: "Соединение через увод", en: "Connection via hide", uk: "З'єднання через відведення", es: "Conexión ocultando" }, formula: "U R U' R'" },
-            { id: 7, name: "F2L 7", desc: { ru: "Соединение влево", en: "Connection left", uk: "З'єднання вліво", es: "Conexión izquierda" }, formula: "U' L' U L" },
-            { id: 8, name: "F2L 8", desc: { ru: "Вставка с разворотом угла", en: "Insertion with corner flip", uk: "Вставка з розворотом кута", es: "Inserción con giro de esquina" }, formula: "R U' R' U2 R U' R'" },
-            { id: 9, name: "F2L 9", desc: { ru: "Вставка слева с разворотом", en: "Left insertion with flip", uk: "Вставка зліва з розворотом", es: "Inserción izquierda con giro" }, formula: "L' U L U2 L' U L" },
-            { id: 10, name: "F2L 10", desc: { ru: "Угол вверх, ребро сбоку", en: "Corner up, edge on side", uk: "Кут вгору, ребро збоку", es: "Esquina arriba, arista al lado" }, formula: "U R U R' U' R U R'" }
+            { id: 5, name: "F2L 5", desc: { ru: "Разделение пары влево", en: "Pair separation left", uk: "Розділення пари вліво", es: "Separación de pareja izquierda" }, formula: "L' U2 L U L' U' L" }
         ],
         oll: [
-            { id: 1, name: "OLL 1", desc: { ru: "Точка", en: "Dot", uk: "Точка", es: "Punto" }, formula: "R U2 R2 F R F' U2 R' F R F'" },
-            { id: 21, name: "OLL 21", desc: { ru: "Крест (Все углы на месте)", en: "Cross", uk: "Хрест", es: "Cruz" }, formula: "R U2 R2 U' R2 U' R2 U2 R" },
+            { id: 1, name: "OLL 1", desc: { ru: "Точка (Точка)", en: "Dot (All oriented)", uk: "Точка (Точка)", es: "Punto" }, formula: "R U2 R2 F R F' U2 R' F R F'" },
+            { id: 21, name: "OLL 21", desc: { ru: "Крест (Все углы на месте)", en: "Cross (All corners on place)", uk: "Хрест (Усі кути на місці)", es: "Cruz (Todas las esquinas en su lugar)" }, formula: "R U2 R2 U' R2 U' R2 U2 R" },
             { id: 26, name: "OLL 26", desc: { ru: "«Рыбка» базовая", en: "Basic 'Fish'", uk: "«Рибка» базова", es: "'Pescado' básico" }, formula: "R U2 R' U' R U' R'" },
-            { id: 27, name: "OLL 27", desc: { ru: "«Рыбка» обратная", en: "Reverse 'Fish'", uk: "«Рибка» зворотна", es: "'Pescado' inverso" }, formula: "R U R' U R U2 R'" },
-            { id: 57, name: "OLL 57", desc: { ru: "«Чистый крест»", en: "Pure cross", uk: "«Чистий хрест»", es: "Cruz pura" }, formula: "R U R' U' M' U R U' r'" }
+            { id: 27, name: "OLL 27", desc: { ru: "«Рыбка» обратная", en: "Reverse 'Fish'", uk: "«Рибка» зворотна", es: "'Pescado' inverso" }, formula: "R U R' U R U2 R'" }
         ],
         pll: [
-            { id: 9, name: "H Perm", desc: { ru: "Перестановка H", en: "H Permutation", uk: "Перестановка H", es: "Permutación H" }, formula: "M2 U M2 U2 M2 U M2" },
+            { id: 3, name: "E Perm", desc: { ru: "Перестановка E (диагональные углы)", en: "E Permutation (diagonal corners)", uk: "Перестановка E (діагональні кути)", es: "Permutación E (esquinas diagonales)" }, formula: "x' R U' R' D R U R' D' R U R' D R U' R' D' x" },
+            { id: 9, name: "H Perm", desc: { ru: "Перестановка H (ребра)", en: "H Permutation (edges)", uk: "Перестановка H (ребра)", es: "Permutación H (aristas)" }, formula: "M2 U M2 U2 M2 U M2" },
             { id: 11, name: "Jb Perm", desc: { ru: "Перестановка J (b)", en: "J Permutation (b)", uk: "Перестановка J (b)", es: "Permutación J (b)" }, formula: "R U R' F' R U R' U' R' F R2 U' R'" },
-            { id: 16, name: "T Perm", desc: { ru: "Перестановка T", en: "T Permutation", uk: "Перестановка T", es: "Permutación T" }, formula: "R U R' U' R' F R2 U' R' U' R U R' F'" },
-            { id: 17, name: "Ua Perm", desc: { ru: "Перестановка U (a)", en: "U Permutation (a)", uk: "Перестановка U (a)", es: "Permutación U (a)" }, formula: "R U' R U R U R U' R' U' R2" },
-            { id: 18, name: "Ub Perm", desc: { ru: "Перестановка U (b)", en: "U Permutation (b)", uk: "Перестановка U (b)", es: "Permutación U (b)" }, formula: "R2 U R U R' U' R' U' R' U R'" },
-            { id: 21, name: "Z Perm", desc: { ru: "Перестановка Z", en: "Z Permutation", uk: "Перестановка Z", es: "Permutación Z" }, formula: "M2 U M2 U M' U2 M2 U2 M' U2" }
+            { id: 16, name: "T Perm", desc: { ru: "Перестановка T (базовая)", en: "T Permutation (basic)", uk: "Перестановка T (базова)", es: "Permutación T (básica)" }, formula: "R U R' U' R' F R2 U' R' U' R U R' F'" },
+            { id: 17, name: "Ua Perm", desc: { ru: "Перестановка U (a - против часовой)", en: "U Permutation (a - counter-clockwise)", uk: "Перестановка U (a - проти годинникової)", es: "Permutación U (a - antihorario)" }, formula: "R U' R U R U R U' R' U' R2" },
+            { id: 21, name: "Z Perm", desc: { ru: "Перестановка Z (ребра)", en: "Z Permutation (edges)", uk: "Перестановка Z (ребра)", es: "Permutación Z (aristas)" }, formula: "M2 U M2 U M' U2 M2 U2 M' U2" }
         ]
     };
 
@@ -591,7 +585,6 @@
         showView('view-detail');
     }
 
-    // Исправленный алгоритм инвертирования формулы (скрамбла)
     function getInverseScramble(formula) {
         let clean = formula.replace(/\(([^)]+)\)\s*3/g, "$1 $1 $1")
                            .replace(/\(([^)]+)\)\s*2/g, "$1 $1")
@@ -633,7 +626,7 @@
         const tokens = text.split(/\s+/).filter(t => t.length > 0);
         for (let token of tokens) {
             while (isMoving) {
-                await new Promise(r => setTimeout(r, 20));
+                await new Promise(r => setTimeout(r, 15));
             }
             applyMove(token);
         }
@@ -826,7 +819,6 @@
         });
     }
 
-    // Исправленный метод вращения с четкой фиксацией координат во избежание багов
     function applyMove(moveStr) {
         if (isMoving) return;
         isMoving = true;
@@ -839,6 +831,8 @@
         let filter = c => false;
         let angle = (isPrime ? Math.PI / 2 : -Math.PI / 2);
         if (isDouble) angle *= 2;
+
+        let isWholeCube = false;
 
         switch (base) {
             case 'R': axis.set(1, 0, 0); filter = c => c.position.x > 0.5; break;
@@ -859,27 +853,31 @@
             case 'E': axis.set(0, -1, 0); filter = c => Math.abs(c.position.y) < 0.5; angle = -angle; break;
             case 'S': axis.set(0, 0, 1); filter = c => Math.abs(c.position.z) < 0.5; break;
 
-            case 'x': axis.set(1, 0, 0); filter = c => true; break;
-            case 'y': axis.set(0, 1, 0); filter = c => true; break;
-            case 'z': axis.set(0, 0, 1); filter = c => true; break;
+            case 'x': axis.set(1, 0, 0); isWholeCube = true; break;
+            case 'y': axis.set(0, 1, 0); isWholeCube = true; angle = -angle; break;
+            case 'z': axis.set(0, 0, 1); isWholeCube = true; break;
         }
 
         const pivot = new THREE.Group();
         scene.add(pivot);
 
-        const affected = cubies.filter(filter);
+        const affected = isWholeCube ? [...cubies] : cubies.filter(filter);
         affected.forEach(c => {
             cubeGroup.remove(c);
             pivot.add(c);
         });
 
-        const steps = 12;
+        const steps = 10;
         const stepAngle = angle / steps;
         let currentStep = 0;
 
         function animateStep() {
             currentStep++;
-            pivot.rotateOnAxis(axis, stepAngle);
+            if (isWholeCube) {
+                pivot.rotateOnWorldAxis(axis, stepAngle);
+            } else {
+                pivot.rotateOnAxis(axis, stepAngle);
+            }
             renderer.render(scene, camera);
 
             if (currentStep < steps) {
@@ -892,7 +890,6 @@
                     c.position.y = Math.round(c.position.y);
                     c.position.z = Math.round(c.position.z);
                     
-                    // Нормализация углов поворота элементов для предотвращения искажения текстур
                     c.rotation.x = Math.round(c.rotation.x / (Math.PI / 2)) * (Math.PI / 2);
                     c.rotation.y = Math.round(c.rotation.y / (Math.PI / 2)) * (Math.PI / 2);
                     c.rotation.z = Math.round(c.rotation.z / (Math.PI / 2)) * (Math.PI / 2);
