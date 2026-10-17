@@ -7,794 +7,585 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 :root {
-  --bg-color: #121212;
-  --card-bg: #1e1e1e;
-  --text-color: #ffffff;
-  --text-secondary: #aaaaaa;
-  --button-color: #007aff;
-  --button-text-color: #ffffff;
-  --border-color: rgba(255, 255, 255, 0.1);
+--bg-color: #121212;
+--card-bg: #1e1e1e;
+--text-color: #ffffff;
+--text-secondary: #aaaaaa;
+--button-color: #007aff;
+--button-text-color: #ffffff;
+--border-color: rgba(255, 255, 255, 0.1);
 }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  margin: 0;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  touch-action: manipulation;
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+background-color: var(--bg-color);
+color: var(--text-color);
+margin: 0;
+padding: 16px;
+display: flex;
+flex-direction: column;
+align-items: center;
+touch-action: manipulation;
 }
 .container-box {
-  width: 100%;
-  max-width: 520px;
+width: 100%;
+max-width: 520px;
 }
 .view {
-  display: none;
-  width: 100%;
+display: none;
+width: 100%;
 }
 .view.active {
-  display: flex;
-  flex-direction: column;
+display: flex;
+flex-direction: column;
 }
 .header {
-  text-align: center;
-  margin-bottom: 20px;
+text-align: center;
+margin-bottom: 20px;
 }
 .header h1 { font-size: 22px; margin: 0 0 6px 0; font-weight: bold; }
 .header p { font-size: 14px; color: var(--text-secondary); margin: 0; }
 .menu-btn {
-  background-color: var(--button-color);
-  color: var(--button-text-color);
-  border: none;
-  border-radius: 12px;
-  padding: 14px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-bottom: 12px;
-  text-align: center;
-  width: 100%;
+background-color: var(--button-color);
+color: var(--button-text-color);
+border: none;
+border-radius: 12px;
+padding: 14px;
+font-size: 16px;
+font-weight: 600;
+cursor: pointer;
+margin-bottom: 12px;
+text-align: center;
+width: 100%;
 }
 .cube-section {
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  background: var(--card-bg);
-  border-radius: 16px;
-  padding: 12px;
-  box-sizing: border-box;
-  border: 1px solid var(--border-color);
+margin-top: 10px;
+display: flex;
+flex-direction: column;
+align-items: center;
+width: 100%;
+background: var(--card-bg);
+border-radius: 16px;
+padding: 12px;
+box-sizing: border-box;
+border: 1px solid var(--border-color);
 }
 #cubeCanvas {
-  width: 100%;
-  height: 280px;
-  margin-bottom: 12px;
-  touch-action: none;
-  cursor: grab;
-  display: block;
-  background: rgba(0,0,0,0.25);
-  border-radius: 12px;
+width: 100%;
+height: 280px;
+margin-bottom: 12px;
+touch-action: none;
+cursor: grab;
+display: block;
+background: rgba(0,0,0,0.25);
+border-radius: 12px;
 }
 #cubeCanvas:active { cursor: grabbing; }
 .controls-panel {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+width: 100%;
+display: flex;
+flex-direction: column;
+gap: 5px;
 }
 .control-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 3px;
+display: flex;
+justify-content: space-between;
+gap: 3px;
 }
 .ctrl-btn {
-  flex: 1;
-  background-color: rgba(255,255,255,0.05);
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 8px 0;
-  font-size: 13px;
-  font-weight: bold;
-  cursor: pointer;
-  text-align: center;
-  user-select: none;
+flex: 1;
+background-color: rgba(255,255,255,0.05);
+color: var(--text-color);
+border: 1px solid var(--border-color);
+border-radius: 6px;
+padding: 8px 0;
+font-size: 13px;
+font-weight: bold;
+cursor: pointer;
+text-align: center;
+user-select: none;
 }
 .ctrl-btn:active { background-color: var(--button-color); }
 .ctrl-btn.spec {
-  background-color: rgba(0, 122, 255, 0.2);
-  color: #4da3ff;
-  border-color: rgba(0, 122, 255, 0.4);
+background-color: rgba(0, 122, 255, 0.2);
+color: #4da3ff;
+border-color: rgba(0, 122, 255, 0.4);
 }
 .list-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  max-height: 70vh;
-  overflow-y: auto;
-  padding-bottom: 20px;
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 10px;
+max-height: 70vh;
+overflow-y: auto;
+padding-bottom: 20px;
 }
 .case-card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 12px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+background-color: var(--card-bg);
+border: 1px solid var(--border-color);
+border-radius: 12px;
+padding: 12px;
+cursor: pointer;
+display: flex;
+flex-direction: column;
+align-items: center;
+text-align: center;
 }
 .case-card h3 { font-size: 15px; margin: 0 0 4px 0; color: #4da3ff; font-weight: bold; }
 .case-card p {
-  font-size: 11px;
-  color: var(--text-secondary);
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+font-size: 11px;
+color: var(--text-secondary);
+margin: 0;
+overflow: hidden;
+text-overflow: ellipsis;
+display: -webkit-box;
+-webkit-line-clamp: 2;
+-webkit-box-orient: vertical;
 }
 .back-btn {
-  background: none;
-  border: none;
-  color: var(--button-color);
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-bottom: 16px;
-  padding: 0;
-  text-align: left;
+background: none;
+border: none;
+color: var(--button-color);
+font-size: 16px;
+font-weight: 600;
+cursor: pointer;
+margin-bottom: 16px;
+padding: 0;
+text-align: left;
 }
 .search-box {
-  width: 100%;
-  padding: 12px;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  color: var(--text-color);
-  font-size: 14px;
-  margin-bottom: 16px;
-  box-sizing: border-box;
+width: 100%;
+padding: 12px;
+background-color: var(--card-bg);
+border: 1px solid var(--border-color);
+border-radius: 10px;
+color: var(--text-color);
+font-size: 14px;
+margin-bottom: 16px;
+box-sizing: border-box;
 }
 .detail-card {
-  background-color: var(--card-bg);
-  border-radius: 16px;
-  padding: 20px;
-  border: 1px solid var(--border-color);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+background-color: var(--card-bg);
+border-radius: 16px;
+padding: 20px;
+border: 1px solid var(--border-color);
+display: flex;
+flex-direction: column;
+gap: 14px;
 }
 .formula-box {
-  background-color: rgba(0,0,0,0.4);
-  border: 1px solid var(--border-color);
-  padding: 12px;
-  border-radius: 8px;
-  font-family: monospace;
-  font-size: 15px;
-  word-break: break-all;
-  line-height: 1.4;
+background-color: rgba(0,0,0,0.4);
+border: 1px solid var(--border-color);
+padding: 12px;
+border-radius: 8px;
+font-family: monospace;
+font-size: 15px;
+word-break: break-all;
+line-height: 1.4;
 }
 .copy-btn {
-  background-color: var(--button-color);
-  color: var(--button-text-color);
-  border: none;
-  border-radius: 8px;
-  padding: 12px;
-  font-weight: 600;
-  cursor: pointer;
+background-color: var(--button-color);
+color: var(--button-text-color);
+border: none;
+border-radius: 8px;
+padding: 12px;
+font-weight: 600;
+cursor: pointer;
 }
 </style>
 </head>
 <body>
-
-<div class="container-box">
-  <!-- Main View -->
-  <div id="view-main" class="view active">
-    <div class="header">
-      <h1>🧩 Кубик Рубика</h1>
-      <p>Интерактивный справочник CFOP и Симулятор</p>
-    </div>
-
-    <button class="menu-btn" onclick="showView('view-cfop')">🧩 Метод CFOP (Фридрих)</button>
-    <button class="menu-btn" onclick="showView('view-4lll')" style="background-color: #2c2c2e; color: #fff;">📗 Метод 4LLL (Упрощенный CFOP)</button>
-
-    <div class="cube-section">
-      <div style="width: 100%; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px;">
-        <label style="font-size: 11px; color: var(--text-secondary); text-align: center;">Введите или вставьте формулу:</label>
-        <div style="display: flex; gap: 6px;">
-          <input type="text" id="custom-formula-input" value="R U R' U'" style="flex: 1; padding: 8px 10px; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: monospace; font-size: 13px; outline: none;">
-          <button onclick="executeCustomFormula()" style="background-color: var(--button-color); color: var(--button-text-color); border: none; border-radius: 8px; padding: 0 12px; font-weight: 600; font-size: 12px; cursor: pointer;">Применить</button>
-          <button onclick="resetCube()" style="background-color: #3a3a3c; color: var(--text-color); border: none; border-radius: 8px; padding: 0 12px; font-weight: 600; font-size: 12px; cursor: pointer;">Сброс</button>
-        </div>
-      </div>
-      <canvas id="cubeCanvas" width="300" height="280"></canvas>
-      <div class="controls-panel">
-        <div class="control-row">
-          <button class="ctrl-btn" onclick="applyMove('R')">R</button>
-          <button class="ctrl-btn" onclick="applyMove('R\'')">R'</button>
-          <button class="ctrl-btn" onclick="applyMove('L')">L</button>
-          <button class="ctrl-btn" onclick="applyMove('L\'')">L'</button>
-          <button class="ctrl-btn" onclick="applyMove('U')">U</button>
-          <button class="ctrl-btn" onclick="applyMove('U\'')">U'</button>
-        </div>
-        <div class="control-row">
-          <button class="ctrl-btn" onclick="applyMove('D')">D</button>
-          <button class="ctrl-btn" onclick="applyMove('D\'')">D'</button>
-          <button class="ctrl-btn" onclick="applyMove('F')">F</button>
-          <button class="ctrl-btn" onclick="applyMove('F\'')">F'</button>
-          <button class="ctrl-btn" onclick="applyMove('B')">B</button>
-          <button class="ctrl-btn" onclick="applyMove('B\'')">B'</button>
-        </div>
-        <div class="control-row">
-          <button class="ctrl-btn" onclick="applyMove('M')">M</button>
-          <button class="ctrl-btn" onclick="applyMove('M\'')">M'</button>
-          <button class="ctrl-btn" onclick="applyMove('E')">E</button>
-          <button class="ctrl-btn" onclick="applyMove('E\'')">E'</button>
-          <button class="ctrl-btn" onclick="applyMove('S')">S</button>
-          <button class="ctrl-btn" onclick="applyMove('S\'')">S'</button>
-        </div>
-        <div class="control-row special-row">
-          <button class="ctrl-btn spec" onclick="applyMove('x')">x</button>
-          <button class="ctrl-btn spec" onclick="applyMove('x\'')">x'</button>
-          <button class="ctrl-btn spec" onclick="applyMove('y')">y</button>
-          <button class="ctrl-btn spec" onclick="applyMove('y\'')">y'</button>
-          <button class="ctrl-btn spec" onclick="applyMove('z')">z</button>
-          <button class="ctrl-btn spec" onclick="applyMove('z\'')">z'</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- CFOP Categories View -->
-  <div id="view-cfop" class="view">
-    <button class="back-btn" onclick="showView('view-main')">← На главную</button>
-    <div class="header">
-      <h1>Метод CFOP</h1>
-      <p>Выберите этап</p>
-    </div>
-    <button class="menu-btn" onclick="openCategory('f2l')">F2L (41 случай)</button>
-    <button class="menu-btn" onclick="openCategory('oll')">OLL (57 случаев)</button>
-    <button class="menu-btn" onclick="openCategory('pll')">PLL (21 случай)</button>
-  </div>
-
-  <!-- 4LLL View -->
-  <div id="view-4lll" class="view">
-    <button class="back-btn" onclick="showView('view-main')">← На главную</button>
-    <div class="header">
-      <h1>Упрощенный CFOP (4LLL)</h1>
-      <p>Базовые алгоритмы для быстрой сборки</p>
-    </div>
-    <div id="list-4lll-container" class="list-grid"></div>
-  </div>
-
-  <!-- Algorithms List View -->
-  <div id="view-list" class="view">
-    <button class="back-btn" onclick="showView('view-cfop')">← К списку этапов</button>
-    <input type="text" class="search-box" id="search" placeholder="Поиск алгоритма..." oninput="filterAlgorithms()">
-    <div id="algorithms-list" class="list-grid"></div>
-  </div>
-
-  <!-- Detail View -->
-  <div id="view-detail" class="view">
-    <button class="back-btn" onclick="showView('view-list')">← К списку</button>
-    <div class="detail-card">
-      <h2 id="detail-title" style="margin:0; font-size: 20px;">Название</h2>
-      <p id="detail-desc" style="color: var(--text-secondary); margin:0; font-size: 14px;"></p>
-      <div>
-        <span style="font-size: 13px; color: var(--text-secondary);">Формула (Алгоритм решения):</span>
-        <div class="formula-box" id="detail-formula">R U R'</div>
-      </div>
-      <div>
-        <span style="font-size: 13px; color: var(--text-secondary);">Скрамбл (Для создания ситуации):</span>
-        <div class="formula-box" id="detail-scramble" style="color: #4da3ff;">R U R'</div>
-      </div>
-      <div style="display: flex; gap: 8px;">
-        <button class="copy-btn" onclick="copyFormula()" id="t-copy-btn" style="flex: 1;">Копировать формулу</button>
-        <button class="copy-btn" onclick="applyCaseScramble()" style="background-color: #34c759; flex: 1;">Собрать ситуацию</button>
-      </div>
-    </div>
-  </div>
+​<div class="container-box">
+<!-- Main View -->
+<div id="view-main" class="view active">
+<div class="header">
+<h1>🧩 Кубик Рубика</h1>
+<p>Интерактивный справочник CFOP и Симулятор</p>
 </div>
-
+​<button class="menu-btn" onclick="showView('view-cfop')">🧩 Метод CFOP (Фридрих)</button>
+<button class="menu-btn" onclick="showView('view-4lll')" style="background-color: #2c2c2e; color: #fff;">📗 Метод 4LLL (Упрощенный CFOP)</button>
+​<div class="cube-section">
+<div style="width: 100%; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px;">
+<label style="font-size: 11px; color: var(--text-secondary); text-align: center;">Введите или вставьте формулу:</label>
+<div style="display: flex; gap: 6px;">
+<input type="text" id="custom-formula-input" value="R U R' U'" style="flex: 1; padding: 8px 10px; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: monospace; font-size: 13px; outline: none;">
+<button onclick="executeCustomFormula()" style="background-color: var(--button-color); color: var(--button-text-color); border: none; border-radius: 8px; padding: 0 12px; font-weight: 600; font-size: 12px; cursor: pointer;">Применить</button>
+<button onclick="resetCube()" style="background-color: #3a3a3c; color: var(--text-color); border: none; border-radius: 8px; padding: 0 12px; font-weight: 600; font-size: 12px; cursor: pointer;">Сброс</button>
+</div>
+</div>
+<div style="width: 100%; height: 280px; position: relative;">
+<canvas id="cubeCanvas" width="300" height="280"></canvas>
+</div>
+<div class="controls-panel" style="margin-top: 10px;">
+<div class="control-row">
+<button class="ctrl-btn" onclick="applyMove('R')">R</button>
+<button class="ctrl-btn" onclick="applyMove('R\'')">R'</button>
+<button class="ctrl-btn" onclick="applyMove('L')">L</button>
+<button class="ctrl-btn" onclick="applyMove('L\'')">L'</button>
+<button class="ctrl-btn" onclick="applyMove('U')">U</button>
+<button class="ctrl-btn" onclick="applyMove('U\'')">U'</button>
+</div>
+<div class="control-row">
+<button class="ctrl-btn" onclick="applyMove('D')">D</button>
+<button class="ctrl-btn" onclick="applyMove('D\'')">D'</button>
+<button class="ctrl-btn" onclick="applyMove('F')">F</button>
+<button class="ctrl-btn" onclick="applyMove('F\'')">F'</button>
+<button class="ctrl-btn" onclick="applyMove('B')">B</button>
+<button class="ctrl-btn" onclick="applyMove('B\'')">B'</button>
+</div>
+<div class="control-row">
+<button class="ctrl-btn" onclick="applyMove('M')">M</button>
+<button class="ctrl-btn" onclick="applyMove('M\'')">M'</button>
+<button class="ctrl-btn" onclick="applyMove('E')">E</button>
+<button class="ctrl-btn" onclick="applyMove('E\'')">E'</button>
+<button class="ctrl-btn" onclick="applyMove('S')">S</button>
+<button class="ctrl-btn" onclick="applyMove('S\'')">S'</button>
+</div>
+<div class="control-row special-row">
+<button class="ctrl-btn spec" onclick="applyMove('x')">x</button>
+<button class="ctrl-btn spec" onclick="applyMove('x\'')">x'</button>
+<button class="ctrl-btn spec" onclick="applyMove('y')">y</button>
+<button class="ctrl-btn spec" onclick="applyMove('y\'')">y'</button>
+<button class="ctrl-btn spec" onclick="applyMove('z')">z</button>
+<button class="ctrl-btn spec" onclick="applyMove('z\'')">z'</button>
+</div>
+</div>
+</div>
+</div>
+​<!-- CFOP Categories View -->
+<div id="view-cfop" class="view">
+<button class="back-btn" onclick="showView('view-main')">← На главную</button>
+<div class="header">
+<h1>Метод CFOP</h1>
+<p>Выберите этап</p>
+</div>
+<button class="menu-btn" onclick="openCategory('f2l')">F2L (41 случай)</button>
+<button class="menu-btn" onclick="openCategory('oll')">OLL (57 случаев)</button>
+<button class="menu-btn" onclick="openCategory('pll')">PLL (21 случай)</button>
+</div>
+​<!-- 4LLL View -->
+<div id="view-4lll" class="view">
+<button class="back-btn" onclick="showView('view-main')">← На главную</button>
+<div class="header">
+<h1>Упрощенный CFOP (4LLL)</h1>
+<p>Базовые алгоритмы для быстрой сборки</p>
+</div>
+<div id="list-4lll-container" class="list-grid"></div>
+</div>
+​<!-- Algorithms List View -->
+<div id="view-list" class="view">
+<button class="back-btn" onclick="showView('view-cfop')">← К списку этапов</button>
+<input type="text" class="search-box" id="search" placeholder="Поиск алгоритма..." oninput="filterAlgorithms()">
+<div id="algorithms-list" class="list-grid"></div>
+</div>
+​<!-- Detail View -->
+<div id="view-detail" class="view">
+<button class="back-btn" onclick="showView('view-list')">← К списку</button>
+<div class="detail-card">
+<h2 id="detail-title" style="margin:0; font-size: 20px;">Название</h2>
+<p id="detail-desc" style="color: var(--text-secondary); margin:0; font-size: 14px;"></p>
+<div>
+<span style="font-size: 13px; color: var(--text-secondary);">Формула (Алгоритм решения):</span>
+<div class="formula-box" id="detail-formula">R U R'</div>
+</div>
+<div>
+<span style="font-size: 13px; color: var(--text-secondary);">Скрамбл (Для создания ситуации):</span>
+<div class="formula-box" id="detail-scramble" style="color: #4da3ff;">R U R'</div>
+</div>
+<div style="display: flex; gap: 8px;">
+<button class="copy-btn" onclick="copyFormula()" id="t-copy-btn" style="flex: 1;">Копировать формулу</button>
+<button class="copy-btn" onclick="applyCaseScramble()" style="background-color: #34c759; flex: 1;">Собрать ситуацию</button>
+</div>
+</div>
+</div>
+</div>
+​<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-let currentCategory = '';
-let currentItemData = null;
-
 const algorithmsData = {
-  f2l: [
-    { id: 1, name: "F2L 1", desc: { ru: "Базовый случай вправо" }, formula: "U R U' R'" },
-    { id: 2, name: "F2L 2", desc: { ru: "Базовый случай влево" }, formula: "U' L' U L" },
-    { id: 3, name: "F2L 3", desc: { ru: "Угол и ребро вместе, цвета совпадают" }, formula: "F' U' F" },
-    { id: 4, name: "F2L 4", desc: { ru: "Угол и ребро вместе в левом слое" }, formula: "R U R'" },
-    { id: 5, name: "F2L 5", desc: { ru: "Угол смотрит вправо, ребро сзади" }, formula: "U' R U R' U2 R U' R'" },
-    { id: 6, name: "F2L 6", desc: { ru: "Угол смотрит влево, ребро справа" }, formula: "U L' U' L U2 L' U L" },
-    { id: 7, name: "F2L 7", desc: { ru: "Цвета разбавлены, ребро вверху" }, formula: "U' R U2 R' U2 R U' R'" },
-    { id: 8, name: "F2L 8", desc: { ru: "Требует трекинга верхней грани" }, formula: "U L' U2 L U2 L' U L" },
-    { id: 9, name: "F2L 9", desc: { ru: "Угол смотрит вверх, цвета совпадают" }, formula: "R U' R' U2 R U R'" },
-    { id: 10, name: "F2L 10", desc: { ru: "Угол вверх, левая сторона" }, formula: "L' U L U2 L' U' L" },
-    { id: 11, name: "F2L 11", desc: { ru: "Угол смотрит на себя, ребро сзади" }, formula: "U' R U' R' U R U R'" },
-    { id: 12, name: "F2L 12", desc: { ru: "Угол смотрит на себя, ребро спереди" }, formula: "U L' U L U' L' U' L" },
-    { id: 13, name: "F2L 13", desc: { ru: "Пара разделена" }, formula: "U' R U2 R' U F' U' F" },
-    { id: 14, name: "F2L 14", desc: { ru: "Разделенная пара влево" }, formula: "U L' U2 L U' F U F'" },
-    { id: 15, name: "F2L 15", desc: { ru: "Белый вверх, ребро рядом" }, formula: "R U2 R' U' R U R'" },
-    { id: 16, name: "F2L 16", desc: { ru: "Белый вверх, ребро слева" }, formula: "L' U2 L U L' U' L" },
-    { id: 17, name: "F2L 17", desc: { ru: "Белый вверх, ребро напротив" }, formula: "R U2 R' U2 R U' R'" },
-    { id: 18, name: "F2L 18", desc: { ru: "Белый вверх, зеркальный 17" }, formula: "L' U2 L U2 L' U L" },
-    { id: 19, name: "F2L 19", desc: { ru: "Разворот угла на месте" }, formula: "R U' R' U R U2 R' U R U' R'" },
-    { id: 20, name: "F2L 20", desc: { ru: "Угол в слоте, белый спереди" }, formula: "U' R U' R' U2 R U' R'" },
-    { id: 21, name: "F2L 21", desc: { ru: "Угол в слоте, белый справа" }, formula: "U L' U L U2 L' U L" },
-    { id: 22, name: "F2L 22", desc: { ru: "Ребро в слоте, угол вверху" }, formula: "F' U F U' F' U F" },
-    { id: 23, name: "F2L 23", desc: { ru: "Ребро перевернуто в слоте" }, formula: "R U R' U' F' U F" },
-    { id: 24, name: "F2L 24", desc: { ru: "Угол и ребро в слоте неверно" }, formula: "R U' R' U' R U R' U' R U2 R'" },
-    { id: 25, name: "F2L 25", desc: { ru: "Правильная пара, но не в том слоте" }, formula: "R U R' U' R U R'" },
-    { id: 26, name: "F2L 26", desc: { ru: "Зеркальный вывод из слота" }, formula: "L' U' L U L' U' L" },
-    { id: 27, name: "F2L 27", desc: { ru: "Выбивание параллельной пары" }, formula: "R U' R' U R U' R'" },
-    { id: 28, name: "F2L 28", desc: { ru: "Глубокая подстановка" }, formula: "R U R' U2 R U' R' U R U' R'" },
-    { id: 29, name: "F2L 29", desc: { ru: "Слот сзади справа" }, formula: "R' U R U' R' U' R" },
-    { id: 30, name: "F2L 30", desc: { ru: "Слот сзади слева" }, formula: "L U' L' U L U L'" },
-    { id: 31, name: "F2L 31", desc: { ru: "Двойное объединение" }, formula: "U' R' F R F' R U R'" },
-    { id: 32, name: "F2L 32", desc: { ru: "Диагональное разведение" }, formula: "R U R' U' R U2 R' U' R U R'" },
-    { id: 33, name: "F2L 33", desc: { ru: "Ребро повернуто, угол правильно" }, formula: "R' F R F' R U R'" },
-    { id: 34, name: "F2L 34", desc: { ru: "Двойной разворот элементов" }, formula: "U R U' R' U' F' U F" },
-    { id: 35, name: "F2L 35", desc: { ru: "Перестановка через замену" }, formula: "R U2 R' U R U' R'" },
-    { id: 36, name: "F2L 36", desc: { ru: "Задний быстрый загон" }, formula: "U' R' U R U' R' U' R" },
-    { id: 37, name: "F2L 37", desc: { ru: "Перевернутая пара в слоте" }, formula: "R2 U2 F R2 F' U2 R' U R'" },
-    { id: 38, name: "F2L 38", desc: { ru: "Угол смотрит на себя, ребро развернуто" }, formula: "R U' R' U R U' R' U2 R U' R'" },
-    { id: 39, name: "F2L 39", desc: { ru: "Сложный разворот двух блоков" }, formula: "R U R' U2 R U' R' U2 R U R'" },
-    { id: 40, name: "F2L 40", desc: { ru: "Захват из противоположного слота" }, formula: "R U' R' U R U2 R' U' R U R'" },
-    { id: 41, name: "F2L 41", desc: { ru: "Полный перевертыш" }, formula: "R U' R' U' R U R' U2 R U' R'" }
-  ],
-  oll: [
-    { id: 1, name: "OLL 1", desc: { ru: "Точка" }, formula: "R U2 R2 F R F' U2 R' F R F'" },
-    { id: 2, name: "OLL 2", desc: { ru: "Точка с углами" }, formula: "F R U R' U' F' f R U R' U' f'" },
-    { id: 3, name: "OLL 3", desc: { ru: "Точка перекрестная" }, formula: "f R U R' U' f' U' F R U R' U' F'" },
-    { id: 4, name: "OLL 4", desc: { ru: "Точка диагональная" }, formula: "f R U R' U' f' U F R U R' U' F'" },
-    { id: 5, name: "OLL 5", desc: { ru: "Пропеллер" }, formula: "l' U2 L U L' U l" },
-    { id: 6, name: "OLL 6", desc: { ru: "Зеркальный пропеллер" }, formula: "r U2 R' U' R U' r'" },
-    { id: 7, name: "OLL 7", desc: { ru: "Молния малая" }, formula: "r U R' U R U2 r'" },
-    { id: 8, name: "OLL 8", desc: { ru: "Молния малая левая" }, formula: "l' U' L U' L' U2 l" },
-    { id: 9, name: "OLL 9", desc: { ru: "Рыбка с усами" }, formula: "R U R' U' R' F R F'" },
-    { id: 10, name: "OLL 10", desc: { ru: "Зеркальная рыбка" }, formula: "R U R' U R' F R F' R U2 R'" },
-    { id: 11, name: "OLL 11", desc: { ru: "Молния большая" }, formula: "r U R' U R U' R' U' r'" },
-    { id: 12, name: "OLL 12", desc: { ru: "Молния большая левая" }, formula: "F R U R' U' F' U F R U R' U' F'" },
-    { id: 13, name: "OLL 13", desc: { ru: "Закорючка правая" }, formula: "F U R U' R' F' U F R U R' U' F'" },
-    { id: 14, name: "OLL 14", desc: { ru: "Закорючка левая" }, formula: "R' U' R U' R' U F' U F R" },
-    { id: 15, name: "OLL 15", desc: { ru: "Закорючка двойная" }, formula: "l' U' L U' L' U L U' L' U2 l" },
-    { id: 16, name: "OLL 16", desc: { ru: "Хамелеон" }, formula: "r U R' U R U2 r' U r U R' U' r'" },
-    { id: 17, name: "OLL 17", desc: { ru: "Диагональ с точкой" }, formula: "F R U R' U' R R' F' R U R' U' F'" },
-    { id: 18, name: "OLL 18", desc: { ru: "Корона" }, formula: "r U R' U R U2 r2 U' R U' R' U2 r" },
-    { id: 19, name: "OLL 19", desc: { ru: "Двойная молния" }, formula: "r' U2 R U R' U r" },
-    { id: 20, name: "OLL 20", desc: { ru: "Точка крест-накрест" }, formula: "r U R' U' M U R U' R'" },
-    { id: 21, name: "OLL 21", desc: { ru: "Крест / Вертолет" }, formula: "R U2 R2 U' R2 U' R2 U2 R" },
-    { id: 22, name: "OLL 22", desc: { ru: "Крест / Уши" }, formula: "R U2 R' U' R U R' U' R U' R'" },
-    { id: 23, name: "OLL 23", desc: { ru: "Крест / Уши в стороны" }, formula: "R2 D' R U2 R' D R U2 R" },
-    { id: 24, name: "OLL 24", desc: { ru: "Крест / Глаза" }, formula: "r U R' U' r' F R F'" },
-    { id: 25, name: "OLL 25", desc: { ru: "Крест / Восьмерка" }, formula: "F' r U R' U' r' F R" },
-    { id: 26, name: "OLL 26", desc: { ru: "Анти-рыбка" }, formula: "R U2 R' U' R U' R'" },
-    { id: 27, name: "OLL 27", desc: { ru: "Рыбка (Sune)" }, formula: "R U R' U R U2 R'" },
-    { id: 28, name: "OLL 28", desc: { ru: "Крест без углов" }, formula: "r U R' U' r' R U R' U' R'" },
-    { id: 29, name: "OLL 29", desc: { ru: "Спот левый" }, formula: "R U R' U' R U' R' F' U' F R U R'" },
-    { id: 30, name: "OLL 30", desc: { ru: "Спот правый" }, formula: "F R U R' U' F' U R U R' U' R U R'" },
-    { id: 31, name: "OLL 31", desc: { ru: "P-образный левый" }, formula: "R' U' F U R U' R' F' R" },
-    { id: 32, name: "OLL 32", desc: { ru: "P-образный правый" }, formula: "L U F' U' L' U L F L'" },
-    { id: 33, name: "OLL 33", desc: { ru: "Т-образный малый" }, formula: "R U R' U' R' F R F'" },
-    { id: 34, name: "OLL 34", desc: { ru: "Т-образный большой" }, formula: "R U R2 U' R' F R U R U' F'" },
-    { id: 35, name: "OLL 35", desc: { ru: "Рыба без хвоста" }, formula: "R U2 R2 F R F' R U2 R'" },
-    { id: 36, name: "OLL 36", desc: { ru: "Змея" }, formula: "L' U' L U' L' U2 L R U R' U R U2 R'" },
-    { id: 37, name: "OLL 37", desc: { ru: "Телевизор" }, formula: "F R U' R' U' R U R' F'" },
-    { id: 38, name: "OLL 38", desc: { ru: "Песочные часы" }, formula: "R U R' U R U' R' U' R' F R F'" },
-    { id: 39, name: "OLL 39", desc: { ru: "Шит малый" }, formula: "L F R' F' L' F R F'" },
-    { id: 40, name: "OLL 40", desc: { ru: "Щит большой" }, formula: "R' F' L F R F' L' F" },
-    { id: 41, name: "OLL 41", desc: { ru: "Запятая правая" }, formula: "R U R' U R U2 R' F R U R' U' F'" },
-    { id: 42, name: "OLL 42", desc: { ru: "Запятая левая" }, formula: "L' U' L U' L' U2 L F' L' U' L U F" },
-    { id: 43, name: "OLL 43", desc: { ru: "Фонарь" }, formula: "F' U' L' U L F" },
-    { id: 44, name: "OLL 44", desc: { ru: "Засов" }, formula: "F U R U' R' F'" },
-    { id: 45, name: "OLL 45", desc: { ru: "Галочка" }, formula: "F R U R' U' F'" },
-    { id: 46, name: "OLL 46", desc: { ru: "След" }, formula: "R' U' R' F R F' U R" },
-    { id: 47, name: "OLL 47", desc: { ru: "Г-образный правый" }, formula: "F' L' U' L U L' U' L U F" },
-    { id: 48, name: "OLL 48", desc: { ru: "Г-образный левый" }, formula: "F R U R' U' R U R' U' F'" },
-    { id: 49, name: "OLL 49", desc: { ru: "Сопля правая" }, formula: "r U' r2 U r2 U r2 U' r" },
-    { id: 50, name: "OLL 50", desc: { ru: "Сопля левая" }, formula: "r' U r2 U' r2 U' r2 U r'" },
-    { id: 51, name: "OLL 51", desc: { ru: "Полоса" }, formula: "F R U R' U' R U R' U' F'" },
-    { id: 52, name: "OLL 52", desc: { ru: "Мина" }, formula: "R U R' U R U' B U' B' R'" },
-    { id: 53, name: "OLL 53", desc: { ru: "Танк малый" }, formula: "l' U2 L U L' U' L U L' U l" },
-    { id: 54, name: "OLL 54", desc: { ru: "Танк большой" }, formula: "r U2 R' U' R U R' U' R U' r'" },
-    { id: 55, name: "OLL 55", desc: { ru: "Бутылка" }, formula: "R' F R U R U' R2 F' R2 U' R' U R U R'" },
-    { id: 56, name: "OLL 56", desc: { ru: "Вертолет малый" }, formula: "r U r' U R U' R' U R U' R' r U' r'" },
-    { id: 57, name: "OLL 57", desc: { ru: "Крест чистый" }, formula: "R U R' U' M' U R U' r'" }
-  ],
-  pll: [
-    { id: 1, name: "Aa Perm", desc: { ru: "Угловая перестановка A1" }, formula: "x R' D R' U2 R D' R' U2 R2 x'" },
-    { id: 2, name: "Ab Perm", desc: { ru: "Угловая перестановка A2" }, formula: "x R2 U2 R D R' U2 R D' R x'" },
-    { id: 3, name: "E Perm", desc: { ru: "Параллельная перестановка углов" }, formula: "x' R U' R' D R U R' D' R U R' D R U' R' D' x" },
-    { id: 4, name: "F Perm", desc: { ru: "Длинная перестановка одной стороны" }, formula: "R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R" },
-    { id: 5, name: "Ga Perm", desc: { ru: "Перестановка G1" }, formula: "R2 U R' U R' U' R U' R2 D U' R' U R D'" },
-    { id: 6, name: "Gb Perm", desc: { ru: "Перестановка G2" }, formula: "R' U' R B2 D U' R U R' D' U B2" },
-    { id: 7, name: "Gc Perm", desc: { ru: "Перестановка G3" }, formula: "R2 U' R U' R U R' U R2 D' U R U' R' D" },
-    { id: 8, name: "Gd Perm", desc: { ru: "Перестановка G4" }, formula: "R U R' F' R U R' U' R' F R2 U' R' U'" },
-    { id: 9, name: "H Perm", desc: { ru: "Крестовая перестановка ребер" }, formula: "M2 U M2 U2 M2 U M2" },
-    { id: 10, name: "Ja Perm", desc: { ru: "Левый крюк" }, formula: "L' U2 L U L' U2 R' U L U' R" },
-    { id: 11, name: "Jb Perm", desc: { ru: "Правый крюк" }, formula: "R U R' F' R U R' U' R' F R2 U' R' U'" },
-    { id: 12, name: "Na Perm", desc: { ru: "Двойная диагональ A" }, formula: "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'" },
-    { id: 13, name: "Nb Perm", desc: { ru: "Двойная диагональ B" }, formula: "R' U R U' R' F' U' F R U R' F R' F' R U' R" },
-    { id: 14, name: "Ra Perm", desc: { ru: "Парус A" }, formula: "R U' R' U' R U R D R' U' R D' R' U2 R'" },
-    { id: 15, name: "Rb Perm", desc: { ru: "Парус B" }, formula: "R' U2 R U2 R' F R U R' U' R' F' R2 U'" },
-    { id: 16, name: "T Perm", desc: { ru: "Т-перестановка" }, formula: "R U R' U' R' F R2 U' R' U' R U R' F'" },
-    { id: 17, name: "Ua Perm", desc: { ru: "Треугольник ребер против часовой" }, formula: "M2 U M U2 M' U M2" },
-    { id: 18, name: "Ub Perm", desc: { ru: "Треугольник ребер по часовой" }, formula: "M2 U' M U2 M' U' M2" },
-    { id: 19, name: "V Perm", desc: { ru: "Галочка" }, formula: "R' U R' U' R D' R' D R' U D' R2 U' R2 D R2" },
-    { id: 20, name: "Y Perm", desc: { ru: "Диагональ" }, formula: "F R U' R' U' R U R' F' R U R' U' R' F R F'" },
-    { id: 21, name: "Z Perm", desc: { ru: "Шахматная перестановка ребер" }, formula: "M' U M2 U M2 U M' U2 M2" }
-  ],
-  '4lll': [
-    { id: 101, name: "4LLL Step 1: Крест (ОЛЛ)", desc: { ru: "Случай Палка" }, formula: "F R U R' U' F'" },
-    { id: 102, name: "4LLL Step 1: Крест (ОЛЛ)", desc: { ru: "Случай Галочка" }, formula: "f R U R' U' f'" },
-    { id: 103, name: "4LLL Step 1: Крест (ОЛЛ)", desc: { ru: "Случай Точка" }, formula: "F R U R' U' F' f R U R' U' f'" },
-    { id: 104, name: "4LLL Step 2: Углы (ОЛЛ)", desc: { ru: "Рыбка (Sune)" }, formula: "R U R' U R U2 R'" },
-    { id: 105, name: "4LLL Step 2: Углы (ОЛЛ)", desc: { ru: "Анти-Рыбка" }, formula: "R U2 R' U' R U' R'" },
-    { id: 106, name: "4LLL Step 3: Углы (ПЛЛ)", desc: { ru: "Углами (T-Perm)" }, formula: "R U R' U' R' F R2 U' R' U' R U R' F'" },
-    { id: 107, name: "4LLL Step 4: Ребра (ПЛЛ)", desc: { ru: "Ребра по часовой (Ub)" }, formula: "M2 U' M U2 M' U' M2" },
-    { id: 108, name: "4LLL Step 4: Ребра (ПЛЛ)", desc: { ru: "Ребра против часовой (Ua)" }, formula: "M2 U M U2 M' U M2" }
-  ]
+'4lll': [
+{ name: 'Рыбка (Sune)', formula: 'R U R' U R U2 R'', desc: { ru: 'Классический алгоритм OLL для ориентации углов' } },
+{ name: 'Зеркальная рыбка (Anti-Sune)', formula: 'R U2 R' U' R U' R'', desc: { ru: 'Зеркальный вариант рыбки' } },
+{ name: 'Уголки (Headlights)', formula: 'R2 D R' U2 R D' R' U2 R'', desc: { ru: 'PLL: перестановка углов' } },
+{ name: 'Блинчики (H-Perm)', formula: 'M2 U M2 U2 M2 U M2', desc: { ru: 'PLL: перестановка ребер крестом' } }
+],
+'oll': [
+{ name: 'OLL 1', formula: 'R U2 R2 F R F' U2 R' F R F'', desc: { ru: 'Точечные алгоритмы OLL' } },
+{ name: 'OLL 2', formula: 'F R U R' U' F' f R U R' U' f'', desc: { ru: 'Крест с точками' } },
+{ name: 'OLL 3', formula: 'f R U R' U' f'', desc: { ru: 'Маленькая молния' } },
+{ name: 'OLL 4', formula: 'F R U R' U' F'', desc: { ru: 'Уголок' } },
+{ name: 'OLL 21 (Восьмерка)', formula: 'R' U2 R R U R' U R U2 R'', desc: { ru: 'Ориентация креста' } },
+{ name: 'OLL 26 (Зеркальная рыбка)', formula: 'R U2 R' U' R U' R'', desc: { ru: 'Левая рыбка' } },
+{ name: 'OLL 27 (Рыбка)', formula: 'R U R' U R U2 R'', desc: { ru: 'Правая рыбка' } }
+],
+'f2l': [
+{ name: 'F2L 1', formula: 'R U R'', desc: { ru: 'Угол и ребро в верхнем слое' } },
+{ name: 'F2L 2', formula: 'U R U' R'', desc: { ru: 'Базовая пара' } },
+{ name: 'F2L 3', formula: 'R U2 R' U' R U R'', desc: { ru: 'Разделение пары' } },
+{ name: 'F2L 4', formula: 'R U' R' U R U R'', desc: { ru: 'Соединение через верх' } },
+{ name: 'F2L 5', formula: 'U' R U R'', desc: { ru: 'Простая вставка слева' } },
+{ name: 'F2L 6', formula: 'R U' R'', desc: { ru: 'Разделение в позиции' } }
+],
+'pll': [
+{ name: 'T-Perm', formula: 'R U R' U' R' F R2 U' R' U' R U R' F'', desc: { ru: 'Классическая Т-перестановка' } },
+{ name: 'Y-Perm', formula: 'F R U' R' U' R U R' F' R U R' U' R' F R F'', desc: { ru: 'Y-перестановка' } },
+{ name: 'H-Perm', formula: 'M2 U M2 U2 M2 U M2', desc: { ru: 'H-перестановка ребер' } },
+{ name: 'Ua-Perm', formula: 'R U' R U R U R U' R' U' R2', desc: { ru: 'Перестановка ребер по часовой' } },
+{ name: 'Ub-Perm', formula: 'R2 U R U R' U' R' U' R' U R'', desc: { ru: 'Перестановка ребер против часовой' } },
+{ name: 'Z-Perm', formula: 'M2 U M2 U M' U2 M2 U2 M' U2', desc: { ru: 'Z-перестановка ребер' } }
+]
 };
-
-function showView(viewId) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById(viewId).classList.add('active');
-  window.scrollTo(0, 0);
-  if (viewId === 'view-main') {
-    setTimeout(() => {
-      if (canvas && ctx) drawCube();
-    }, 50);
-  } else if (viewId === 'view-4lll') {
-    render4LLL();
-  }
-}
-
-function openCategory(category) {
-  currentCategory = category;
-  renderAlgorithms(algorithmsData[category]);
-  showView('view-list');
-}
-
-function renderAlgorithms(items) {
-  const container = document.getElementById('algorithms-list');
-  if (!container) return;
-  container.innerHTML = '';
-  items.forEach(item => {
-    const card = document.createElement('div');
-    card.className = 'case-card';
-    card.onclick = () => openDetail(item);
-    card.innerHTML = `<h3>${item.name}</h3><p>${item.desc.ru || ''}</p>`;
-    container.appendChild(card);
-  });
-}
-
-function render4LLL() {
-  const container = document.getElementById('list-4lll-container');
-  if (!container) return;
-  container.innerHTML = '';
-  algorithmsData['4lll'].forEach(item => {
-    const card = document.createElement('div');
-    card.className = 'case-card';
-    card.onclick = () => openDetail(item);
-    card.innerHTML = `<h3>${item.name}</h3><p>${item.desc.ru || ''}</p>`;
-    container.appendChild(card);
-  });
-}
-
-function filterAlgorithms() {
-  const query = document.getElementById('search').value.toLowerCase();
-  const items = algorithmsData[currentCategory] || [];
-  renderAlgorithms(items.filter(i => i.name.toLowerCase().includes(query) || i.formula.toLowerCase().includes(query)));
-}
-
-function openDetail(item) {
-  currentItemData = item;
-  document.getElementById('detail-title').innerText = item.name;
-  document.getElementById('detail-desc').innerText = item.desc.ru || '';
-  document.getElementById('detail-formula').innerText = item.formula;
-  document.getElementById('detail-scramble').innerText = getInverseScramble(item.formula);
-  document.getElementById('custom-formula-input').value = item.formula;
-  showView('view-detail');
-}
-
-function getInverseScramble(formula) {
-  const clean = formula.replace(/[()]/g, ' ');
-  const tokens = clean.split(/\s+/).filter(t => t.length > 0);
-  let inverseTokens = [];
-  for (let i = tokens.length - 1; i >= 0; i--) {
-    let token = tokens[i];
-    if (token.includes("'")) inverseTokens.push(token.replace("'", ""));
-    else if (token.includes("2")) inverseTokens.push(token);
-    else inverseTokens.push(token + "'");
-  }
-  return inverseTokens.join(' ');
-}
-
-function applyCaseScramble() {
-  if (!currentItemData) return;
-  document.getElementById('custom-formula-input').value = getInverseScramble(currentItemData.formula);
-  showView('view-main');
-  executeCustomFormula();
-}
-
-function executeCustomFormula() {
-  const text = document.getElementById('custom-formula-input').value.trim();
-  const tokens = text.replace(/[()]/g, ' ').split(/\s+/).filter(t => t.length > 0);
-  tokens.forEach(token => applyMove(token));
-}
-
-function resetCube() {
-  cubeState = createSolvedState();
-  drawCube();
-  document.getElementById('custom-formula-input').value = '';
-}
-
-function copyFormula() {
-  const text = document.getElementById('detail-formula').innerText;
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text);
-  } else {
-    const textArea = document.createElement("textarea");
-    textArea.value = text;
-    document.body.appendChild(textArea);
-    textArea.select();
-    try { document.execCommand('copy'); } catch (err) {}
-    document.body.removeChild(textArea);
-  }
-  const btn = document.getElementById('t-copy-btn');
-  const old = btn.innerText;
-  btn.innerText = 'Скопировано!';
-  setTimeout(() => btn.innerText = old, 1500);
-}
-
-let canvas, ctx;
+​let currentCategory = '';
+let currentItemData = null;
+​let scene, camera, renderer, cubeGroup;
 let isDragging = false;
-let prevMouse = { x: 0, y: 0 };
-let camRotX = 0.6, camRotY = 0.8;
-
-const COLOR_HEX = {
-  R: '#c41e3a', // Red (+X)
-  L: '#ff5800', // Orange (-X)
-  U: '#ffffff', // White (+Y)
-  D: '#ffd500', // Yellow (-Y)
-  F: '#0051ba', // Blue (+Z)
-  B: '#009e60', // Green (-Z)
-  IN: '#181818' // Internal
+let previousMousePosition = { x: 0, y: 0 };
+let cubeRotation = { x: 0.5, y: -0.6 };
+let cubelets = [];
+​const FACE_COLORS = {
+U: 0xffffff, // White
+D: 0xffd500, // Yellow
+F: 0x0051ba, // Blue
+B: 0x009e60, // Green
+L: 0xff5800, // Orange
+R: 0xc41e3a  // Red
 };
-
-let cubeState = [];
-
-function createSolvedState() {
-  let state = [];
-  for (let x = -1; x <= 1; x++) {
-    for (let y = -1; y <= 1; y++) {
-      for (let z = -1; z <= 1; z++) {
-        state.push({
-          x: x, y: y, z: z,
-          faces: {
-            R: x === 1 ? COLOR_HEX.R : COLOR_HEX.IN,
-            L: x === -1 ? COLOR_HEX.L : COLOR_HEX.IN,
-            U: y === 1 ? COLOR_HEX.U : COLOR_HEX.IN,
-            D: y === -1 ? COLOR_HEX.D : COLOR_HEX.IN,
-            F: z === 1 ? COLOR_HEX.F : COLOR_HEX.IN,
-            B: z === -1 ? COLOR_HEX.B : COLOR_HEX.IN
-          }
-        });
-      }
-    }
-  }
-  return state;
+​function initCube3D() {
+const canvas = document.getElementById('cubeCanvas');
+if (!canvas) return;
+​scene = new THREE.Scene();
+​const width = canvas.clientWidth || 300;
+const height = canvas.clientHeight || 280;
+​camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+camera.position.z = 7.5;
+​renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+renderer.setSize(width, height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+​const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+scene.add(ambientLight);
+​const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+directionalLight.position.set(5, 10, 7);
+scene.add(directionalLight);
+​createRubiksCube();
+​canvas.addEventListener('mousedown', (e) => {
+isDragging = true;
+previousMousePosition = { x: e.clientX, y: e.clientY };
+});
+​window.addEventListener('mousemove', (e) => {
+if (!isDragging) return;
+const deltaX = e.clientX - previousMousePosition.x;
+const deltaY = e.clientY - previousMousePosition.y;
+​cubeRotation.y += deltaX * 0.008;
+cubeRotation.x += deltaY * 0.008;
+​if (cubeGroup) {
+cubeGroup.rotation.x = cubeRotation.x;
+cubeGroup.rotation.y = cubeRotation.y;
 }
-
-function initEngine() {
-  canvas = document.getElementById('cubeCanvas');
-  if (!canvas) return;
-  ctx = canvas.getContext('2d');
-  cubeState = createSolvedState();
-  drawCube();
-
-  canvas.addEventListener('mousedown', e => {
-    isDragging = true;
-    prevMouse = { x: e.clientX, y: e.clientY };
-  });
-  window.addEventListener('mousemove', e => {
-    if (!isDragging) return;
-    camRotY -= (e.clientX - prevMouse.x) * 0.015;
-    camRotX -= (e.clientY - prevMouse.y) * 0.015;
-    camRotX = Math.max(0.1, Math.min(Math.PI - 0.1, camRotX));
-    prevMouse = { x: e.clientX, y: e.clientY };
-    drawCube();
-  });
-  window.addEventListener('mouseup', () => isDragging = false);
-
-  canvas.addEventListener('touchstart', e => {
-    if (e.touches.length === 1) {
-      isDragging = true;
-      prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    }
-  }, { passive: true });
-  window.addEventListener('touchmove', e => {
-    if (!isDragging || e.touches.length !== 1) return;
-    camRotY -= (e.touches[0].clientX - prevMouse.x) * 0.015;
-    camRotX -= (e.touches[0].clientY - prevMouse.y) * 0.015;
-    camRotX = Math.max(0.1, Math.min(Math.PI - 0.1, camRotX));
-    prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    drawCube();
-  }, { passive: true });
-  window.addEventListener('touchend', () => isDragging = false);
+​previousMousePosition = { x: e.clientX, y: e.clientY };
+});
+​window.addEventListener('mouseup', () => {
+isDragging = false;
+});
+​canvas.addEventListener('touchstart', (e) => {
+if (e.touches.length === 1) {
+isDragging = true;
+previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
 }
-
-function rotatePoint(x, y, z, ry, rx) {
-  let x1 = x * Math.cos(ry) + z * Math.sin(ry);
-  let y1 = y;
-  let z1 = -x * Math.sin(ry) + z * Math.cos(ry);
-
-  let x2 = x1;
-  let y2 = y1 * Math.cos(rx) - z1 * Math.sin(rx);
-  let z2 = y1 * Math.sin(rx) + z1 * Math.cos(rx);
-  return { x: x2, y: y2, z: z2 };
+}, { passive: true });
+​window.addEventListener('touchmove', (e) => {
+if (!isDragging || e.touches.length !== 1) return;
+const deltaX = e.touches[0].clientX - previousMousePosition.x;
+const deltaY = e.touches[0].clientY - previousMousePosition.y;
+​cubeRotation.y += deltaX * 0.008;
+cubeRotation.x += deltaY * 0.008;
+​if (cubeGroup) {
+cubeGroup.rotation.x = cubeRotation.x;
+cubeGroup.rotation.y = cubeRotation.y;
 }
-
-function drawCube() {
-  if (!ctx || !canvas) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  let cx = canvas.width / 2;
-  let cy = canvas.height / 2;
-  let scale = 42;
-  let size = 0.9;
-
-  let renderList = cubeState.map(cubie => {
-    let p = rotatePoint(cubie.x, cubie.y, cubie.z, camRotY, camRotX);
-    return { cubie, depth: p.z, pos: p };
-  });
-  renderList.sort((a, b) => a.depth - b.depth);
-
-  const faceNormals = {
-    R: { nx: 1, ny: 0, nz: 0 },
-    L: { nx: -1, ny: 0, nz: 0 },
-    U: { nx: 0, ny: 1, nz: 0 },
-    D: { nx: 0, ny: -1, nz: 0 },
-    F: { nx: 0, ny: 0, nz: 1 },
-    B: { nx: 0, ny: 0, nz: -1 }
-  };
-
-  renderList.forEach(item => {
-    let cb = item.cubie;
-    let hs = size / 2;
-
-    Object.keys(cb.faces).forEach(fKey => {
-      let color = cb.faces[fKey];
-      if (color === COLOR_HEX.IN) return;
-
-      let fn = faceNormals[fKey];
-      let rNorm = rotatePoint(fn.nx, fn.ny, fn.nz, camRotY, camRotX);
-      if (rNorm.z > 0.001) {
-        let corners = [];
-        if (fKey === 'R') corners = [[hs,-hs,-hs],[hs,hs,-hs],[hs,hs,hs],[hs,-hs,hs]];
-        if (fKey === 'L') corners = [[-hs,-hs,hs],[-hs,hs,hs],[-hs,hs,-hs],[-hs,-hs,-hs]];
-        if (fKey === 'U') corners = [[-hs,hs,-hs],[hs,hs,-hs],[hs,hs,hs],[-hs,hs,hs]];
-        if (fKey === 'D') corners = [[-hs,-hs,hs],[hs,-hs,hs],[hs,-hs,-hs],[-hs,-hs,-hs]];
-        if (fKey === 'F') corners = [[-hs,-hs,hs],[hs,-hs,hs],[hs,hs,hs],[-hs,hs,hs]];
-        if (fKey === 'B') corners = [[hs,-hs,-hs],[-hs,-hs,-hs],[-hs,hs,-hs],[hs,hs,-hs]];
-
-        let projectedCorners = corners.map(c => {
-          let wx = cb.x + c[0];
-          let wy = cb.y + c[1];
-          let wz = cb.z + c[2];
-          let rp = rotatePoint(wx, wy, wz, camRotY, camRotX);
-          return {
-            x: cx + rp.x * scale,
-            y: cy - rp.y * scale
-          };
-        });
-
-        ctx.beginPath();
-        ctx.moveTo(projectedCorners[0].x, projectedCorners[0].y);
-        for (let i = 1; i < projectedCorners.length; i++) {
-          ctx.lineTo(projectedCorners[i].x, projectedCorners[i].y);
-        }
-        ctx.closePath();
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.strokeStyle = '#0a0a0a';
-        ctx.lineWidth = 1.8;
-        ctx.stroke();
-      }
-    });
-  });
+​previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+}, { passive: true });
+​window.addEventListener('touchend', () => {
+isDragging = false;
+});
+​animate();
 }
-
-function applyMove(moveStr) {
-  let base = moveStr[0];
-  let isPrime = moveStr.includes("'");
-  let isDouble = moveStr.includes("2");
-
-  let turns = 1;
-  if (isPrime) turns = 3;
-  if (isDouble) turns = 2;
-
-  for (let t = 0; t < turns; t++) {
-    rotateCubeLogical(base);
-  }
-  drawCube();
+​function createRubiksCube() {
+if (cubeGroup) {
+scene.remove(cubeGroup);
 }
-
-function rotateCubeLogical(move) {
-  let axis = '';
-  let dir = 1;
-  let filter = c => true;
-
-  if (move === 'R') { axis = 'X'; dir = -1; filter = c => c.x > 0.5; }
-  else if (move === 'L') { axis = 'X'; dir = 1; filter = c => c.x < -0.5; }
-  else if (move === 'U') { axis = 'Y'; dir = -1; filter = c => c.y > 0.5; }
-  else if (move === 'D') { axis = 'Y'; dir = 1; filter = c => c.y < -0.5; }
-  else if (move === 'F') { axis = 'Z'; dir = -1; filter = c => c.z > 0.5; }
-  else if (move === 'B') { axis = 'Z'; dir = 1; filter = c => c.z < -0.5; }
-  else if (move === 'M') { axis = 'X'; dir = 1; filter = c => Math.abs(c.x) < 0.5; }
-  else if (move === 'E') { axis = 'Y'; dir = 1; filter = c => Math.abs(c.y) < 0.5; }
-  else if (move === 'S') { axis = 'Z'; dir = -1; filter = c => Math.abs(c.z) < 0.5; }
-  else if (move === 'x') { axis = 'X'; dir = -1; filter = c => true; }
-  else if (move === 'y') { axis = 'Y'; dir = -1; filter = c => true; }
-  else if (move === 'z') { axis = 'Z'; dir = -1; filter = c => true; }
-
-  if (!axis) return;
-
-  let newCubeState = cubeState.map(cb => {
-    let matches = filter(cb);
-    if (!matches) return cb;
-
-    let nx = cb.x, ny = cb.y, nz = cb.z;
-    let nFaces = { ...cb.faces };
-
-    if (axis === 'X') {
-      let oy = ny, oz = nz;
-      if (dir === 1) { ny = -oz; nz = oy; }
-      else { ny = oz; nz = -oy; }
-
-      nFaces.U = cb.faces[dir === 1 ? 'B' : 'F'];
-      nFaces.F = cb.faces[dir === 1 ? 'U' : 'D'];
-      nFaces.D = cb.faces[dir === 1 ? 'F' : 'B'];
-      nFaces.B = cb.faces[dir === 1 ? 'D' : 'U'];
-    } else if (axis === 'Y') {
-      let ox = nx, oz = nz;
-      if (dir === 1) { nx = oz; nz = -ox; }
-      else { nx = -oz; nz = ox; }
-
-      nFaces.R = cb.faces[dir === 1 ? 'F' : 'B'];
-      nFaces.B = cb.faces[dir === 1 ? 'R' : 'L'];
-      nFaces.L = cb.faces[dir === 1 ? 'B' : 'F'];
-      nFaces.F = cb.faces[dir === 1 ? 'L' : 'R'];
-    } else if (axis === 'Z') {
-      let ox = nx, oy = ny;
-      if (dir === 1) { nx = -oy; ny = ox; }
-      else { nx = oy; ny = -ox; }
-
-      nFaces.U = cb.faces[dir === 1 ? 'L' : 'R'];
-      nFaces.R = cb.faces[dir === 1 ? 'U' : 'D'];
-      nFaces.D = cb.faces[dir === 1 ? 'R' : 'L'];
-      nFaces.L = cb.faces[dir === 1 ? 'D' : 'U'];
-    }
-
-    return { x: Math.round(nx), y: Math.round(ny), z: Math.round(nz), faces: nFaces };
-  });
-
-  cubeState = newCubeState;
+cubeGroup = new THREE.Group();
+cubelets = [];
+​const size = 0.92;
+const spacing = 0.98;
+​for (let x = -1; x <= 1; x++) {
+for (let y = -1; y <= 1; y++) {
+for (let z = -1; z <= 1; z++) {
+const geometry = new THREE.BoxGeometry(size, size, size);
+​const materials = [
+new THREE.MeshBasicMaterial({ color: x === 1 ? FACE_COLORS.R : 0x111111 }),
+new THREE.MeshBasicMaterial({ color: x === -1 ? FACE_COLORS.L : 0x111111 }),
+new THREE.MeshBasicMaterial({ color: y === 1 ? FACE_COLORS.U : 0x111111 }),
+new THREE.MeshBasicMaterial({ color: y === -1 ? FACE_COLORS.D : 0x111111 }),
+new THREE.MeshBasicMaterial({ color: z === 1 ? FACE_COLORS.F : 0x111111 }),
+new THREE.MeshBasicMaterial({ color: z === -1 ? FACE_COLORS.B : 0x111111 })
+];
+​const cubelet = new THREE.Mesh(geometry, materials);
+cubelet.position.set(x * spacing, y * spacing, z * spacing);
+​cubeGroup.add(cubelet);
+cubelets.push(cubelet);
 }
-
-window.onload = function() {
-  initEngine();
+}
+}
+​cubeGroup.rotation.x = cubeRotation.x;
+cubeGroup.rotation.y = cubeRotation.y;
+scene.add(cubeGroup);
+}
+​function animate() {
+requestAnimationFrame(animate);
+if (renderer && scene && camera) {
+renderer.render(scene, camera);
+}
+}
+​function applyMove(moveStr) {
+if (!cubeGroup) return;
+const base = moveStr.replace(/['2]/g, '');
+const isPrime = moveStr.includes("'");
+const isDouble = moveStr.includes('2');
+​let times = isDouble ? 2 : (isPrime ? 3 : 1);
+​for (let t = 0; t < times; t++) {
+cubelets.forEach(c => {
+const pos = c.position;
+let rx = Math.round(pos.x / 0.98);
+let ry = Math.round(pos.y / 0.98);
+let rz = Math.round(pos.z / 0.98);
+​let match = false;
+let axis = new THREE.Vector3(0, 0, 0);
+let angle = -Math.PI / 2;
+​if (base === 'R' && rx === 1) { match = true; axis.set(1, 0, 0); angle = -Math.PI / 2; }
+else if (base === 'L' && rx === -1) { match = true; axis.set(1, 0, 0); angle = Math.PI / 2; }
+else if (base === 'U' && ry === 1) { match = true; axis.set(0, 1, 0); angle = -Math.PI / 2; }
+else if (base === 'D' && ry === -1) { match = true; axis.set(0, 1, 0); angle = Math.PI / 2; }
+else if (base === 'F' && rz === 1) { match = true; axis.set(0, 0, 1); angle = -Math.PI / 2; }
+else if (base === 'B' && rz === -1) { match = true; axis.set(0, 0, 1); angle = Math.PI / 2; }
+​else if (base === 'M' && rx === 0) { match = true; axis.set(1, 0, 0); angle = Math.PI / 2; }
+else if (base === 'E' && ry === 0) { match = true; axis.set(0, 1, 0); angle = Math.PI / 2; }
+else if (base === 'S' && rz === 0) { match = true; axis.set(0, 0, 1); angle = -Math.PI / 2; }
+​else if (base === 'x') { match = true; axis.set(1, 0, 0); angle = -Math.PI / 2; }
+else if (base === 'y') { match = true; axis.set(0, 1, 0); angle = -Math.PI / 2; }
+else if (base === 'z') { match = true; axis.set(0, 0, 1); angle = -Math.PI / 2; }
+​if (match) {
+c.position.applyAxisAngle(axis, angle);
+c.rotateOnWorldAxis(axis, angle);
+​c.position.x = Math.round(c.position.x / 0.98) * 0.98;
+c.position.y = Math.round(c.position.y / 0.98) * 0.98;
+c.position.z = Math.round(c.position.z / 0.98) * 0.98;
+}
+});
+}
+}
+​function resetCube() {
+createRubiksCube();
+}
+​function executeCustomFormula() {
+const input = document.getElementById('custom-formula-input').value;
+const moves = input.trim().split(/\s+/);
+moves.forEach(m => {
+if (m) applyMove(m);
+});
+}
+​function showView(viewId) {
+document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+const target = document.getElementById(viewId);
+if (target) {
+target.classList.add('active');
+if (viewId === 'view-main') {
+setTimeout(() => {
+if (!renderer) {
+initCube3D();
+} else {
+const canvas = document.getElementById('cubeCanvas');
+if (canvas) {
+renderer.setSize(canvas.clientWidth || 300, canvas.clientHeight || 280);
+}
+}
+}, 50);
+}
+}
+}
+​function openCategory(cat) {
+currentCategory = cat;
+const listContainer = document.getElementById('algorithms-list');
+listContainer.innerHTML = '';
+​const items = algorithmsData[cat] || [];
+items.forEach(item => {
+const card = document.createElement('div');
+card.className = 'case-card';
+card.innerHTML = <h3>${item.name}</h3><p>${item.desc.ru}</p>;
+card.onclick = () => showDetail(item);
+listContainer.appendChild(card);
+});
+​showView('view-list');
+}
+​function load4LLLList() {
+const container = document.getElementById('list-4lll-container');
+container.innerHTML = '';
+const items = algorithmsData['4lll'] || [];
+items.forEach(item => {
+const card = document.createElement('div');
+card.className = 'case-card';
+card.innerHTML = <h3>${item.name}</h3><p>${item.desc.ru}</p>;
+card.onclick = () => showDetail(item);
+container.appendChild(card);
+});
+}
+​function showDetail(item) {
+currentItemData = item;
+document.getElementById('detail-title').innerText = item.name;
+document.getElementById('detail-desc').innerText = item.desc.ru;
+document.getElementById('detail-formula').innerText = item.formula;
+document.getElementById('detail-scramble').innerText = item.formula;
+showView('view-detail');
+}
+​function copyFormula() {
+if (!currentItemData) return;
+const text = currentItemData.formula;
+const textArea = document.createElement("textarea");
+textArea.value = text;
+document.body.appendChild(textArea);
+textArea.select();
+try {
+document.execCommand('copy');
+const btn = document.getElementById('t-copy-btn');
+btn.innerText = 'Скопировано!';
+setTimeout(() => { btn.innerText = 'Копировать формулу'; }, 1500);
+} catch (err) {
+console.error('Copy failed', err);
+}
+document.body.removeChild(textArea);
+}
+​function applyCaseScramble() {
+if (currentItemData) {
+document.getElementById('custom-formula-input').value = currentItemData.formula;
+}
+showView('view-main');
+resetCube();
+executeCustomFormula();
+}
+​function filterAlgorithms() {
+const query = document.getElementById('search').value.toLowerCase();
+const listContainer = document.getElementById('algorithms-list');
+listContainer.innerHTML = '';
+​const items = algorithmsData[currentCategory] || [];
+const filtered = items.filter(i => i.name.toLowerCase().includes(query) || i.desc.ru.toLowerCase().includes(query));
+​filtered.forEach(item => {
+const card = document.createElement('div');
+card.className = 'case-card';
+card.innerHTML = <h3>${item.name}</h3><p>${item.desc.ru}</p>;
+card.onclick = () => showDetail(item);
+listContainer.appendChild(card);
+});
+}
+​window.onload = function() {
+load4LLLList();
+initCube3D();
 };
 </script>
-
 </body>
 </html>
