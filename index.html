@@ -459,8 +459,8 @@
 
     function resetCube() {
         if (isMoving) return;
-        cubeState = createSolvedState();
-        rebuildVisualCube();
+        if (cubeGroup) scene.remove(cubeGroup);
+        initCubeModel();
         document.getElementById('custom-formula-input').value = '';
     }
 
@@ -483,32 +483,6 @@
         R: 0xc41e3a, L: 0xff5800, U: 0xffffff,
         D: 0xffd500, F: 0x0051ba, B: 0x009e60, IN: 0x111111
     };
-
-    // МАТРИЧНАЯ МОДЕЛЬ: Храним 26 деталей с их прямыми цветами граней [R, L, U, D, F, B]
-    let cubeState = [];
-
-    function createSolvedState() {
-        let state = [];
-        for (let x = -1; x <= 1; x++) {
-            for (let y = -1; y <= 1; y++) {
-                for (let z = -1; z <= 1; z++) {
-                    if (x === 0 && y === 0 && z === 0) continue;
-                    state.push({
-                        x: x, y: y, z: z,
-                        colors: [
-                            x === 1 ? COLORS.R : COLORS.IN,
-                            x === -1 ? COLORS.L : COLORS.IN,
-                            y === 1 ? COLORS.U : COLORS.IN,
-                            y === -1 ? COLORS.D : COLORS.IN,
-                            z === 1 ? COLORS.F : COLORS.IN,
-                            z === -1 ? COLORS.B : COLORS.IN
-                        ]
-                    });
-                }
-            }
-        }
-        return state;
-    }
 
     function updateCamera() {
         if (!camera) return;
@@ -536,8 +510,7 @@
         light.position.set(10, 20, 15);
         scene.add(light);
 
-        cubeState = createSolvedState();
-        rebuildVisualCube();
+        initCubeModel();
 
         container.addEventListener('mousedown', e => { isDragging = true; prevMouse = { x: e.clientX, y: e.clientY }; });
         window.addEventListener('mousemove', e => {
@@ -551,8 +524,7 @@
         window.addEventListener('mouseup', () => isDragging = false);
     }
 
-    function rebuildVisualCube() {
-        if (cubeGroup) scene.remove(cubeGroup);
+    function initCubeModel() {
         cubeGroup = new THREE.Group();
         scene.add(cubeGroup);
         cubies = [];
@@ -560,16 +532,28 @@
         const size = 0.92;
         const geom = new THREE.BoxGeometry(size, size, size);
 
-        cubeState.forEach(item => {
-            const mats = item.colors.map(col => new THREE.MeshBasicMaterial({ color: col }));
-            const mesh = new THREE.Mesh(geom, mats);
-            mesh.position.set(item.x, item.y, item.z);
-            cubeGroup.add(mesh);
-            cubies.push(mesh);
-        });
+        for (let x = -1; x <= 1; x++) {
+            for (let y = -1; y <= 1; y++) {
+                for (let z = -1; z <= 1; z++) {
+                    const mats = [
+                        new THREE.MeshBasicMaterial({ color: x === 1 ? COLORS.R : COLORS.IN }),
+                        new THREE.MeshBasicMaterial({ color: x === -1 ? COLORS.L : COLORS.IN }),
+                        new THREE.MeshBasicMaterial({ color: y === 1 ? COLORS.U : COLORS.IN }),
+                        new THREE.MeshBasicMaterial({ color: y === -1 ? COLORS.D : COLORS.IN }),
+                        new THREE.MeshBasicMaterial({ color: z === 1 ? COLORS.F : COLORS.IN }),
+                        new THREE.MeshBasicMaterial({ color: z === -1 ? COLORS.B : COLORS.IN })
+                    ];
+                    const mesh = new THREE.Mesh(geom, mats);
+                    mesh.position.set(x, y, z);
+                    cubeGroup.add(mesh);
+                    cubies.push(mesh);
+                }
+            }
+        }
         if (renderer) renderer.render(scene, camera);
     }
 
+    // ИСПРАВЛЕННОЕ ЯДРО С ОРТОГОНАЛИЗАЦИЕЙ МАТРИЦ (ПРЕДОТВРАЩАЕТ ПЕРЕКОСЫ И ЧЕРНЫЕ ГРАНИ)
     function applyMove(moveStr) {
         if (isMoving) return;
         isMoving = true;
@@ -578,23 +562,12 @@
         const isPrime = moveStr.includes("'");
         const isDouble = moveStr.includes("2");
 
-        let turns = 1;
-        if (isPrime) turns = 3;
-        if (isDouble) turns = 2;
-
-        // Вначале строго пересчитываем матрицу логического состояния
-        for (let t = 0; t < turns; t++) {
-            rotateCubeStateLogical(base);
-        }
-
-        // Анимация визуального поворота
         let axis = new THREE.Vector3();
-        let angle = -Math.PI / 2;
-        if (isPrime) angle = Math.PI / 2;
+        let angle = (isPrime ? Math.PI / 2 : -Math.PI / 2);
         if (isDouble) angle *= 2;
 
         let filter = c => false;
-        let isWhole = false;
+        let isWholeCube = false;
 
         switch (base) {
             case 'R': axis.set(1, 0, 0); filter = c => c.position.x > 0.5; break;
@@ -603,92 +576,72 @@
             case 'D': axis.set(0, -1, 0); filter = c => c.position.y < -0.5; angle = -angle; break;
             case 'F': axis.set(0, 0, 1); filter = c => c.position.z > 0.5; break;
             case 'B': axis.set(0, 0, -1); filter = c => c.position.z < -0.5; angle = -angle; break;
-            case 'M': axis.set(-1, 0, 0); filter = c => Math.abs(c.position.x) < 0.5; angle = -angle; break;
-            case 'E': axis.set(0, -1, 0); filter = c => Math.abs(c.position.y) < 0.5; angle = -angle; break;
-            case 'S': axis.set(0, 0, 1); filter = c => Math.abs(c.position.z) < 0.5; break;
-            case 'x': axis.set(1, 0, 0); isWhole = true; break;
-            case 'y': axis.set(0, 1, 0); isWhole = true; angle = -angle; break;
-            case 'z': axis.set(0, 0, 1); isWhole = true; break;
+            case 'M': axis.set(-1, 0, 0); filter = c => Math.abs(c.position.x) < 0.1; angle = -angle; break;
+            case 'E': axis.set(0, -1, 0); filter = c => Math.abs(c.position.y) < 0.1; angle = -angle; break;
+            case 'S': axis.set(0, 0, 1); filter = c => Math.abs(c.position.z) < 0.1; break;
+            case 'x': axis.set(1, 0, 0); isWholeCube = true; break;
+            case 'y': axis.set(0, 1, 0); isWholeCube = true; angle = -angle; break;
+            case 'z': axis.set(0, 0, 1); isWholeCube = true; break;
         }
 
         const pivot = new THREE.Group();
+        pivot.position.set(0, 0, 0);
         scene.add(pivot);
 
-        const affected = isWhole ? [...cubies] : cubies.filter(filter);
+        const affected = isWholeCube ? [...cubies] : cubies.filter(filter);
         affected.forEach(c => {
             cubeGroup.remove(c);
             pivot.add(c);
         });
 
-        const steps = 8;
+        const steps = 10;
         const stepAngle = angle / steps;
-        let curStep = 0;
+        let currentStep = 0;
 
-        function animate() {
-            curStep++;
-            if (isWhole) pivot.rotateOnWorldAxis(axis, stepAngle);
-            else pivot.rotateOnAxis(axis, stepAngle);
+        function animateStep() {
+            currentStep++;
+            if (isWholeCube) {
+                pivot.rotateOnWorldAxis(axis, stepAngle);
+            } else {
+                pivot.rotateOnAxis(axis, stepAngle);
+            }
             renderer.render(scene, camera);
 
-            if (curStep < steps) {
-                requestAnimationFrame(animate);
+            if (currentStep < steps) {
+                requestAnimationFrame(animateStep);
             } else {
+                pivot.updateMatrixWorld();
+                affected.forEach(c => {
+                    c.applyMatrix4(pivot.matrixWorld);
+                    
+                    // Строго очищаем матрицу от искажений и сдвигов
+                    const m = new THREE.Matrix4().copy(c.matrix);
+                    const pos = new THREE.Vector3().setFromMatrixPosition(m);
+                    pos.x = Math.round(pos.x);
+                    pos.y = Math.round(pos.y);
+                    pos.z = Math.round(pos.z);
+                    c.position.copy(pos);
+
+                    const rotMat = new THREE.Matrix4().extractRotation(m);
+                    c.quaternion.setFromRotationMatrix(rotMat);
+
+                    // Квантуем углы до идеальных 90 градусов
+                    const euler = new THREE.Euler().setFromQuaternion(c.quaternion, 'YXZ');
+                    euler.x = Math.round(euler.x / (Math.PI / 2)) * (Math.PI / 2);
+                    euler.y = Math.round(euler.y / (Math.PI / 2)) * (Math.PI / 2);
+                    euler.z = Math.round(euler.z / (Math.PI / 2)) * (Math.PI / 2);
+                    c.quaternion.setFromEuler(euler);
+                    c.updateMatrix();
+
+                    pivot.remove(c);
+                    cubeGroup.add(c);
+                });
                 scene.remove(pivot);
-                rebuildVisualCube();
+                renderer.render(scene, camera);
                 isMoving = false;
             }
         }
-        animate();
-    }
-
-    // Алгебраический пересчет позиций граней и цветов (полностью убирает накопление ошибок осей)
-    function rotateCubeStateLogical(face) {
-        const cR = 0, cL = 1, cU = 2, cD = 3, cF = 4, cB = 5;
-
-        cubeState.forEach(item => {
-            let match = false;
-            if (face === 'R' && item.x > 0.5) match = true;
-            if (face === 'L' && item.x < -0.5) match = true;
-            if (face === 'U' && item.y > 0.5) match = true;
-            if (face === 'D' && item.y < -0.5) match = true;
-            if (face === 'F' && item.z > 0.5) match = true;
-            if (face === 'B' && item.z < -0.5) match = true;
-            if (face === 'M' && Math.abs(item.x) < 0.5) match = true;
-            if (face === 'E' && Math.abs(item.y) < 0.5) match = true;
-            if (face === 'S' && Math.abs(item.z) < 0.5) match = true;
-            if (face === 'x' || face === 'y' || face === 'z') match = true;
-
-            if (match) {
-                let ox = item.x, oy = item.y, oz = item.z;
-                let cols = [...item.colors];
-
-                if (face === 'R' || (face === 'M' && face !== 'R') || face === 'x') {
-                    item.y = -oz; item.z = oy;
-                    item.colors[cU] = cols[cF]; item.colors[cF] = cols[cD];
-                    item.colors[cD] = cols[cB]; item.colors[cB] = cols[cU];
-                } else if (face === 'L') {
-                    item.y = oz; item.z = -oy;
-                    item.colors[cU] = cols[cB]; item.colors[cB] = cols[cD];
-                    item.colors[cD] = cols[cF]; item.colors[cF] = cols[cU];
-                } else if (face === 'U' || face === 'E' || face === 'y') {
-                    item.x = -oz; item.z = ox;
-                    item.colors[cF] = cols[cR]; item.colors[cR] = cols[cB];
-                    item.colors[cB] = cols[cL]; item.colors[cL] = cols[cF];
-                } else if (face === 'D') {
-                    item.x = oz; item.z = -ox;
-                    item.colors[cF] = cols[cL]; item.colors[cL] = cols[cB];
-                    item.colors[cB] = cols[cR]; item.colors[cR] = cols[cF];
-                } else if (face === 'F' || face === 'S' || face === 'z') {
-                    item.x = -oy; item.y = ox;
-                    item.colors[cU] = cols[cL]; item.colors[cL] = cols[cD];
-                    item.colors[cD] = cols[cR]; item.colors[cR] = cols[cU];
-                } else if (face === 'B') {
-                    item.x = oy; item.y = -ox;
-                    item.colors[cU] = cols[cR]; item.colors[cR] = cols[cD];
-                    item.colors[cD] = cols[cL]; item.colors[cL] = cols[cU];
-                }
-            }
-        });
+        animateStep();
     }
 
     window.onload = function() {
