@@ -213,14 +213,6 @@ body {
     <button class="menu-btn" onclick="showView('view-4lll')" style="background-color: #2c2c2e; color: #fff;">📗 Метод 4LLL (Упрощенный)</button>
 
     <div class="cube-section">
-      <div style="width: 100%; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px;">
-        <label style="font-size: 11px; color: var(--text-secondary); text-align: center;">Введите или вставьте формулу:</label>
-        <div style="display: flex; gap: 6px;">
-          <input type="text" id="custom-formula-input" value="R U R' U'" style="flex: 1; padding: 8px 10px; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: monospace; font-size: 13px; outline: none;">
-          <button onclick="executeCustomFormula()" style="background-color: var(--button-color); color: var(--button-text-color); border: none; border-radius: 8px; padding: 0 12px; font-weight: 600; font-size: 12px; cursor: pointer;">Применить</button>
-          <button onclick="resetCube()" style="background-color: #3a3a3c; color: var(--text-color); border: none; border-radius: 8px; padding: 0 12px; font-weight: 600; font-size: 12px; cursor: pointer;">Сброс</button>
-        </div>
-      </div>
       <div id="cubeCanvasContainer">
         <canvas id="cubeCanvas"></canvas>
       </div>
@@ -300,13 +292,8 @@ body {
         <span style="font-size: 13px; color: var(--text-secondary);">Формула (Алгоритм решения):</span>
         <div class="formula-box" id="detail-formula">R U R'</div>
       </div>
-      <div>
-        <span style="font-size: 13px; color: var(--text-secondary);">Скрамбл (Для создания ситуации):</span>
-        <div class="formula-box" id="detail-scramble" style="color: #4da3ff;">R U R'</div>
-      </div>
       <div style="display: flex; gap: 8px;">
-        <button class="copy-btn" onclick="copyFormula()" id="t-copy-btn" style="flex: 1;">Копировать формулу</button>
-        <button class="copy-btn" onclick="applyCaseScramble()" style="background-color: #34c759; flex: 1;">Собрать ситуацию</button>
+        <button class="copy-btn" onclick="copyFormula()" id="t-copy-btn" style="width: 100%;">Копировать формулу</button>
       </div>
     </div>
   </div>
@@ -428,12 +415,12 @@ const algorithmsData = {
     { name: 'Ub-Perm', formula: 'R2 U R U R\' U\' R\' U\' R\' U R\'', desc: { ru: 'U-перестановка b' } },
     { name: 'Z-Perm', formula: 'M2 U M2 U M U2 M2 U2 M U2', desc: { ru: 'Z-перестановка' } },
     { name: 'H-Perm', formula: 'M2 U M2 U2 M2 U M2', desc: { ru: 'H-перестановка ребер' } },
-    { name: 'Aa-Perm', formula: 'l\' U R\' D2 R U\' R\' D2 R l', desc: { ru: 'Перестановка углов Aa (Rotation-free)' } },
-    { name: 'Ab-Perm', formula: 'l R\' D2 R U R\' D2 R U\' l\'', desc: { ru: 'Перестановка углов Ab (Rotation-free)' } },
+    { name: 'Aa-Perm', formula: 'x R\' U R\' D2 R U\' R\' D2 R2 x\'', desc: { ru: 'Перестановка углов Aa' } },
+    { name: 'Ab-Perm', formula: 'x R2 D2 R U R\' D2 R U\' R x\'', desc: { ru: 'Перестановка углов Ab' } },
     { name: 'E-Perm', formula: 'x\' R U\' R\' D R U R\' D\' R U R\' D R U\' R\' D\' x', desc: { ru: 'Е-перестановка' } },
     { name: 'T-Perm', formula: 'R U R\' U\' R\' F R2 U\' R\' U\' R U R\' F\'', desc: { ru: 'Т-перестановка' } },
     { name: 'F-Perm', formula: 'R\' U\' F R U R\' U\' R\' F\' R2 U\' R\' U\' R U R\' U R2', desc: { ru: 'F-перестановка' } },
-    { name: 'V-Perm', formula: 'R\' U R\' U\' B\' R\' F2 R B R\' F2 R2', desc: { ru: 'V-перестановка' } },
+    { name: 'V-Perm', formula: 'R\' U R\' U\' y R\' F\' R2 U\' R\' U R\' F R U\'', desc: { ru: 'V-перестановка' } },
     { name: 'Y-Perm', formula: 'F R U\' R\' U\' R U R\' F\' R U R\' U\' R\' F R F\'', desc: { ru: 'Y-перестановка' } },
     { name: 'Ra-Perm', formula: 'R U\' R\' U\' R U R D R\' U\' R D\' R2 U\'', desc: { ru: 'R-перестановка a' } },
     { name: 'Rb-Perm', formula: 'R\' U2 R U2 R\' F R U R\' U\' R\' F\' R2', desc: { ru: 'R-перестановка b' } },
@@ -602,6 +589,38 @@ function applyMove(moveStr) {
   let times = isDouble ? 2 : (isPrime ? 3 : 1);
 
   for (let t = 0; t < times; t++) {
+    if (base === 'x') {
+      const rotAngle = -Math.PI / 2;
+      cubelets.forEach(c => {
+        c.position.applyAxisAngle(new THREE.Vector3(1, 0, 0), rotAngle);
+        c.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), rotAngle);
+        c.position.x = Math.round(c.position.x / 0.98) * 0.98;
+        c.position.y = Math.round(c.position.y / 0.98) * 0.98;
+        c.position.z = Math.round(c.position.z / 0.98) * 0.98;
+      });
+      continue;
+    } else if (base === 'y') {
+      const rotAngle = -Math.PI / 2;
+      cubelets.forEach(c => {
+        c.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotAngle);
+        c.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), rotAngle);
+        c.position.x = Math.round(c.position.x / 0.98) * 0.98;
+        c.position.y = Math.round(c.position.y / 0.98) * 0.98;
+        c.position.z = Math.round(c.position.z / 0.98) * 0.98;
+      });
+      continue;
+    } else if (base === 'z') {
+      const rotAngle = -Math.PI / 2;
+      cubelets.forEach(c => {
+        c.position.applyAxisAngle(new THREE.Vector3(0, 0, 1), rotAngle);
+        c.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), rotAngle);
+        c.position.x = Math.round(c.position.x / 0.98) * 0.98;
+        c.position.y = Math.round(c.position.y / 0.98) * 0.98;
+        c.position.z = Math.round(c.position.z / 0.98) * 0.98;
+      });
+      continue;
+    }
+
     cubelets.forEach(c => {
       const pos = c.position;
       let rx = Math.round(pos.x / 0.98);
@@ -642,10 +661,6 @@ function applyMove(moveStr) {
         if (rz === -1 || rz === 0) { match = true; axis.set(0, 0, 1); angle = Math.PI / 2; }
       }
 
-      else if (base === 'x') { match = true; axis.set(1, 0, 0); angle = -Math.PI / 2; }
-      else if (base === 'y') { match = true; axis.set(0, 1, 0); angle = -Math.PI / 2; }
-      else if (base === 'z') { match = true; axis.set(0, 0, 1); angle = -Math.PI / 2; }
-
       if (match) {
         c.position.applyAxisAngle(axis, angle);
         c.rotateOnWorldAxis(axis, angle);
@@ -655,49 +670,7 @@ function applyMove(moveStr) {
         c.position.z = Math.round(c.position.z / 0.98) * 0.98;
       }
     });
-
-    if (base === 'y') {
-      const rotAngle = isPrime ? Math.PI / 2 : -Math.PI / 2;
-      cubelets.forEach(c => {
-        c.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotAngle);
-        c.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), rotAngle);
-        c.position.x = Math.round(c.position.x / 0.98) * 0.98;
-        c.position.y = Math.round(c.position.y / 0.98) * 0.98;
-        c.position.z = Math.round(c.position.z / 0.98) * 0.98;
-      });
-    } else if (base === 'x') {
-      const rotAngle = isPrime ? Math.PI / 2 : -Math.PI / 2;
-      cubelets.forEach(c => {
-        c.position.applyAxisAngle(new THREE.Vector3(1, 0, 0), rotAngle);
-        c.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), rotAngle);
-        c.position.x = Math.round(c.position.x / 0.98) * 0.98;
-        c.position.y = Math.round(c.position.y / 0.98) * 0.98;
-        c.position.z = Math.round(c.position.z / 0.98) * 0.98;
-      });
-    } else if (base === 'z') {
-      const rotAngle = isPrime ? Math.PI / 2 : -Math.PI / 2;
-      cubelets.forEach(c => {
-        c.position.applyAxisAngle(new THREE.Vector3(0, 0, 1), rotAngle);
-        c.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), rotAngle);
-        c.position.x = Math.round(c.position.x / 0.98) * 0.98;
-        c.position.y = Math.round(c.position.y / 0.98) * 0.98;
-        c.position.z = Math.round(c.position.z / 0.98) * 0.98;
-      });
-    }
   }
-}
-
-function resetCube() {
-  createRubiksCube();
-}
-
-function executeCustomFormula() {
-  const input = document.getElementById('custom-formula-input').value;
-  const tokens = input.trim().split(/\s+/);
-  tokens.forEach(token => {
-    if (!token) return;
-    applyMove(token);
-  });
 }
 
 function showView(viewId) {
@@ -753,7 +726,6 @@ function showDetail(item) {
   document.getElementById('detail-title').innerText = item.name;
   document.getElementById('detail-desc').innerText = item.desc.ru;
   document.getElementById('detail-formula').innerText = item.formula;
-  document.getElementById('detail-scramble').innerText = item.formula;
   showView('view-detail');
 }
 
@@ -773,15 +745,6 @@ function copyFormula() {
     console.error('Copy failed', err);
   }
   document.body.removeChild(textArea);
-}
-
-function applyCaseScramble() {
-  if (currentItemData) {
-    document.getElementById('custom-formula-input').value = currentItemData.formula;
-  }
-  showView('view-main');
-  resetCube();
-  executeCustomFormula();
 }
 
 function filterAlgorithms() {
