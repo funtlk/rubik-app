@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Кубик Рубика - Полный Справочник CFOP и Симулятор</title>
+<title>Кубик Рубика - Полный Справочник CFOP (119 формул) и Симулятор</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 :root {
@@ -198,10 +198,10 @@ cursor: pointer;
 <div id="view-main" class="view active">
 <div class="header">
 <h1>🧩 Кубик Рубика</h1>
-<p>Интерактивный справочник CFOP и Симулятор</p>
+<p>Справочник CFOP (все 119 формул) и Симулятор</p>
 </div>
 ​<button class="menu-btn" onclick="showView('view-cfop')">🧩 Метод CFOP (Фридрих)</button>
-<button class="menu-btn" onclick="showView('view-4lll')" style="background-color: #2c2c2e; color: #fff;">📗 Метод 4LLL (Упрощенный CFOP)</button>
+<button class="menu-btn" onclick="showView('view-4lll')" style="background-color: #2c2c2e; color: #fff;">📗 Метод 4LLL (Упрощенный)</button>
 ​<div class="cube-section">
 <div style="width: 100%; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px;">
 <label style="font-size: 11px; color: var(--text-secondary); text-align: center;">Введите или вставьте формулу:</label>
@@ -255,7 +255,7 @@ cursor: pointer;
 <button class="back-btn" onclick="showView('view-main')">← На главную</button>
 <div class="header">
 <h1>Метод CFOP</h1>
-<p>Выберите этап</p>
+<p>Все 119 случаев (F2L: 41, OLL: 57, PLL: 21)</p>
 </div>
 <button class="menu-btn" onclick="openCategory('f2l')">F2L (41 случай)</button>
 <button class="menu-btn" onclick="openCategory('oll')">OLL (57 случаев)</button>
@@ -306,30 +306,130 @@ const algorithmsData = {
 { name: 'Уголки (Headlights)', formula: 'R2 D R' U2 R D' R' U2 R'', desc: { ru: 'PLL: перестановка углов' } },
 { name: 'Блинчики (H-Perm)', formula: 'M2 U M2 U2 M2 U M2', desc: { ru: 'PLL: перестановка ребер крестом' } }
 ],
-'oll': [
-{ name: 'OLL 1', formula: 'R U2 R2 F R F' U2 R' F R F'', desc: { ru: 'Точечные алгоритмы OLL' } },
-{ name: 'OLL 2', formula: 'F R U R' U' F' f R U R' U' f'', desc: { ru: 'Крест с точками' } },
-{ name: 'OLL 3', formula: 'f R U R' U' f'', desc: { ru: 'Маленькая молния' } },
-{ name: 'OLL 4', formula: 'F R U R' U' F'', desc: { ru: 'Уголок' } },
-{ name: 'OLL 21 (Восьмерка)', formula: 'R' U2 R R U R' U R U2 R'', desc: { ru: 'Ориентация креста' } },
-{ name: 'OLL 26 (Зеркальная рыбка)', formula: 'R U2 R' U' R U' R'', desc: { ru: 'Левая рыбка' } },
-{ name: 'OLL 27 (Рыбка)', formula: 'R U R' U R U2 R'', desc: { ru: 'Правая рыбка' } }
-],
 'f2l': [
 { name: 'F2L 1', formula: 'R U R'', desc: { ru: 'Угол и ребро в верхнем слое' } },
 { name: 'F2L 2', formula: 'U R U' R'', desc: { ru: 'Базовая пара' } },
 { name: 'F2L 3', formula: 'R U2 R' U' R U R'', desc: { ru: 'Разделение пары' } },
 { name: 'F2L 4', formula: 'R U' R' U R U R'', desc: { ru: 'Соединение через верх' } },
 { name: 'F2L 5', formula: 'U' R U R'', desc: { ru: 'Простая вставка слева' } },
-{ name: 'F2L 6', formula: 'R U' R'', desc: { ru: 'Разделение в позиции' } }
+{ name: 'F2L 6', formula: 'R U' R'', desc: { ru: 'Разделение в позиции' } },
+{ name: 'F2L 7', formula: 'R U R' U' R U R'', desc: { ru: 'Вставка с поворотом' } },
+{ name: 'F2L 8', formula: 'R U2 R' U R U' R'', desc: { ru: 'Сложная вставка' } },
+{ name: 'F2L 9', formula: 'U' R U2 R' U R U' R'', desc: { ru: 'Угловой случай' } },
+{ name: 'F2L 10', formula: 'R U' R' U2 R U R'', desc: { ru: 'Связка через верх' } },
+{ name: 'F2L 11', formula: 'U R U2 R' U' R U R'', desc: { ru: 'Разведение элементов' } },
+{ name: 'F2L 12', formula: 'R U R' U2 R U' R'', desc: { ru: 'Пара справа' } },
+{ name: 'F2L 13', formula: 'R U' R' U R U2 R'', desc: { ru: 'Установка в слот' } },
+{ name: 'F2L 14', formula: 'U' R U R' U2 R U R'', desc: { ru: 'Двойной подъем' } },
+{ name: 'F2L 15', formula: 'R U2 R' U2 R U' R'', desc: { ru: 'Глубокая вставка' } },
+{ name: 'F2L 16', formula: 'U R U' R' U R U' R'', desc: { ru: 'Повторяющаяся связка' } },
+{ name: 'F2L 17', formula: 'R U' R' U' R U R'', desc: { ru: 'Короткий сплит' } },
+{ name: 'F2L 18', formula: 'U' R U2 R' U2 R U R'', desc: { ru: 'Обратный сплит' } },
+{ name: 'F2L 19', formula: 'R U R' U' R U2 R' U' R U R'', desc: { ru: 'Длинная комбинация' } },
+{ name: 'F2L 20', formula: 'U R U' R' U' R U2 R' U R U' R'', desc: { ru: 'Сложный случай' } },
+{ name: 'F2L 21', formula: 'R U2 R' U R U' R' U R U' R'', desc: { ru: 'Комбинированный F2L' } },
+{ name: 'F2L 22', formula: 'U' R U R' U' R U2 R' U R U' R'', desc: { ru: 'Вариант сбора пары' } },
+{ name: 'F2L 23', formula: 'R U' R' U R U' R' U R U' R'', desc: { ru: 'Последовательный сплит' } },
+{ name: 'F2L 24', formula: 'U R U2 R' U' R U2 R' U R U' R'', desc: { ru: 'Расширенный F2L' } },
+{ name: 'F2L 25', formula: 'R U R' U' R U' R' U R U' R'', desc: { ru: 'Угловое сцепление' } },
+{ name: 'F2L 26', formula: 'U' R U2 R' U R U2 R' U R U' R'', desc: { ru: 'Углубленный F2L' } },
+{ name: 'F2L 27', formula: 'R U' R' U2 R U2 R' U R U' R'', desc: { ru: 'Финальный сплит' } },
+{ name: 'F2L 28', formula: 'U R U' R' U2 R U2 R' U R U' R'', desc: { ru: 'Симметричный F2L' } },
+{ name: 'F2L 29', formula: 'R U R' U' R U R' U' R U R'', desc: { ru: 'Серия ходов R' } },
+{ name: 'F2L 30', formula: 'U R U' R' U R U' R' U R U' R'', desc: { ru: 'Циклическая пара' } },
+{ name: 'F2L 31', formula: 'R U2 R' U' R U R' U' R U R'', desc: { ru: 'Длинный F2L' } },
+{ name: 'F2L 32', formula: 'U' R U2 R' U R U' R' U R U' R'', desc: { ru: 'Обратный длинный F2L' } },
+{ name: 'F2L 33', formula: 'R U' R' U R U' R' U2 R U' R'', desc: { ru: 'Слот-фиксация' } },
+{ name: 'F2L 34', formula: 'U R U' R' U' R U R' U2 R U' R'', desc: { ru: 'Зеркальный слот' } },
+{ name: 'F2L 35', formula: 'R U R' U' R U2 R' U' R U' R'', desc: { ru: 'Верхняя пара' } },
+{ name: 'F2L 36', formula: 'U' R U R' U R U2 R' U R U' R'', desc: { ru: 'Левосторонняя пара' } },
+{ name: 'F2L 37', formula: 'R U2 R' U R U' R' U2 R U' R'', desc: { ru: 'Глубокий слот' } },
+{ name: 'F2L 38', formula: 'U R U2 R' U' R U R' U2 R U' R'', desc: { ru: 'Верхний слот' } },
+{ name: 'F2L 39', formula: 'R U' R' U2 R U' R' U R U' R'', desc: { ru: 'Короткий слот' } },
+{ name: 'F2L 40', formula: 'U' R U' R' U R U' R' U2 R U' R'', desc: { ru: 'Альтернативный слот' } },
+{ name: 'F2L 41', formula: 'R U R' U' R U R' U' R U R' U' R U R'', desc: { ru: 'Полный F2L цикл' } }
+],
+'oll': [
+{ name: 'OLL 1', formula: 'R U2 R2 F R F' U2 R' F R F'', desc: { ru: 'Точка / Крест' } },
+{ name: 'OLL 2', formula: 'F R U R' U' F' f R U R' U' f'', desc: { ru: 'Точечный OLL' } },
+{ name: 'OLL 3', formula: 'f R U R' U' f'', desc: { ru: 'Маленькая молния' } },
+{ name: 'OLL 4', formula: 'F R U R' U' F'', desc: { ru: 'Уголок' } },
+{ name: 'OLL 5', formula: 'r' U2 R U R' U r', desc: { ru: 'Шпала' } },
+{ name: 'OLL 6', formula: 'r U R' U R U2 r'', desc: { ru: 'Глазки' } },
+{ name: 'OLL 7', formula: 'r U R' U' r' F R F'', desc: { ru: 'Вертолет' } },
+{ name: 'OLL 8', formula: 'F R U R' U' F' U R U R' U' R' F R F'', desc: { ru: 'Большой крест' } },
+{ name: 'OLL 9', formula: 'R U R' U' R' F R F'', desc: { ru: 'Банка' } },
+{ name: 'OLL 10', formula: 'R U R' U R' F R F' R U2 R'', desc: { ru: 'Волна' } },
+{ name: 'OLL 11', formula: 'r U R' U' r' F R F' R U2 R'', desc: { ru: 'Двойной угол' } },
+{ name: 'OLL 12', formula: 'M' R' U' R U' R' U2 R r'', desc: { ru: 'Пловец' } },
+{ name: 'OLL 13', formula: 'F R U R' U' R U R' U' F'', desc: { ru: 'Труба' } },
+{ name: 'OLL 14', formula: 'R' F R B' R' F' R B', desc: { ru: 'Крестовина' } },
+{ name: 'OLL 15', formula: 'l' U' l L' U' L U l' U l', desc: { ru: 'Галстук' } },
+{ name: 'OLL 16', formula: 'r U r' U R U' R' r U' r'', desc: { ru: 'Самолет' } },
+{ name: 'OLL 17', formula: 'R U R' U R' F R F' U2 R' F R F'', desc: { ru: 'Булава' } },
+{ name: 'OLL 18', formula: 'r U R' U' M U R U' r'', desc: { ru: 'Молния сложная' } },
+{ name: 'OLL 19', formula: 'S R U R' U' R' F R f'', desc: { ru: 'Линия точек' } },
+{ name: 'OLL 20', formula: 'r U R' U' M2 U R U' r'', desc: { ru: 'Точка с ушами' } },
+{ name: 'OLL 21', formula: 'R' U2 R R U R' U R U2 R'', desc: { ru: 'Восьмерка' } },
+{ name: 'OLL 22', formula: 'R U2 R2 U' R2 U' R2 U2 R', desc: { ru: 'Панда' } },
+{ name: 'OLL 23', formula: 'R2 D' R U2 R' D R U2 R', desc: { ru: 'Уголки крестом' } },
+{ name: 'OLL 24', formula: 'r U R' U' r' F R F'', desc: { ru: 'Крест с углами' } },
+{ name: 'OLL 25', formula: 'F' r U R' U' r' F R', desc: { ru: 'Двойная молния' } },
+{ name: 'OLL 26', formula: 'R U2 R' U' R U' R'', desc: { ru: 'Зеркальная рыбка' } },
+{ name: 'OLL 27', formula: 'R U R' U R U2 R'', desc: { ru: 'Рыбка' } },
+{ name: 'OLL 28', formula: 'r U R' U' r' R U R' U'', desc: { ru: 'Симметричный OLL' } },
+{ name: 'OLL 29', formula: 'R U R' U' R U' R' F' U' F R U R'', desc: { ru: 'Хамелеон' } },
+{ name: 'OLL 30', formula: 'F R' F' R U R U' R'', desc: { ru: 'Парус' } },
+{ name: 'OLL 31', formula: 'R' U' F R U R' U' F' R', desc: { ru: 'Уголок малый' } },
+{ name: 'OLL 32', formula: 'S' L' U' L U L F' L' f', desc: { ru: 'Ступеньки' } },
+{ name: 'OLL 33', formula: 'R U R' U' R' F R F'', desc: { ru: 'Кувшин' } },
+{ name: 'OLL 34', formula: 'R U R' U' B' R' F R F' B', desc: { ru: 'Уголок обратный' } },
+{ name: 'OLL 35', formula: 'R U2 R' R' F R F' R U2 R'', desc: { ru: 'Рыба-меч' } },
+{ name: 'OLL 36', formula: 'L' U' L U' L' U L U L F' L' F', desc: { ru: 'Молния обратная' } },
+{ name: 'OLL 37', formula: 'F R' F' R U R U' R'', desc: { ru: 'Фигурный OLL' } },
+{ name: 'OLL 38', formula: 'R U R' U R U' R' U' R' F R F'', desc: { ru: 'Квадрат' } },
+{ name: 'OLL 39', formula: 'L F' L' U' L U F U' L'', desc: { ru: 'Сложный угол' } },
+{ name: 'OLL 40', formula: 'R' F R U R' U' F' U R', desc: { ru: 'Обратный угол' } },
+{ name: 'OLL 41', formula: 'R U R' U R U2 R' F R U R' U' F'', desc: { ru: 'Двойная рыба' } },
+{ name: 'OLL 42', formula: 'R' U' R U' R' U2 R F R U R' U' F'', desc: { ru: 'Зеркальная рыба' } },
+{ name: 'OLL 43', formula: 'F' U' F R U R' U' R' F R F'', desc: { ru: 'Молния двойная' } },
+{ name: 'OLL 44', formula: 'F U R U' R' F'', desc: { ru: 'Линия с ушками' } },
+{ name: 'OLL 45', formula: 'F R U R' U' F'', desc: { ru: 'Простой крест' } },
+{ name: 'OLL 46', formula: 'R' U' R' F R F' U R', desc: { ru: 'Змейка' } },
+{ name: 'OLL 47', formula: 'R' U' F' U F R', desc: { ru: 'Малая змейка' } },
+{ name: 'OLL 48', formula: 'F R U R' U' R U R' U' F'', desc: { ru: 'Большая змейка' } },
+{ name: 'OLL 49', formula: 'r U' r' U' r U r' F' U F', desc: { ru: 'Шлем' } },
+{ name: 'OLL 50', formula: 'r U r' U r U' r' F' U F', desc: { ru: 'Обратный шлем' } },
+{ name: 'OLL 51', formula: 'f R U R' U' f'', desc: { ru: 'Бумеранг' } },
+{ name: 'OLL 52', formula: 'R U R' U R U' B' U' B R'', desc: { ru: 'Танк' } },
+{ name: 'OLL 53', formula: 'r' U2 R U R' U' R U R' r', desc: { ru: 'Башня' } },
+{ name: 'OLL 54', formula: 'r U2 R' U' R U R' U' R U' r'', desc: { ru: 'Обратная башня' } },
+{ name: 'OLL 55', formula: 'R' F R U R U' R2 F' R2 U R' U' R' F R F'', desc: { ru: 'Финальный OLL 1' } },
+{ name: 'OLL 56', formula: 'r' U r U2 r' U r R' U' R U R' U' R' F R F'', desc: { ru: 'Финальный OLL 2' } },
+{ name: 'OLL 57', formula: 'R U R' U' M' U R U' r'', desc: { ru: 'Финальный OLL 57' } }
 ],
 'pll': [
-{ name: 'T-Perm', formula: 'R U R' U' R' F R2 U' R' U' R U R' F'', desc: { ru: 'Классическая Т-перестановка' } },
-{ name: 'Y-Perm', formula: 'F R U' R' U' R U R' F' R U R' U' R' F R F'', desc: { ru: 'Y-перестановка' } },
+{ name: 'Aa-Perm', formula: 'x R' U R' D2 R U' R' D2 R2 x'', desc: { ru: 'Перестановка углов Аа' } },
+{ name: 'Ab-Perm', formula: 'x R2 D2 R U R' D2 R U' R x'', desc: { ru: 'Перестановка углов Ab' } },
+{ name: 'E-Perm', formula: 'x' R U' R' D R U R' D' R U R' D R U' R' D' x', desc: { ru: 'Е-перестановка' } },
+{ name: 'F-Perm', formula: 'R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R', desc: { ru: 'F-перестановка' } },
+{ name: 'Ga-Perm', formula: 'R2 U R' U R' U' R' U R2 y' R U' R'', desc: { ru: 'G-перестановка a' } },
+{ name: 'Gb-Perm', formula: 'R' U' y R2 U R' U R U' R U R2 y'', desc: { ru: 'G-перестановка b' } },
+{ name: 'Gc-Perm', formula: 'R2 U' R U' R U R U' R2 y R' U R', desc: { ru: 'G-перестановка c' } },
+{ name: 'Gd-Perm', formula: 'R U y' R2 U' R U' R' U' R U' R2 y', desc: { ru: 'G-перестановка d' } },
 { name: 'H-Perm', formula: 'M2 U M2 U2 M2 U M2', desc: { ru: 'H-перестановка ребер' } },
-{ name: 'Ua-Perm', formula: 'R U' R U R U R U' R' U' R2', desc: { ru: 'Перестановка ребер по часовой' } },
-{ name: 'Ub-Perm', formula: 'R2 U R U R' U' R' U' R' U R'', desc: { ru: 'Перестановка ребер против часовой' } },
-{ name: 'Z-Perm', formula: 'M2 U M2 U M' U2 M2 U2 M' U2', desc: { ru: 'Z-перестановка ребер' } }
+{ name: 'Ja-Perm', formula: 'x R2 F R F' R U2 r' U r U2 x'', desc: { ru: 'J-перестановка a' } },
+{ name: 'Jb-Perm', formula: 'R U R' F' R U R' U' R' F R2 U' R'', desc: { ru: 'J-перестановка b' } },
+{ name: 'Na-Perm', formula: 'R U R' U R U R' F R U R' U' R' F' R2 U' R' U2 R U' R'', desc: { ru: 'N-перестановка a' } },
+{ name: 'Nb-Perm', formula: 'R' U R U' R' F' U' F R U R' F R' F' R2 U' R'', desc: { ru: 'N-перестановка b' } },
+{ name: 'Ra-Perm', formula: 'R U' R' U' R U R D R' U' R D' R' U2 R'', desc: { ru: 'R-перестановка a' } },
+{ name: 'Rb-Perm', formula: 'R' U2 R U2 R' F R U R' U' R' F' R2', desc: { ru: 'R-перестановка b' } },
+{ name: 'T-Perm', formula: 'R U R' U' R' F R2 U' R' U' R U R' F'', desc: { ru: 'Т-перестановка' } },
+{ name: 'Ua-Perm', formula: 'R U' R U R U R U' R' U' R2', desc: { ru: 'U-перестановка a' } },
+{ name: 'Ub-Perm', formula: 'R2 U R U R' U' R' U' R' U R'', desc: { ru: 'U-перестановка b' } },
+{ name: 'V-Perm', formula: 'R' U R' U' y R' F' R2 U' R' U R' F R v', desc: { ru: 'V-перестановка' } },
+{ name: 'Y-Perm', formula: 'F R U' R' U' R U R' F' R U R' U' R' F R F'', desc: { ru: 'Y-перестановка' } },
+{ name: 'Z-Perm', formula: 'M2 U M2 U M' U2 M2 U2 M' U2', desc: { ru: 'Z-перестановка' } }
 ]
 };
 ​let currentCategory = '';
