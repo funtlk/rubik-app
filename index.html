@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Кубик Рубика - Справочник CFOP и Симулятор</title>
+    <title>Кубик Рубика - Полный справочник CFOP и Симулятор</title>
     <style>
         :root {
             --bg-color: #121212;
@@ -41,15 +41,8 @@
             text-align: center;
             margin-bottom: 20px;
         }
-        .header h1 {
-            font-size: 22px;
-            margin: 0 0 6px 0;
-        }
-        .header p {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin: 0;
-        }
+        .header h1 { font-size: 22px; margin: 0 0 6px 0; }
+        .header p { font-size: 14px; color: var(--text-secondary); margin: 0; }
         .lang-container {
             display: flex;
             justify-content: center;
@@ -101,14 +94,11 @@
             margin-bottom: 12px;
             touch-action: none;
             user-select: none;
-            -webkit-user-select: none;
             position: relative;
             cursor: grab;
             display: block;
         }
-        #cube-container:active {
-            cursor: grabbing;
-        }
+        #cube-container:active { cursor: grabbing; }
         .controls-panel {
             width: 100%;
             display: flex;
@@ -133,9 +123,7 @@
             text-align: center;
             user-select: none;
         }
-        .ctrl-btn:active {
-            background-color: var(--button-color);
-        }
+        .ctrl-btn:active { background-color: var(--button-color); }
         .ctrl-btn.spec {
             background-color: rgba(0, 122, 255, 0.2);
             color: #4da3ff;
@@ -160,10 +148,7 @@
             align-items: center;
             text-align: center;
         }
-        .case-card h3 {
-            font-size: 15px;
-            margin: 0 0 6px 0;
-        }
+        .case-card h3 { font-size: 15px; margin: 0 0 6px 0; }
         .case-card p {
             font-size: 12px;
             color: var(--text-secondary);
@@ -247,8 +232,7 @@
 
         <div class="cube-section">
             <div style="width: 100%; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px;">
-                <label id="t-custom-formula-label" style="font-size: 11px; color: var(--text-secondary); text-align: center;">Введите или вставьте формулу, чтобы собрать/воспроизвести ситуацию:</label>
-                <div id="t-spam-warning" style="font-size: 10px; color: #ff9f0a; text-align: center; margin-bottom: 2px;">⚠️ Не спамьте на кнопки во время вращения кубика — алгоритм может сбиться!</div>
+                <label id="t-custom-formula-label" style="font-size: 11px; color: var(--text-secondary); text-align: center;">Введите или вставьте формулу:</label>
                 <div style="display: flex; gap: 6px;">
                     <input type="text" id="custom-formula-input" value="x' R U' R' D R U R' D' R U R' D R U' R' D' x" style="flex: 1; padding: 8px 10px; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: monospace; font-size: 13px; outline: none;">
                     <button onclick="executeCustomFormula()" id="t-apply-formula-btn" style="background-color: var(--button-color); color: var(--button-text-color); border: none; border-radius: 8px; padding: 0 12px; font-weight: 600; font-size: 12px; cursor: pointer;">Применить</button>
@@ -272,6 +256,14 @@
                     <button class="ctrl-btn" onclick="applyMove('F\'')">F'</button>
                     <button class="ctrl-btn" onclick="applyMove('B')">B</button>
                     <button class="ctrl-btn" onclick="applyMove('B\'')">B'</button>
+                </div>
+                <div class="control-row">
+                    <button class="ctrl-btn" onclick="applyMove('M')">M</button>
+                    <button class="ctrl-btn" onclick="applyMove('M\'')">M'</button>
+                    <button class="ctrl-btn" onclick="applyMove('E')">E</button>
+                    <button class="ctrl-btn" onclick="applyMove('E\'')">E'</button>
+                    <button class="ctrl-btn" onclick="applyMove('S')">S</button>
+                    <button class="ctrl-btn" onclick="applyMove('S\'')">S'</button>
                 </div>
                 <div class="control-row special-row">
                     <button class="ctrl-btn spec" onclick="applyMove('x')">x</button>
@@ -336,18 +328,19 @@
     let currentLang = 'ru';
     let currentCategory = '';
     let currentItemData = null;
-    
+
     let algorithmsData = {
         f2l: [
-            { id: 1, name: "F2L 1", desc: { ru: "Базовый вправо", en: "Basic right" }, formula: "R U R'" },
-            { id: 2, name: "F2L 2", desc: { ru: "Базовый влево", en: "Basic left" }, formula: "L' U' L" }
+            { id: 1, name: "F2L 1", desc: { ru: "Базовый вправо" }, formula: "R U R'" },
+            { id: 2, name: "F2L 2", desc: { ru: "Базовый влево" }, formula: "L' U' L" }
         ],
         oll: [
             { id: 21, name: "OLL 21", desc: { ru: "Крест" }, formula: "R U2 R2 U' R2 U' R2 U2 R" },
-            { id: 26, name: "OLL 26", desc: { ru: "Рыбка" }, formula: "R U2 R' U' R U' R'" }
+            { id: 27, name: "OLL 27", desc: { ru: "Рыбка" }, formula: "R U R' U R U2 R'" }
         ],
         pll: [
             { id: 3, name: "E Perm", desc: { ru: "Перестановка E" }, formula: "x' R U' R' D R U R' D' R U R' D R U' R' D' x" },
+            { id: 9, name: "H Perm", desc: { ru: "Перестановка H" }, formula: "M2 U M2 U2 M2 U M2" },
             { id: 16, name: "T Perm", desc: { ru: "Перестановка T" }, formula: "R U R' U' R' F R2 U' R' U' R U R' F'" }
         ]
     };
@@ -374,7 +367,6 @@
             applyScrambleBtn: "Собрать ситуацию",
             backToList: "← К списку",
             customFormulaLabel: "Введите или вставьте формулу, чтобы получить ситуацию:",
-            spamWarning: "⚠️ Не спамьте на кнопки во время вращения кубика — алгоритм может сбиться!",
             applyFormulaBtn: "Применить",
             resetBtn: "Сброс"
         }
@@ -467,31 +459,8 @@
 
     function resetCube() {
         if (isMoving) return;
-        if (cubeGroup) scene.remove(cubeGroup);
-        cubeGroup = new THREE.Group();
-        scene.add(cubeGroup);
-        cubies = [];
-
-        const geom = new THREE.BoxGeometry(0.92, 0.92, 0.92);
-        for (let x = -1; x <= 1; x++) {
-            for (let y = -1; y <= 1; y++) {
-                for (let z = -1; z <= 1; z++) {
-                    const mats = [
-                        new THREE.MeshBasicMaterial({ color: x === 1 ? COLORS.R : COLORS.IN }),
-                        new THREE.MeshBasicMaterial({ color: x === -1 ? COLORS.L : COLORS.IN }),
-                        new THREE.MeshBasicMaterial({ color: y === 1 ? COLORS.U : COLORS.IN }),
-                        new THREE.MeshBasicMaterial({ color: y === -1 ? COLORS.D : COLORS.IN }),
-                        new THREE.MeshBasicMaterial({ color: z === 1 ? COLORS.F : COLORS.IN }),
-                        new THREE.MeshBasicMaterial({ color: z === -1 ? COLORS.B : COLORS.IN })
-                    ];
-                    const mesh = new THREE.Mesh(geom, mats);
-                    mesh.position.set(x, y, z);
-                    cubeGroup.add(mesh);
-                    cubies.push(mesh);
-                }
-            }
-        }
-        if (renderer) renderer.render(scene, camera);
+        cubeState = createSolvedState();
+        rebuildVisualCube();
         document.getElementById('custom-formula-input').value = '';
     }
 
@@ -515,6 +484,32 @@
         D: 0xffd500, F: 0x0051ba, B: 0x009e60, IN: 0x111111
     };
 
+    // МАТРИЧНАЯ МОДЕЛЬ: Храним 26 деталей с их прямыми цветами граней [R, L, U, D, F, B]
+    let cubeState = [];
+
+    function createSolvedState() {
+        let state = [];
+        for (let x = -1; x <= 1; x++) {
+            for (let y = -1; y <= 1; y++) {
+                for (let z = -1; z <= 1; z++) {
+                    if (x === 0 && y === 0 && z === 0) continue;
+                    state.push({
+                        x: x, y: y, z: z,
+                        colors: [
+                            x === 1 ? COLORS.R : COLORS.IN,
+                            x === -1 ? COLORS.L : COLORS.IN,
+                            y === 1 ? COLORS.U : COLORS.IN,
+                            y === -1 ? COLORS.D : COLORS.IN,
+                            z === 1 ? COLORS.F : COLORS.IN,
+                            z === -1 ? COLORS.B : COLORS.IN
+                        ]
+                    });
+                }
+            }
+        }
+        return state;
+    }
+
     function updateCamera() {
         if (!camera) return;
         camera.position.set(
@@ -536,12 +531,13 @@
         renderer.setSize(container.clientWidth || 300, container.clientHeight || 280);
         container.appendChild(renderer.domElement);
 
-        scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-        const light = new THREE.DirectionalLight(0xffffff, 0.7);
+        scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+        const light = new THREE.DirectionalLight(0xffffff, 0.8);
         light.position.set(10, 20, 15);
         scene.add(light);
 
-        resetCube();
+        cubeState = createSolvedState();
+        rebuildVisualCube();
 
         container.addEventListener('mousedown', e => { isDragging = true; prevMouse = { x: e.clientX, y: e.clientY }; });
         window.addEventListener('mousemove', e => {
@@ -555,7 +551,25 @@
         window.addEventListener('mouseup', () => isDragging = false);
     }
 
-    // ИСПРАВЛЕННЫЙ МЕТОД ВРАЩЕНИЯ С ИДЕАЛЬНЫМ РАСЧЕТОМ ДЛЯ ВСЕГО КУБИКА (x, y, z)
+    function rebuildVisualCube() {
+        if (cubeGroup) scene.remove(cubeGroup);
+        cubeGroup = new THREE.Group();
+        scene.add(cubeGroup);
+        cubies = [];
+
+        const size = 0.92;
+        const geom = new THREE.BoxGeometry(size, size, size);
+
+        cubeState.forEach(item => {
+            const mats = item.colors.map(col => new THREE.MeshBasicMaterial({ color: col }));
+            const mesh = new THREE.Mesh(geom, mats);
+            mesh.position.set(item.x, item.y, item.z);
+            cubeGroup.add(mesh);
+            cubies.push(mesh);
+        });
+        if (renderer) renderer.render(scene, camera);
+    }
+
     function applyMove(moveStr) {
         if (isMoving) return;
         isMoving = true;
@@ -564,12 +578,23 @@
         const isPrime = moveStr.includes("'");
         const isDouble = moveStr.includes("2");
 
+        let turns = 1;
+        if (isPrime) turns = 3;
+        if (isDouble) turns = 2;
+
+        // Вначале строго пересчитываем матрицу логического состояния
+        for (let t = 0; t < turns; t++) {
+            rotateCubeStateLogical(base);
+        }
+
+        // Анимация визуального поворота
         let axis = new THREE.Vector3();
-        let angle = (isPrime ? Math.PI / 2 : -Math.PI / 2);
+        let angle = -Math.PI / 2;
+        if (isPrime) angle = Math.PI / 2;
         if (isDouble) angle *= 2;
 
         let filter = c => false;
-        let isWholeCube = false;
+        let isWhole = false;
 
         switch (base) {
             case 'R': axis.set(1, 0, 0); filter = c => c.position.x > 0.5; break;
@@ -578,65 +603,100 @@
             case 'D': axis.set(0, -1, 0); filter = c => c.position.y < -0.5; angle = -angle; break;
             case 'F': axis.set(0, 0, 1); filter = c => c.position.z > 0.5; break;
             case 'B': axis.set(0, 0, -1); filter = c => c.position.z < -0.5; angle = -angle; break;
-            case 'x': axis.set(1, 0, 0); isWholeCube = true; break;
-            case 'y': axis.set(0, 1, 0); isWholeCube = true; angle = -angle; break;
-            case 'z': axis.set(0, 0, 1); isWholeCube = true; break;
+            case 'M': axis.set(-1, 0, 0); filter = c => Math.abs(c.position.x) < 0.5; angle = -angle; break;
+            case 'E': axis.set(0, -1, 0); filter = c => Math.abs(c.position.y) < 0.5; angle = -angle; break;
+            case 'S': axis.set(0, 0, 1); filter = c => Math.abs(c.position.z) < 0.5; break;
+            case 'x': axis.set(1, 0, 0); isWhole = true; break;
+            case 'y': axis.set(0, 1, 0); isWhole = true; angle = -angle; break;
+            case 'z': axis.set(0, 0, 1); isWhole = true; break;
         }
 
         const pivot = new THREE.Group();
         scene.add(pivot);
 
-        const affected = isWholeCube ? [...cubies] : cubies.filter(filter);
+        const affected = isWhole ? [...cubies] : cubies.filter(filter);
         affected.forEach(c => {
             cubeGroup.remove(c);
             pivot.add(c);
         });
 
-        const steps = 10;
+        const steps = 8;
         const stepAngle = angle / steps;
-        let currentStep = 0;
+        let curStep = 0;
 
-        function animateStep() {
-            currentStep++;
-            if (isWholeCube) {
-                pivot.rotateOnWorldAxis(axis, stepAngle);
-            } else {
-                pivot.rotateOnAxis(axis, stepAngle);
-            }
+        function animate() {
+            curStep++;
+            if (isWhole) pivot.rotateOnWorldAxis(axis, stepAngle);
+            else pivot.rotateOnAxis(axis, stepAngle);
             renderer.render(scene, camera);
 
-            if (currentStep < steps) {
-                requestAnimationFrame(animateStep);
+            if (curStep < steps) {
+                requestAnimationFrame(animate);
             } else {
-                pivot.updateMatrixWorld();
-                affected.forEach(c => {
-                    c.applyMatrix4(pivot.matrixWorld);
-                    c.position.x = Math.round(c.position.x);
-                    c.position.y = Math.round(c.position.y);
-                    c.position.z = Math.round(c.position.z);
-                    
-                    c.rotation.x = Math.round(c.rotation.x / (Math.PI / 2)) * (Math.PI / 2);
-                    c.rotation.y = Math.round(c.rotation.y / (Math.PI / 2)) * (Math.PI / 2);
-                    c.rotation.z = Math.round(c.rotation.z / (Math.PI / 2)) * (Math.PI / 2);
-
-                    pivot.remove(c);
-                    cubeGroup.add(c);
-                });
                 scene.remove(pivot);
-                renderer.render(scene, camera);
+                rebuildVisualCube();
                 isMoving = false;
             }
         }
-        animateStep();
+        animate();
+    }
+
+    // Алгебраический пересчет позиций граней и цветов (полностью убирает накопление ошибок осей)
+    function rotateCubeStateLogical(face) {
+        const cR = 0, cL = 1, cU = 2, cD = 3, cF = 4, cB = 5;
+
+        cubeState.forEach(item => {
+            let match = false;
+            if (face === 'R' && item.x > 0.5) match = true;
+            if (face === 'L' && item.x < -0.5) match = true;
+            if (face === 'U' && item.y > 0.5) match = true;
+            if (face === 'D' && item.y < -0.5) match = true;
+            if (face === 'F' && item.z > 0.5) match = true;
+            if (face === 'B' && item.z < -0.5) match = true;
+            if (face === 'M' && Math.abs(item.x) < 0.5) match = true;
+            if (face === 'E' && Math.abs(item.y) < 0.5) match = true;
+            if (face === 'S' && Math.abs(item.z) < 0.5) match = true;
+            if (face === 'x' || face === 'y' || face === 'z') match = true;
+
+            if (match) {
+                let ox = item.x, oy = item.y, oz = item.z;
+                let cols = [...item.colors];
+
+                if (face === 'R' || (face === 'M' && face !== 'R') || face === 'x') {
+                    item.y = -oz; item.z = oy;
+                    item.colors[cU] = cols[cF]; item.colors[cF] = cols[cD];
+                    item.colors[cD] = cols[cB]; item.colors[cB] = cols[cU];
+                } else if (face === 'L') {
+                    item.y = oz; item.z = -oy;
+                    item.colors[cU] = cols[cB]; item.colors[cB] = cols[cD];
+                    item.colors[cD] = cols[cF]; item.colors[cF] = cols[cU];
+                } else if (face === 'U' || face === 'E' || face === 'y') {
+                    item.x = -oz; item.z = ox;
+                    item.colors[cF] = cols[cR]; item.colors[cR] = cols[cB];
+                    item.colors[cB] = cols[cL]; item.colors[cL] = cols[cF];
+                } else if (face === 'D') {
+                    item.x = oz; item.z = -ox;
+                    item.colors[cF] = cols[cL]; item.colors[cL] = cols[cB];
+                    item.colors[cB] = cols[cR]; item.colors[cR] = cols[cF];
+                } else if (face === 'F' || face === 'S' || face === 'z') {
+                    item.x = -oy; item.y = ox;
+                    item.colors[cU] = cols[cL]; item.colors[cL] = cols[cD];
+                    item.colors[cD] = cols[cR]; item.colors[cR] = cols[cU];
+                } else if (face === 'B') {
+                    item.x = oy; item.y = -ox;
+                    item.colors[cU] = cols[cR]; item.colors[cR] = cols[cD];
+                    item.colors[cD] = cols[cL]; item.colors[cL] = cols[cU];
+                }
+            }
+        });
     }
 
     window.onload = function() {
         initRubikCube();
-        const list4lll = [
-            { id: 1, name: "OLL 21 (Крест)", desc: { ru: "Стандартный крест" }, formula: "R U2 R2 U' R2 U' R2 U2 R" },
+        algorithmsData['4lll'] = [
+            { id: 1, name: "OLL 21", desc: { ru: "Крест" }, formula: "R U2 R2 U' R2 U' R2 U2 R" },
             { id: 3, name: "PLL E-Perm", desc: { ru: "Перестановка E" }, formula: "x' R U' R' D R U R' D' R U R' D R U' R' D' x" }
         ];
-        algorithmsData['4lll'] = list4lll;
     };
 </script>
 
