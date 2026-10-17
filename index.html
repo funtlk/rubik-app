@@ -229,7 +229,7 @@ cursor: pointer;
 <div style="width: 100%; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px;">
 <label id="t-custom-formula-label" style="font-size: 11px; color: var(--text-secondary); text-align: center;">Введите или вставьте формулу:</label>
 <div style="display: flex; gap: 6px;">
-<input type="text" id="custom-formula-input" value="x' R U' R' D R U R' D' R U R' D R U' R' D' x" style="flex: 1; padding: 8px 10px; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: monospace; font-size: 13px; outline: none;">
+<input type="text" id="custom-formula-input" value="R U R' U'" style="flex: 1; padding: 8px 10px; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: monospace; font-size: 13px; outline: none;">
 <button onclick="executeCustomFormula()" id="t-apply-formula-btn" style="background-color: var(--button-color); color: var(--button-text-color); border: none; border-radius: 8px; padding: 0 12px; font-weight: 600; font-size: 12px; cursor: pointer;">Применить</button>
 <button onclick="resetCube()" id="t-reset-btn" style="background-color: #3a3a3c; color: var(--text-color); border: none; border-radius: 8px; padding: 0 12px; font-weight: 600; font-size: 12px; cursor: pointer;">Сброс</button>
 </div>
@@ -526,22 +526,18 @@ else inverseTokens.push(token + "'");
 }
 return inverseTokens.join(' ');
 }
-​async function applyCaseScramble() {
+​function applyCaseScramble() {
 if (!currentItemData) return;
 document.getElementById('custom-formula-input').value = getInverseScramble(currentItemData.formula);
 showView('view-main');
-await executeCustomFormula();
+executeCustomFormula();
 }
-​async function executeCustomFormula() {
-if (isMoving) return;
+​function executeCustomFormula() {
 const text = document.getElementById('custom-formula-input').value.trim();
 const tokens = text.replace(/[()]/g, ' ').split(/\s+/).filter(t => t.length > 0);
-for (let token of tokens) {
-applyMove(token);
-}
+tokens.forEach(token => applyMove(token));
 }
 ​function resetCube() {
-if (isMoving) return;
 cubeState = createSolvedState();
 drawCube();
 document.getElementById('custom-formula-input').value = '';
@@ -553,9 +549,8 @@ const old = btn.innerText;
 btn.innerText = 'Скопировано!';
 setTimeout(() => btn.innerText = old, 1500);
 }
-​// --- CANVAS 2D ISOMETRIC ENGINE & MATRIX ROTATION ---
+​// --- CANVAS 2D ISOMETRIC ENGINE & ROBUST MATRIX ROTATION ---
 let canvas, ctx;
-let isMoving = false;
 let isDragging = false;
 let prevMouse = { x: 0, y: 0 };
 let camRotX = 0.6, camRotY = 0.8;
@@ -576,14 +571,14 @@ for (let y = -1; y <= 1; y++) {
 for (let z = -1; z <= 1; z++) {
 state.push({
 x: x, y: y, z: z,
-faces: [
-{ nx: 1, ny: 0, nz: 0, color: x === 1 ? COLOR_HEX.R : COLOR_HEX.IN },
-{ nx: -1, ny: 0, nz: 0, color: x === -1 ? COLOR_HEX.L : COLOR_HEX.IN },
-{ nx: 0, ny: 1, nz: 0, color: y === 1 ? COLOR_HEX.U : COLOR_HEX.IN },
-{ nx: 0, ny: -1, nz: 0, color: y === -1 ? COLOR_HEX.D : COLOR_HEX.IN },
-{ nx: 0, ny: 0, nz: 1, color: z === 1 ? COLOR_HEX.F : COLOR_HEX.IN },
-{ nx: 0, ny: 0, nz: -1, color: z === -1 ? COLOR_HEX.B : COLOR_HEX.IN }
-]
+faces: {
+R: x === 1 ? COLOR_HEX.R : COLOR_HEX.IN,
+L: x === -1 ? COLOR_HEX.L : COLOR_HEX.IN,
+U: y === 1 ? COLOR_HEX.U : COLOR_HEX.IN,
+D: y === -1 ? COLOR_HEX.D : COLOR_HEX.IN,
+F: z === 1 ? COLOR_HEX.F : COLOR_HEX.IN,
+B: z === -1 ? COLOR_HEX.B : COLOR_HEX.IN
+}
 });
 }
 }
@@ -592,6 +587,7 @@ return state;
 }
 ​function initEngine() {
 canvas = document.getElementById('cubeCanvas');
+if (!canvas) return;
 ctx = canvas.getContext('2d');
 cubeState = createSolvedState();
 drawCube();
@@ -645,27 +641,30 @@ let p = rotatePoint(cubie.x, cubie.y, cubie.z, camRotY, camRotX);
 return { cubie, depth: p.z, pos: p };
 });
 renderList.sort((a, b) => a.depth - b.depth);
+​const faceNormals = {
+R: { nx: 1, ny: 0, nz: 0 },
+L: { nx: -1, ny: 0, nz: 0 },
+U: { nx: 0, ny: 1, nz: 0 },
+D: { nx: 0, ny: -1, nz: 0 },
+F: { nx: 0, ny: 0, nz: 1 },
+B: { nx: 0, ny: 0, nz: -1 }
+};
 ​renderList.forEach(item => {
 let cb = item.cubie;
 let hs = size / 2;
-​cb.faces.forEach(f => {
-if (f.color === COLOR_HEX.IN) return;
-​let rNorm = rotatePoint(f.nx, f.ny, f.nz, camRotY, camRotX);
+​Object.keys(cb.faces).forEach(fKey => {
+let color = cb.faces[fKey];
+if (color === COLOR_HEX.IN) return;
+​let fn = faceNormals[fKey];
+let rNorm = rotatePoint(fn.nx, fn.ny, fn.nz, camRotY, camRotX);
 if (rNorm.z > 0.001) {
 let corners = [];
-if (Math.abs(f.nx) > 0.5) {
-let s = f.nx > 0 ? 1 : -1;
-corners = [[shs,-hs,-hs],[shs,hs,-hs],[shs,hs,hs],[shs,-hs,hs]];
-if (s < 0) corners.reverse();
-} else if (Math.abs(f.ny) > 0.5) {
-let s = f.ny > 0 ? 1 : -1;
-corners = [[-hs,shs,-hs],[hs,shs,-hs],[hs,shs,hs],[-hs,shs,hs]];
-if (s < 0) corners.reverse();
-} else if (Math.abs(f.nz) > 0.5) {
-let s = f.nz > 0 ? 1 : -1;
-corners = [[-hs,-hs,shs],[hs,-hs,shs],[hs,hs,shs],[-hs,hs,shs]];
-if (s > 0) corners.reverse();
-}
+if (fKey === 'R') corners = [[hs,-hs,-hs],[hs,hs,-hs],[hs,hs,hs],[hs,-hs,hs]];
+if (fKey === 'L') corners = [[-hs,-hs,hs],[-hs,hs,hs],[-hs,hs,-hs],[-hs,-hs,-hs]];
+if (fKey === 'U') corners = [[-hs,hs,-hs],[hs,hs,-hs],[hs,hs,hs],[-hs,hs,hs]];
+if (fKey === 'D') corners = [[-hs,-hs,hs],[hs,-hs,hs],[hs,-hs,-hs],[-hs,-hs,-hs]];
+if (fKey === 'F') corners = [[-hs,-hs,hs],[hs,-hs,hs],[hs,hs,hs],[-hs,hs,hs]];
+if (fKey === 'B') corners = [[hs,-hs,-hs],[-hs,-hs,-hs],[-hs,hs,-hs],[hs,hs,-hs]];
 ​let projectedCorners = corners.map(c => {
 let wx = cb.x + c[0];
 let wy = cb.y + c[1];
@@ -682,7 +681,7 @@ for (let i = 1; i < projectedCorners.length; i++) {
 ctx.lineTo(projectedCorners[i].x, projectedCorners[i].y);
 }
 ctx.closePath();
-ctx.fillStyle = f.color;
+ctx.fillStyle = color;
 ctx.fill();
 ctx.strokeStyle = '#0a0a0a';
 ctx.lineWidth = 1.8;
@@ -691,7 +690,7 @@ ctx.stroke();
 });
 });
 }
-​// --- ACCURATE DISCRETE ROTATION LOGIC ---
+​// --- EXACT DISCRETE ROTATION LOGIC ---
 function applyMove(moveStr) {
 let base = moveStr[0];
 let isPrime = moveStr.includes("'");
@@ -700,26 +699,14 @@ let isDouble = moveStr.includes("2");
 if (isPrime) turns = 3;
 if (isDouble) turns = 2;
 ​for (let t = 0; t < turns; t++) {
-rotateCubeStateLogical(base);
+rotateCubeLogical(base);
 }
 ​drawCube();
 }
-​function rotateVectorDiscrete(x, y, z, axis, dir) {
-// axis: 'X', 'Y', 'Z'
-// dir: 1 (CW 90deg), -1 (CCW 90deg)
-if (axis === 'X') {
-return { x: x, y: -z * dir, z: y * dir };
-} else if (axis === 'Y') {
-return { x: z * dir, y: y, z: -x * dir };
-} else if (axis === 'Z') {
-return { x: -y * dir, y: x * dir, z: z };
-}
-return { x, y, z };
-}
-​function rotateCubeStateLogical(move) {
+​function rotateCubeLogical(move) {
 let axis = '';
-let dir = 1;
-let filter = null;
+let dir = 1; // 1 for CW, -1 for CCW
+let filter = c => true;
 ​if (move === 'R') { axis = 'X'; dir = -1; filter = c => c.x > 0.5; }
 else if (move === 'L') { axis = 'X'; dir = 1; filter = c => c.x < -0.5; }
 else if (move === 'U') { axis = 'Y'; dir = -1; filter = c => c.y > 0.5; }
@@ -733,20 +720,39 @@ else if (move === 'x') { axis = 'X'; dir = -1; filter = c => true; }
 else if (move === 'y') { axis = 'Y'; dir = -1; filter = c => true; }
 else if (move === 'z') { axis = 'Z'; dir = -1; filter = c => true; }
 ​if (!axis) return;
-​cubeState.forEach(cubie => {
-if (filter(cubie)) {
-let pos = rotateVectorDiscrete(cubie.x, cubie.y, cubie.z, axis, dir);
-cubie.x = pos.x;
-cubie.y = pos.y;
-cubie.z = pos.z;
-​cubie.faces.forEach(f => {
-let norm = rotateVectorDiscrete(f.nx, f.ny, f.nz, axis, dir);
-f.nx = norm.x;
-f.ny = norm.y;
-f.nz = norm.z;
-});
+​let newCubeState = cubeState.map(cb => {
+let matches = filter(cb);
+if (!matches) return cb;
+​let nx = cb.x, ny = cb.y, nz = cb.z;
+let nFaces = { ...cb.faces };
+​if (axis === 'X') {
+let oy = ny, oz = nz;
+if (dir === 1) { ny = -oz; nz = oy; }
+else { ny = oz; nz = -oy; }
+​nFaces.U = cb.faces[dir === 1 ? 'B' : 'F'];
+nFaces.F = cb.faces[dir === 1 ? 'U' : 'D'];
+nFaces.D = cb.faces[dir === 1 ? 'F' : 'B'];
+nFaces.B = cb.faces[dir === 1 ? 'D' : 'U'];
+} else if (axis === 'Y') {
+let ox = nx, oz = nz;
+if (dir === 1) { nx = oz; nz = -ox; }
+else { nx = -oz; nz = ox; }
+​nFaces.R = cb.faces[dir === 1 ? 'F' : 'B'];
+nFaces.B = cb.faces[dir === 1 ? 'R' : 'L'];
+nFaces.L = cb.faces[dir === 1 ? 'B' : 'F'];
+nFaces.F = cb.faces[dir === 1 ? 'L' : 'R'];
+} else if (axis === 'Z') {
+let ox = nx, oy = ny;
+if (dir === 1) { nx = -oy; ny = ox; }
+else { nx = oy; ny = -ox; }
+​nFaces.U = cb.faces[dir === 1 ? 'L' : 'R'];
+nFaces.R = cb.faces[dir === 1 ? 'U' : 'D'];
+nFaces.D = cb.faces[dir === 1 ? 'R' : 'L'];
+nFaces.L = cb.faces[dir === 1 ? 'D' : 'U'];
 }
+​return { x: Math.round(nx), y: Math.round(ny), z: Math.round(nz), faces: nFaces };
 });
+​cubeState = newCubeState;
 }
 ​window.onload = function() {
 initEngine();
