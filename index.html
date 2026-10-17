@@ -229,7 +229,7 @@ cursor: pointer;
 <div style="width: 100%; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px;">
 <label id="t-custom-formula-label" style="font-size: 11px; color: var(--text-secondary); text-align: center;">Введите или вставьте формулу:</label>
 <div style="display: flex; gap: 6px;">
-<input type="text" id="custom-formula-input" value="R U R' U' R' F R2 U' R' U' R U R' F'" style="flex: 1; padding: 8px 10px; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: monospace; font-size: 13px; outline: none;">
+<input type="text" id="custom-formula-input" value="x' R U' R' D R U R' D' R U R' D R U' R' D' x" style="flex: 1; padding: 8px 10px; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: monospace; font-size: 13px; outline: none;">
 <button onclick="executeCustomFormula()" id="t-apply-formula-btn" style="background-color: var(--button-color); color: var(--button-text-color); border: none; border-radius: 8px; padding: 0 12px; font-weight: 600; font-size: 12px; cursor: pointer;">Применить</button>
 <button onclick="resetCube()" id="t-reset-btn" style="background-color: #3a3a3c; color: var(--text-color); border: none; border-radius: 8px; padding: 0 12px; font-weight: 600; font-size: 12px; cursor: pointer;">Сброс</button>
 </div>
@@ -423,7 +423,7 @@ oll: [
 ],
 pll: [
 { id: 1, name: "Aa Perm", desc: { ru: "Угловая перестановка A1", en: "Corner Perm A1" }, formula: "x R' D R' U2 R D' R' U2 R2 x'" },
-{ id: 2, name: "Ab Perm", desc: { ru: "Угловая перестановка A2", en: "Corner Perm A2" }, formula: "x R2' U2 R D R' U2 R D' R x'" },
+{ id: 2, name: "Ab Perm", desc: { ru: "Угловая перестановка A2", en: "Corner Perm A2" }, formula: "x R2 U2 R D R' U2 R D' R x'" },
 { id: 3, name: "E Perm", desc: { ru: "Параллельная перестановка углов", en: "Parallel Corner Perm" }, formula: "x' R U' R' D R U R' D' R U R' D R U' R' D' x" },
 { id: 4, name: "F Perm", desc: { ru: "Длинная перестановка одной стороны", en: "Side Perm F" }, formula: "R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R" },
 { id: 5, name: "Ga Perm", desc: { ru: "Перестановка G1", en: "G Perm 1" }, formula: "R2 U R' U R' U' R U' R2 D U' R' U R D'" },
@@ -537,7 +537,6 @@ if (isMoving) return;
 const text = document.getElementById('custom-formula-input').value.trim();
 const tokens = text.replace(/[()]/g, ' ').split(/\s+/).filter(t => t.length > 0);
 for (let token of tokens) {
-while (isMoving) await new Promise(r => setTimeout(r, 10));
 applyMove(token);
 }
 }
@@ -577,7 +576,6 @@ for (let y = -1; y <= 1; y++) {
 for (let z = -1; z <= 1; z++) {
 state.push({
 x: x, y: y, z: z,
-// Нормали граней кубика и их исходные цвета
 faces: [
 { nx: 1, ny: 0, nz: 0, color: x === 1 ? COLOR_HEX.R : COLOR_HEX.IN },
 { nx: -1, ny: 0, nz: 0, color: x === -1 ? COLOR_HEX.L : COLOR_HEX.IN },
@@ -651,10 +649,9 @@ renderList.sort((a, b) => a.depth - b.depth);
 let cb = item.cubie;
 let hs = size / 2;
 ​cb.faces.forEach(f => {
-if (f.color === COLOR_HEX.IN) return; // Пропускаем внутренние грани
+if (f.color === COLOR_HEX.IN) return;
 ​let rNorm = rotatePoint(f.nx, f.ny, f.nz, camRotY, camRotX);
 if (rNorm.z > 0.001) {
-// Создаем локальные вершины основываясь на нормали грани
 let corners = [];
 if (Math.abs(f.nx) > 0.5) {
 let s = f.nx > 0 ? 1 : -1;
@@ -694,13 +691,11 @@ ctx.stroke();
 });
 });
 }
-​// --- LOGICAL VECTOR-BASED ROTATIONS ---
+​// --- ACCURATE DISCRETE ROTATION LOGIC ---
 function applyMove(moveStr) {
-if (isMoving) return;
-isMoving = true;
-​const base = moveStr[0];
-const isPrime = moveStr.includes("'");
-const isDouble = moveStr.includes("2");
+let base = moveStr[0];
+let isPrime = moveStr.includes("'");
+let isDouble = moveStr.includes("2");
 ​let turns = 1;
 if (isPrime) turns = 3;
 if (isDouble) turns = 2;
@@ -708,12 +703,22 @@ if (isDouble) turns = 2;
 rotateCubeStateLogical(base);
 }
 ​drawCube();
-setTimeout(() => { isMoving = false; }, 60);
+}
+​function rotateVectorDiscrete(x, y, z, axis, dir) {
+// axis: 'X', 'Y', 'Z'
+// dir: 1 (CW 90deg), -1 (CCW 90deg)
+if (axis === 'X') {
+return { x: x, y: -z * dir, z: y * dir };
+} else if (axis === 'Y') {
+return { x: z * dir, y: y, z: -x * dir };
+} else if (axis === 'Z') {
+return { x: -y * dir, y: x * dir, z: z };
+}
+return { x, y, z };
 }
 ​function rotateCubeStateLogical(move) {
-// Определение оси и направления вращения для каждого базового движения
 let axis = '';
-let dir = 1; // 1: по часовой, -1: против часовой
+let dir = 1;
 let filter = null;
 ​if (move === 'R') { axis = 'X'; dir = -1; filter = c => c.x > 0.5; }
 else if (move === 'L') { axis = 'X'; dir = 1; filter = c => c.x < -0.5; }
@@ -730,31 +735,15 @@ else if (move === 'z') { axis = 'Z'; dir = -1; filter = c => true; }
 ​if (!axis) return;
 ​cubeState.forEach(cubie => {
 if (filter(cubie)) {
-// Вращение координат центра элементов
-let x = cubie.x, y = cubie.y, z = cubie.z;
-if (axis === 'X') {
-cubie.y = Math.round(y * 0 - z * dir);
-cubie.z = Math.round(y * dir + z * 0);
-} else if (axis === 'Y') {
-cubie.x = Math.round(x * 0 + z * dir);
-cubie.z = Math.round(-x * dir + z * 0);
-} else if (axis === 'Z') {
-cubie.x = Math.round(x * 0 - y * dir);
-cubie.y = Math.round(x * dir + y * 0);
-}
-​// Вращение векторов нормалей граней каждого кубика
-cubie.faces.forEach(f => {
-let nx = f.nx, ny = f.ny, nz = f.nz;
-if (axis === 'X') {
-f.ny = Math.round(ny * 0 - nz * dir);
-f.nz = Math.round(ny * dir + nz * 0);
-} else if (axis === 'Y') {
-f.nx = Math.round(nx * 0 + nz * dir);
-f.nz = Math.round(-nx * dir + nz * 0);
-} else if (axis === 'Z') {
-f.nx = Math.round(nx * 0 - ny * dir);
-f.ny = Math.round(nx * dir + ny * 0);
-}
+let pos = rotateVectorDiscrete(cubie.x, cubie.y, cubie.z, axis, dir);
+cubie.x = pos.x;
+cubie.y = pos.y;
+cubie.z = pos.z;
+​cubie.faces.forEach(f => {
+let norm = rotateVectorDiscrete(f.nx, f.ny, f.nz, axis, dir);
+f.nx = norm.x;
+f.ny = norm.y;
+f.nz = norm.z;
 });
 }
 });
