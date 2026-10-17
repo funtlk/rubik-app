@@ -229,7 +229,7 @@ cursor: pointer;
 <div style="width: 100%; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px;">
 <label id="t-custom-formula-label" style="font-size: 11px; color: var(--text-secondary); text-align: center;">Введите или вставьте формулу:</label>
 <div style="display: flex; gap: 6px;">
-<input type="text" id="custom-formula-input" value="x' R U' R' D R U R' D' R U R' D R U' R' D' x" style="flex: 1; padding: 8px 10px; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: monospace; font-size: 13px; outline: none;">
+<input type="text" id="custom-formula-input" value="R U R' U' R' F R2 U' R' U' R U R' F'" style="flex: 1; padding: 8px 10px; background-color: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); font-family: monospace; font-size: 13px; outline: none;">
 <button onclick="executeCustomFormula()" id="t-apply-formula-btn" style="background-color: var(--button-color); color: var(--button-text-color); border: none; border-radius: 8px; padding: 0 12px; font-weight: 600; font-size: 12px; cursor: pointer;">Применить</button>
 <button onclick="resetCube()" id="t-reset-btn" style="background-color: #3a3a3c; color: var(--text-color); border: none; border-radius: 8px; padding: 0 12px; font-weight: 600; font-size: 12px; cursor: pointer;">Сброс</button>
 </div>
@@ -318,8 +318,7 @@ cursor: pointer;
 let currentLang = 'ru';
 let currentCategory = '';
 let currentItemData = null;
-​// ПОЛНАЯ БАЗА CFOP (ПОЛНОСТЬЮ ВСЕ F2L, OLL, PLL И 4LLL)
-const algorithmsData = {
+​const algorithmsData = {
 f2l: [
 { id: 1, name: "F2L 1", desc: { ru: "Базовый случай вправо", en: "Basic right case" }, formula: "U R U' R'" },
 { id: 2, name: "F2L 2", desc: { ru: "Базовый случай влево", en: "Basic left case" }, formula: "U' L' U L" },
@@ -456,32 +455,6 @@ pll: [
 { id: 108, name: "4LLL Step 4: Ребра (ПЛЛ)", desc: { ru: "Ребра против часовой (Ua)", en: "Ua Perm" }, formula: "M2 U M U2 M' U M2" }
 ]
 };
-​const translations = {
-ru: {
-mainTitle: "🧩 Кубик Рубика",
-mainSub: "Интерактивный справочник CFOP и Симулятор",
-btnCfop: "🧩 Метод CFOP (Фридрих)",
-btn4lll: "📗 Метод 4LLL (Упрощенный)",
-backMain: "← На главную",
-cfopTitle: "Метод CFOP",
-cfopSub: "Выберите этап",
-f2lName: "F2L (41 случай)",
-ollName: "OLL (57 случаев)",
-pllName: "PLL (21 случай)",
-title4lll: "Упрощенный CFOP (4LLL)",
-sub4lll: "Базовые алгоритмы для быстрой сборки",
-backDetail: "← К списку этапов",
-searchPH: "Поиск алгоритма...",
-formulaLabel: "Формула (Алгоритм решения):",
-scrambleLabel: "Скрамбл (Для создания ситуации):",
-copyBtn: "Копировать формулу",
-applyScrambleBtn: "Собрать ситуацию",
-backToList: "← К списку",
-customFormulaLabel: "Введите или вставьте формулу, чтобы получить ситуацию:",
-applyFormulaBtn: "Применить",
-resetBtn: "Сброс"
-}
-};
 ​function setLang(lang) {
 currentLang = lang;
 if (currentCategory && algorithmsData[currentCategory]) {
@@ -581,13 +554,13 @@ const old = btn.innerText;
 btn.innerText = 'Скопировано!';
 setTimeout(() => btn.innerText = old, 1500);
 }
-​// --- CANVAS 2D ISOMETRIC ENGINE & STATE ---
+​// --- CANVAS 2D ISOMETRIC ENGINE & MATRIX ROTATION ---
 let canvas, ctx;
 let isMoving = false;
 let isDragging = false;
 let prevMouse = { x: 0, y: 0 };
 let camRotX = 0.6, camRotY = 0.8;
-​const COLORS = {
+​const COLOR_HEX = {
 R: '#c41e3a', // Red (+X)
 L: '#ff5800', // Orange (-X)
 U: '#ffffff', // White (+Y)
@@ -604,13 +577,14 @@ for (let y = -1; y <= 1; y++) {
 for (let z = -1; z <= 1; z++) {
 state.push({
 x: x, y: y, z: z,
-colors: [
-x === 1 ? COLORS.R : COLORS.IN, // 0: +X
-x === -1 ? COLORS.L : COLORS.IN,// 1: -X
-y === 1 ? COLORS.U : COLORS.IN, // 2: +Y
-y === -1 ? COLORS.D : COLORS.IN,// 3: -Y
-z === 1 ? COLORS.F : COLORS.IN, // 4: +Z
-z === -1 ? COLORS.B : COLORS.IN // 5: -Z
+// Нормали граней кубика и их исходные цвета
+faces: [
+{ nx: 1, ny: 0, nz: 0, color: x === 1 ? COLOR_HEX.R : COLOR_HEX.IN },
+{ nx: -1, ny: 0, nz: 0, color: x === -1 ? COLOR_HEX.L : COLOR_HEX.IN },
+{ nx: 0, ny: 1, nz: 0, color: y === 1 ? COLOR_HEX.U : COLOR_HEX.IN },
+{ nx: 0, ny: -1, nz: 0, color: y === -1 ? COLOR_HEX.D : COLOR_HEX.IN },
+{ nx: 0, ny: 0, nz: 1, color: z === 1 ? COLOR_HEX.F : COLOR_HEX.IN },
+{ nx: 0, ny: 0, nz: -1, color: z === -1 ? COLOR_HEX.B : COLOR_HEX.IN }
 ]
 });
 }
@@ -676,18 +650,26 @@ renderList.sort((a, b) => a.depth - b.depth);
 ​renderList.forEach(item => {
 let cb = item.cubie;
 let hs = size / 2;
-​let faces = [
-{ id: 0, norm: {x: 1, y: 0, z: 0}, color: cb.colors[0], corners: [[hs,-hs,-hs],[hs,hs,-hs],[hs,hs,hs],[hs,-hs,hs]] },
-{ id: 1, norm: {x:-1, y: 0, z: 0}, color: cb.colors[1], corners: [[-hs,-hs,hs],[-hs,hs,hs],[-hs,hs,-hs],[-hs,-hs,-hs]] },
-{ id: 2, norm: {x: 0, y: 1, z: 0}, color: cb.colors[2], corners: [[-hs,hs,-hs],[hs,hs,-hs],[hs,hs,hs],[-hs,hs,hs]] },
-{ id: 3, norm: {x: 0, y:-1, z: 0}, color: cb.colors[3], corners: [[-hs,-hs,hs],[hs,-hs,hs],[hs,-hs,-hs],[-hs,-hs,-hs]] },
-{ id: 4, norm: {x: 0, y: 0, z: 1}, color: cb.colors[4], corners: [[-hs,-hs,hs],[hs,-hs,hs],[hs,hs,hs],[-hs,hs,hs]] },
-{ id: 5, norm: {x: 0, y: 0, z:-1}, color: cb.colors[5], corners: [[hs,-hs,-hs],[-hs,-hs,-hs],[-hs,hs,-hs],[hs,hs,-hs]] }
-];
-​faces.forEach(f => {
-let rNorm = rotatePoint(f.norm.x, f.norm.y, f.norm.z, camRotY, camRotX);
+​cb.faces.forEach(f => {
+if (f.color === COLOR_HEX.IN) return; // Пропускаем внутренние грани
+​let rNorm = rotatePoint(f.nx, f.ny, f.nz, camRotY, camRotX);
 if (rNorm.z > 0.001) {
-let projectedCorners = f.corners.map(c => {
+// Создаем локальные вершины основываясь на нормали грани
+let corners = [];
+if (Math.abs(f.nx) > 0.5) {
+let s = f.nx > 0 ? 1 : -1;
+corners = [[shs,-hs,-hs],[shs,hs,-hs],[shs,hs,hs],[shs,-hs,hs]];
+if (s < 0) corners.reverse();
+} else if (Math.abs(f.ny) > 0.5) {
+let s = f.ny > 0 ? 1 : -1;
+corners = [[-hs,shs,-hs],[hs,shs,-hs],[hs,shs,hs],[-hs,shs,hs]];
+if (s < 0) corners.reverse();
+} else if (Math.abs(f.nz) > 0.5) {
+let s = f.nz > 0 ? 1 : -1;
+corners = [[-hs,-hs,shs],[hs,-hs,shs],[hs,hs,shs],[-hs,hs,shs]];
+if (s > 0) corners.reverse();
+}
+​let projectedCorners = corners.map(c => {
 let wx = cb.x + c[0];
 let wy = cb.y + c[1];
 let wz = cb.z + c[2];
@@ -706,13 +688,13 @@ ctx.closePath();
 ctx.fillStyle = f.color;
 ctx.fill();
 ctx.strokeStyle = '#0a0a0a';
-ctx.lineWidth = 1.5;
+ctx.lineWidth = 1.8;
 ctx.stroke();
 }
 });
 });
 }
-​// --- LOGICAL STATE TRANSFORMATIONS ---
+​// --- LOGICAL VECTOR-BASED ROTATIONS ---
 function applyMove(moveStr) {
 if (isMoving) return;
 isMoving = true;
@@ -728,48 +710,52 @@ rotateCubeStateLogical(base);
 ​drawCube();
 setTimeout(() => { isMoving = false; }, 60);
 }
-​function rotateCubeStateLogical(face) {
-const cR = 0, cL = 1, cU = 2, cD = 3, cF = 4, cB = 5;
-​cubeState.forEach(item => {
-let match = false;
-if (face === 'R' && item.x > 0.5) match = true;
-if (face === 'L' && item.x < -0.5) match = true;
-if (face === 'U' && item.y > 0.5) match = true;
-if (face === 'D' && item.y < -0.5) match = true;
-if (face === 'F' && item.z > 0.5) match = true;
-if (face === 'B' && item.z < -0.5) match = true;
-if (face === 'M' && Math.abs(item.x) < 0.5) match = true;
-if (face === 'E' && Math.abs(item.y) < 0.5) match = true;
-if (face === 'S' && Math.abs(item.z) < 0.5) match = true;
-if (face === 'x' || face === 'y' || face === 'z') match = true;
-​if (match) {
-let ox = item.x, oy = item.y, oz = item.z;
-let cols = [...item.colors];
-​if (face === 'R' || (face === 'M' && face !== 'R') || face === 'x') {
-item.y = -oz; item.z = oy;
-item.colors[cU] = cols[cF]; item.colors[cF] = cols[cD];
-item.colors[cD] = cols[cB]; item.colors[cB] = cols[cU];
-} else if (face === 'L') {
-item.y = oz; item.z = -oy;
-item.colors[cU] = cols[cB]; item.colors[cB] = cols[cD];
-item.colors[cD] = cols[cF]; item.colors[cF] = cols[cU];
-} else if (face === 'U' || face === 'E' || face === 'y') {
-item.x = -oz; item.z = ox;
-item.colors[cF] = cols[cR]; item.colors[cR] = cols[cB];
-item.colors[cB] = cols[cL]; item.colors[cL] = cols[cF];
-} else if (face === 'D') {
-item.x = oz; item.z = -ox;
-item.colors[cF] = cols[cL]; item.colors[cL] = cols[cB];
-item.colors[cB] = cols[cR]; item.colors[cR] = cols[cF];
-} else if (face === 'F' || face === 'S' || face === 'z') {
-item.x = -oy; item.y = ox;
-item.colors[cU] = cols[cL]; item.colors[cL] = cols[cD];
-item.colors[cD] = cols[cR]; item.colors[cR] = cols[cU];
-} else if (face === 'B') {
-item.x = oy; item.y = -ox;
-item.colors[cU] = cols[cR]; item.colors[cR] = cols[cD];
-item.colors[cD] = cols[cL]; item.colors[cL] = cols[cU];
+​function rotateCubeStateLogical(move) {
+// Определение оси и направления вращения для каждого базового движения
+let axis = '';
+let dir = 1; // 1: по часовой, -1: против часовой
+let filter = null;
+​if (move === 'R') { axis = 'X'; dir = -1; filter = c => c.x > 0.5; }
+else if (move === 'L') { axis = 'X'; dir = 1; filter = c => c.x < -0.5; }
+else if (move === 'U') { axis = 'Y'; dir = -1; filter = c => c.y > 0.5; }
+else if (move === 'D') { axis = 'Y'; dir = 1; filter = c => c.y < -0.5; }
+else if (move === 'F') { axis = 'Z'; dir = -1; filter = c => c.z > 0.5; }
+else if (move === 'B') { axis = 'Z'; dir = 1; filter = c => c.z < -0.5; }
+else if (move === 'M') { axis = 'X'; dir = 1; filter = c => Math.abs(c.x) < 0.5; }
+else if (move === 'E') { axis = 'Y'; dir = 1; filter = c => Math.abs(c.y) < 0.5; }
+else if (move === 'S') { axis = 'Z'; dir = -1; filter = c => Math.abs(c.z) < 0.5; }
+else if (move === 'x') { axis = 'X'; dir = -1; filter = c => true; }
+else if (move === 'y') { axis = 'Y'; dir = -1; filter = c => true; }
+else if (move === 'z') { axis = 'Z'; dir = -1; filter = c => true; }
+​if (!axis) return;
+​cubeState.forEach(cubie => {
+if (filter(cubie)) {
+// Вращение координат центра элементов
+let x = cubie.x, y = cubie.y, z = cubie.z;
+if (axis === 'X') {
+cubie.y = Math.round(y * 0 - z * dir);
+cubie.z = Math.round(y * dir + z * 0);
+} else if (axis === 'Y') {
+cubie.x = Math.round(x * 0 + z * dir);
+cubie.z = Math.round(-x * dir + z * 0);
+} else if (axis === 'Z') {
+cubie.x = Math.round(x * 0 - y * dir);
+cubie.y = Math.round(x * dir + y * 0);
 }
+​// Вращение векторов нормалей граней каждого кубика
+cubie.faces.forEach(f => {
+let nx = f.nx, ny = f.ny, nz = f.nz;
+if (axis === 'X') {
+f.ny = Math.round(ny * 0 - nz * dir);
+f.nz = Math.round(ny * dir + nz * 0);
+} else if (axis === 'Y') {
+f.nx = Math.round(nx * 0 + nz * dir);
+f.nz = Math.round(-nx * dir + nz * 0);
+} else if (axis === 'Z') {
+f.nx = Math.round(nx * 0 - ny * dir);
+f.ny = Math.round(nx * dir + ny * 0);
+}
+});
 }
 });
 }
